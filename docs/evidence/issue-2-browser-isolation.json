@@ -1,0 +1,17 @@
+{
+  "origin": "https://example.com",
+  "credentials": "omit",
+  "observed_at": "2026-11-13T19:40:21.427Z",
+  "space_revision": "da8e0cdd5a03d0d3c60fab3f942910ef6472310b",
+  "results": {
+    "own_read": 200,
+    "no_token_read": 404,
+    "other_token_read": 404,
+    "other_token_delete": 404,
+    "gradio_file": 403,
+    "legacy_file": 404,
+    "own_delete": 204,
+    "read_after_delete": 404
+  },
+  "scope": "Fixed diagnostic JSON only; production media-job isolation and 30-minute retention are not tested."
+}

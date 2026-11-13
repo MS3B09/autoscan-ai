@@ -1,0 +1,16 @@
+===== Build Queued at 2026-11-13 19:26:05 / Commit SHA: da8e0cd =====
+--> FROM docker.io/library/python:3.10.13@sha256:d5b1fbbc00fd3b55620a9314222498bebf09c4bf606425bf464709ed6a79f202DONE 0.0s
+--> RUN apt-get update && apt-get install -y 	git 	git-lfs 	ffmpeg 	libsm6 	libxext6 	cmake 	rsync 	libgl1 	&& rm -rf /var/lib/apt/lists/* 	&& git lfs installCACHED
+--> RUN pip install --no-cache-dir pip -U &&     pip install --no-cache-dir     datasets     "huggingface-hub>=0.30" "hf-transfer>=0.1.4" "protobuf<4" "click<8.1" torch==2.8.0CACHED
+--> RUN --mount=target=/tmp/packages.txt,source=packages.txt 	apt-get update && 	xargs -r -a /tmp/packages.txt apt-get install -y && 	apt-get install -y curl && 	curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && 	apt-get install -y nodejs && 	rm -rf /var/lib/apt/lists/* && apt-get cleanCACHED
+--> COPY --from=root / /CACHED
+--> RUN --mount=target=/tmp/requirements.txt,source=requirements.txt     pip install --no-cache-dir -r /tmp/requirements.txt "torch<=2.13.0"     gradio[oauth,mcp]==6.32.0     "uvicorn>=0.14.0" "websockets>=10.4"     spaces==0.51.3CACHED
+--> RUN if pip show brotli > /dev/null 2>&1; then pip install --no-cache-dir --no-deps -U "brotli>=1.2.1"; fi &&     if pip show brotlicffi > /dev/null 2>&1; then pip install --no-cache-dir --no-deps -U "brotlicffi>=1.2.1.0"; fiCACHED
+--> WORKDIR /appCACHED
+--> RUN mkdir -p /pipfreezeCACHED
+--> RUN pip freeze > /pipfreeze/freeze.txtCACHED
+--> RUN mkdir -p /home/user && ( [ -e /home/user/app ] || ln -s /app/ /home/user/app ) || trueCACHED
+--> COPY --link ./ /appDONE 0.1s
+--> COPY --from=pipfreeze --link /pipfreeze/ /pipfreeze/DONE 0.0s
+--> Pushing imageDONE 2.0s
+--> Exporting cacheDONE 0.6s

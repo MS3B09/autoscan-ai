@@ -1,0 +1,24 @@
+test_anonymous_cross_origin_job_preserves_models_and_video_frames (test_hosted_validation.HostedValidationTests.test_anonymous_cross_origin_job_preserves_models_and_video_frames) ... FAIL
+test_temporary_result_expires_without_a_browser_cleanup_request (test_hosted_validation.HostedValidationTests.test_temporary_result_expires_without_a_browser_cleanup_request) ... ok
+test_temporary_result_requires_its_capability_and_cannot_bypass_file_routes (test_hosted_validation.HostedValidationTests.test_temporary_result_requires_its_capability_and_cannot_bypass_file_routes) ... ok
+test_existing_output_directory_is_not_overwritten (test_validate_inference.ValidateInferenceTests.test_existing_output_directory_is_not_overwritten) ... ok
+test_help_does_not_require_inference_dependencies (test_validate_inference.ValidateInferenceTests.test_help_does_not_require_inference_dependencies) ... ok
+test_missing_representative_video_fails_before_loading_models (test_validate_inference.ValidateInferenceTests.test_missing_representative_video_fails_before_loading_models) ... ok
+test_missing_vehicle_weights_fail_before_creating_outputs (test_validate_inference.ValidateInferenceTests.test_missing_vehicle_weights_fail_before_creating_outputs) ... ok
+test_unchanged_checkpoints_process_an_image_and_every_video_frame (test_validate_inference.ValidateInferenceTests.test_unchanged_checkpoints_process_an_image_and_every_video_frame) ... skipped 'Integration gate requires PyTorch and AUTOSCAN_VEHICLE_WEIGHTS; not a passing model check'
+test_untrusted_checkpoint_is_rejected_before_loading_inference_libraries (test_validate_inference.ValidateInferenceTests.test_untrusted_checkpoint_is_rejected_before_loading_inference_libraries) ... ok
+test_video_over_twenty_mb_is_rejected_before_loading_models (test_validate_inference.ValidateInferenceTests.test_video_over_twenty_mb_is_rejected_before_loading_models) ... ok
+
+======================================================================
+FAIL: test_anonymous_cross_origin_job_preserves_models_and_video_frames (test_hosted_validation.HostedValidationTests.test_anonymous_cross_origin_job_preserves_models_and_video_frames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\autoscan-ai\tests\test_hosted_validation.py", line 98, in test_anonymous_cross_origin_job_preserves_models_and_video_frames
+    self.fail("Hosted diagnostic failed: " + line[6:])
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Hosted diagnostic failed: {"error": "You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens", "duration": 10, "visible": true, "title": "ZeroGPU quota exceeded"}
+
+----------------------------------------------------------------------
+Ran 10 tests in 46.861s
+
+FAILED (failures=1, skipped=1)
