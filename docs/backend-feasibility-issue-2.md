@@ -176,6 +176,10 @@ Use cached local HF authentication **only for management/uploads**, never in the
 browser probe. Upload the explicit mapping in `backend-validation.md`, not the
 working tree. No paid resources are needed.
 
+[Browser-console commands with completion and isolation assertions](browser-feasibility-probes.md)
+reproduce the two recorded cross-origin probes without an HF token. The inference
+command consumes quota; do not rerun it until the platform's anonymous limit resets.
+
 Prepare the capacity fixture with FFmpeg (no model dependencies required):
 
 ```text
