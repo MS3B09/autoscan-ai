@@ -1,4 +1,4 @@
-"""Opt-in real HTTP/model checks. Uses anonymous free GPU quota; never retries submission."""
+"""Opt-in real HTTP/model checks. Optional developer HF authentication; no submission retries."""
 
 from concurrent.futures import ThreadPoolExecutor
 import csv
@@ -20,11 +20,15 @@ from PIL import Image
 @unittest.skipUnless(os.environ.get("AUTOSCAN_IMAGE_URL"), "Set AUTOSCAN_IMAGE_URL for real hosted image jobs")
 class HostedImageTests(unittest.TestCase):
     def call(self, path, method="GET", data=None, job=None):
+        base = os.environ["AUTOSCAN_IMAGE_URL"].rstrip("/")
         headers = {"Content-Type": "application/octet-stream"}
         if job:
             headers["Authorization"] = "Bearer " + job["token"]
-        return urlopen(Request(os.environ["AUTOSCAN_IMAGE_URL"].rstrip("/") + path,
-                               data=data, method=method, headers=headers), timeout=90)
+        elif method == "POST" and path.startswith("/api/jobs?") and os.environ.get("AUTOSCAN_TEST_HF_TOKEN"):
+            if base != "https://ms3b09-autoscan-ai-images.hf.space":
+                raise ValueError("Authenticated tests are restricted to the AutoScan image Space.")
+            headers["Authorization"] = "Bearer " + os.environ["AUTOSCAN_TEST_HF_TOKEN"]
+        return urlopen(Request(base + path, data=data, method=method, headers=headers), timeout=90)
 
     def submit(self, data, filename="sample.png", types="vehicle,logo,plate", confidence=40):
         with self.call("/api/jobs?" + urlencode({"filename": filename, "types": types, "confidence": confidence}),

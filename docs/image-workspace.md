@@ -177,6 +177,9 @@ the approved job-API boundary, not private implementation call counts. It does
 
 For actual hosted inference (uses quota; no automatic submission retries):
 
+The commands below default to anonymous requests. For developer-only use of your
+free account allowance, follow [authenticated-image-tests.md](authenticated-image-tests.md).
+
 ```powershell
 $env:AUTOSCAN_IMAGE_URL='https://ms3b09-autoscan-ai-images.hf.space'
 python -m unittest discover -s tests -p test_hosted_image_api.py -v

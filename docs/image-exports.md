@@ -84,7 +84,9 @@ Run the local HTTP contract suite and frontend checks as documented in
 checks downloads against real hosted job results, special-character/formula-like
 filenames, selected-only and empty exports, readable PNG bytes, and protected
 retrieval/deletion/expiry. Opt-in hosted tests still need a deployed current
-service and available anonymous GPU quota; skipped tests are not passes.
+service and available GPU quota; skipped tests are not passes. Developer-only
+authenticated submission is documented in [authenticated-image-tests.md](authenticated-image-tests.md);
+the default remains anonymous.
 
 Actual browser downloads and remaining verification gates are recorded in
 [`evidence/issue-4-verification.md`](evidence/issue-4-verification.md).

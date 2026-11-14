@@ -106,3 +106,18 @@ unverified due to quota/the opt-in elapsed-time test. Keep #4 open. The reviewer
 also independently ran the local API file: **11 tests passed**.
 
 These findings do not constitute production-release approval.
+
+## Developer authentication follow-up
+
+Prepared optional `AUTOSCAN_TEST_HF_TOKEN` support for image-job submission only;
+the public frontend and backend remain unchanged. The dedicated READ token is
+entered locally using the [authenticated test instructions](../authenticated-image-tests.md),
+without replacing the saved WRITE deployment credential or storing secrets in
+the repository. No real inference token was read or GPU request made during this
+follow-up; account identity and live quota attribution still need verification.
+
+Four GPU-free outgoing-HTTP checks passed: explicit inference authentication,
+rejection of unrelated target hosts, independent job-key/private and anonymous
+probe behavior, and no fallback to the deployment token. Full default suite:
+**30 tests, 21 passed, 9 skipped**, 7.314 seconds. Mypy passed seven service/test
+files. These client checks do not establish authenticated hosted inference.
