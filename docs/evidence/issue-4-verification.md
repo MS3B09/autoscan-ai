@@ -1,8 +1,9 @@
 # Issue #4 verification
 
-Date: 2026-11-14. **Implemented; hosted export acceptance remains blocked by
-anonymous ZeroGPU quota.** Keep issue #4 open until successful hosted image
-downloads and the actual thirty-minute retention check pass.
+Date: 2026-11-14. **Implemented; the user reports a passing authenticated hosted
+image/export check.** Anonymous inference remains quota-blocked in our recorded
+attempts. Keep issue #4 open for selected-only/empty hosted exports, actual hosted
+browser downloads, and the actual thirty-minute retention check.
 
 ## Scope and contract
 
@@ -76,12 +77,15 @@ verification script, not the production service or shipping frontend.
 - Hosted tests now include schema/runtime metadata, JSON/status/CSV consistency,
   readable identical preview/download bytes, selected-only/empty exports,
   special-character/formula-like filenames, capability protection, deletion, and
-  expiry. Real success/empty/export/lifecycle assertions still need available GPU
-  quota. `AUTOSCAN_TEST_30_MINUTE_EXPIRY=1` is separately opt-in and was **not run**.
+  expiry. The initial anonymous run did not reach success/export assertions; the
+  later user-run result is recorded below. Selected-only/empty checks remain open.
+  `AUTOSCAN_TEST_30_MINUTE_EXPIRY=1` is separately opt-in and was **not run**.
 
 ## Remaining gates
 
-- Successful hosted inference/export and actual hosted browser downloads.
+- Selected-only/empty hosted exports and actual hosted browser downloads.
+- Successful anonymous inference after the platform's quota resets; the
+  authenticated developer result does not establish public-visitor availability.
 - Actual thirty-minute hosted expiry; accelerated local retention is not that pass.
 - Deployed Netlify-origin browser/CORS verification belongs to release issue #7.
 - No spreadsheet-application interoperability matrix, screen-reader session,
@@ -101,9 +105,11 @@ oracles are small, and a shared helper is optional cleanup, not a blocker.
 ### Spec
 
 **0 confirmed implementation bugs or scope-creep findings; 1 open acceptance
-finding:** successful real hosted exports and actual thirty-minute expiry remain
-unverified due to quota/the opt-in elapsed-time test. Keep #4 open. The reviewer
-also independently ran the local API file: **11 tests passed**.
+finding at review time:** successful real hosted exports and actual thirty-minute
+expiry were unverified due to quota/the opt-in elapsed-time test. The subsequent
+user-run result below advances only the hosted success/export gate. Keep #4 open
+for the remaining gates. The reviewer also independently ran the local API file:
+**11 tests passed**.
 
 These findings do not constitute production-release approval.
 
@@ -113,11 +119,33 @@ Prepared optional `AUTOSCAN_TEST_HF_TOKEN` support for image-job submission only
 the public frontend and backend remain unchanged. The dedicated READ token is
 entered locally using the [authenticated test instructions](../authenticated-image-tests.md),
 without replacing the saved WRITE deployment credential or storing secrets in
-the repository. No real inference token was read or GPU request made during this
-follow-up; account identity and live quota attribution still need verification.
+the repository. No real inference token was read or GPU request made by the
+agent while preparing this support.
 
 Four GPU-free outgoing-HTTP checks passed: explicit inference authentication,
 rejection of unrelated target hosts, independent job-key/private and anonymous
 probe behavior, and no fallback to the deployment token. Full default suite:
 **30 tests, 21 passed, 9 skipped**, 7.314 seconds. Mypy passed seven service/test
 files. These client checks do not establish authenticated hosted inference.
+
+### User-run hosted result
+
+After following the authenticated single-test instructions, the user reported:
+
+```text
+Ran 1 test in 23.795s
+
+OK
+```
+
+The documented command selects
+`test_a_real_selection_confidence_raw_classes_and_private_result`: real hosted
+image inference, model identities/confidence, JSON/status/CSV consistency,
+formula-like Unicode filename handling, readable preview-identical PNG bytes,
+capability isolation, generic-route denial, and deletion/revocation.
+
+This is **user-reported evidence**, not an agent rerun. No identity-check output,
+remaining-quota value, or quota-reset timestamp was supplied; exact account quota
+attribution is not independently established from this test summary. This result
+does not cover selected-only/empty jobs, anonymous inference, actual browser
+downloads against the hosted backend, or the thirty-minute expiry test.
