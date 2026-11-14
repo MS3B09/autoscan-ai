@@ -55,6 +55,41 @@ deployed-origin verification belong to release issue #7, not a blocker for #3.
 - Real inference, selected-only predictions, real empty inference, GPU-backed
   lifecycle checks, and the actual 30-minute expiry test remain unverified.
 
+### Storage recovery — 2026-11-14, from 12:22 UTC
+
+- C: had approximately 2.5 GiB free after the user's cleanup. The workspace was
+  already serving at `http://127.0.0.1:5173/detect` (HTTP 200); the attempted
+  duplicate launch stopped on the occupied port rather than replacing it.
+- A single anonymous real-inference recheck at **12:23 UTC** still failed on the
+  platform quota: **1 failed test**, **3.020 seconds**. Its job was cleaned up, and
+  no additional GPU jobs were submitted after that response. Storage recovery did
+  not reset or bypass anonymous GPU quota.
+- The actual Edge browser successfully validated the public compatibility fixture
+  through the hosted preview API at **12:31 UTC**: **HTTP 200**, correct development
+  CORS origin, **40%** default confidence, and **zero inference submissions** on
+  upload. This remains a preview check, not real inference or Netlify evidence.
+- The previously timed-out Hallmark rendered sweep now completed with **exit 0,
+  0 FAIL, 2 WARN**, producing five inspected desktop/mobile captures (1280, 1440,
+  1920, and 375-pixel widths). The warnings are heuristic secondary-button and
+  table-number-style findings; the actual UI has one orange primary action and
+  tabular numerals on result cells. No design changes were needed.
+- The production build, with the public backend URL explicitly configured, and
+  TypeScript checks passed (**7.41 seconds**). All **8 local API tests passed**
+  using the normal C: temporary directory (**2.619 seconds**). Mypy again passed
+  for all five service files. The full default suite passed with **14 passed,
+  9 explicitly not run**, **23 total**, **8.405 seconds**.
+- Local CPU compatibility was attempted in the existing isolated Python 3.10.13
+  environment, using the official CPU index and pinned Torch/Torchvision versions.
+  The **590.7 MiB** Torch CPU wheel still exceeded available temporary space while
+  extracting. Installation stopped; the temporary extraction directory was
+  automatically removed. Torch and Torchvision remain absent in that environment,
+  and C: returned to approximately 2.5 GiB free. No local CPU inference pass is
+  claimed, and no further installation attempts were made.
+- The original application, model checkpoints, requirements, hosted service, and
+  production inference device were not changed. CPU setup was a diagnostic
+  attempt, not a replacement backend or a quota workaround. Hosted inference and
+  actual 30-minute hosted expiry remain open gates.
+
 The initial large-checkpoint upload attempts failed locally (full C: drive/Xet
 I/O problems and a timed-out upload). No checkpoints were replaced. The service
 instead provisions the same artifacts from the exact public T1 revision and
@@ -99,19 +134,21 @@ browser captures were not placed in shipping static assets or the public Space.
 - Frontend TypeScript checking and production build passed.
 - Impeccable detector: `[]` (no findings). Hallmark static: no FAIL/REFLEX; minor
   heuristic warnings remain about secondary button fills/table typography.
-  Hallmark's automated render sweep timed out; it is **not** a render-tool pass.
-  The separate actual-browser captures/workflow above did pass.
+  Hallmark's initial automated render sweep timed out; that attempt is **not** a
+  render-tool pass. The later storage-recovery sweep above completed successfully.
+  The separate actual-browser captures/workflow above also passed.
 - The independent UI finish review requested terminal recovery, image-fetch-
   independent expiry, and post-unlock focus restoration. All three were fixed;
   final reviewer scoring is recorded below.
 
 ## Final checks
 
-- Full default suite: **23 tests, 14 passed, 9 not run**, exit 0, 6.641 seconds.
+- Full default suite, latest storage-recovery run: **23 tests, 14 passed,
+  9 not run**, exit 0, 8.405 seconds.
   Opt-in hosted tests and local Torch inference were explicitly skipped; they are
   not included in the passing count. The separate real hosted GPU failure above
   remains a failure and is not erased by the default suite.
-- The final production frontend build and TypeScript check passed (8.60 seconds);
+- The latest production frontend build and TypeScript check passed (7.41 seconds);
   mypy passed for all five new service files. Whitespace checking passed.
 - API tests were rerun on NTFS after intermittent permission errors in removable-
   drive temporary-directory cleanup. All eight then passed (2.500 seconds). Those
