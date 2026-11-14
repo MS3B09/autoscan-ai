@@ -2,9 +2,10 @@
 
 Date: 2026-11-14. **Implemented; authenticated hosted success/selected-only/empty
 exports and real hosted-backed browser downloads now pass.** See the shared #3
-closeout below. Native anonymous inference remains quota-blocked; actual
-thirty-minute retention is still running. #4 remains open while earlier-ticket
-verification is completed and these remaining gates are reviewed.
+closeout below. Actual thirty-minute hosted retention now passes as well. Native
+anonymous inference remains quota-blocked; anonymous-public/deployed-origin
+verification stays an explicit release gate. #4 remains the current ticket after
+the earlier #2/#3 closeout; no new #4 feature was added during that closeout.
 
 ## Scope and contract
 
@@ -86,8 +87,6 @@ verification script, not the production service or shipping frontend.
 
 - Successful anonymous inference after the platform's quota resets; the
   authenticated developer result does not establish public-visitor availability.
-- Actual thirty-minute hosted expiry is running, not yet passed; accelerated local
-  retention is not that pass.
 - Deployed Netlify-origin browser/CORS verification belongs to release issue #7.
 - No spreadsheet-application interoperability matrix, screen-reader session,
   detection-accuracy benchmark, video check, or public-load test was attempted.
@@ -169,7 +168,9 @@ recorded in [issue-3-verification.md](issue-3-verification.md#closeout-checks--2
 - Independent browser-context access was denied; Delete now revoked every old
   download, and restored keyboard focus. Shared-limit and native anonymous GPU
   quota errors did not create false success or failed-job downloads.
-- Actual thirty-minute hosted expiry is still awaiting terminal output. No
-  completion or anonymous-public availability claim is made from a pending test.
+- Actual thirty-minute hosted expiry passed: **1 test in 1,810.025 seconds**;
+  status/preview/all three downloads returned 404 after expiry without browser
+  cleanup. The [terminal log](issue-3-hosted-30-minute-expiry.log) is retained.
+  This does not establish anonymous-public availability or deployed-origin CORS.
 
 No new #4 feature was added during this earlier-ticket closeout.

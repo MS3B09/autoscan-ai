@@ -1,11 +1,12 @@
 # Issue #3 verification
 
-Date: 2026-11-14. **Implemented; closeout verification advanced below.** Real
-authenticated image/empty inference, queue/cancellation, and hosted-backed browser
-flows now pass. Actual thirty-minute retention is running; native anonymous
-inference still hits platform quota. Do not read the historical failed attempts
-below as a description of the later authenticated results. Netlify deployment and
-deployed-origin verification belong to release issue #7.
+Date: 2026-11-14. **Implemented and verified for issue #3's scope.** Real
+authenticated image/empty inference, queue/cancellation, hosted-backed browser
+flows, and actual thirty-minute retention now pass. Native anonymous inference
+still hits platform quota; successful anonymous-public and deployed Netlify-origin
+verification remain explicit release gates for #7. Do not read the historical
+failed attempts below as a description of the later authenticated results. This
+closeout is not production-release approval.
 
 ## Hosted service
 
@@ -209,7 +210,7 @@ or frontend variable. The saved WRITE deployment login was not replaced.
 | Bounded admission and cancellation | 1 passed, 8.207 s | `issue-3-hosted-admission.log` |
 | Plate-only selection at 40%, and successful empty result at 100%, including exports | 1 passed, 12.811 s (two image jobs) | `issue-3-hosted-selection-empty.log` |
 | Supported previews, corrupt/misleading/checkpoint/oversized inputs, invalid settings | 1 passed, 18.498 s | `issue-3-hosted-validation-closeout.log` |
-| Actual thirty-minute hosted retention | Running, not yet a pass | Await terminal test output |
+| Actual thirty-minute hosted retention | 1 passed, 1,810.025 s | `issue-3-hosted-30-minute-expiry.log` |
 
 The tests retain their protected image/result/download checks. Local API contract
 file independently passed **11 tests in 6.200 seconds**. Full default suite:
@@ -274,12 +275,48 @@ The temporary auth adapter was stopped and the encrypted handoff file removed.
 The retention test had already loaded its credential before that cleanup. No
 owner token entered frontend code, URLs, captured output, or shipping assets.
 
-### Still open at this point
+### Remaining release limitations
 
-- The real thirty-minute hosted retention test must reach its terminal result.
 - A native anonymous successful image/browser flow remains unverified while the
   platform denies GPU quota. The authenticated relay flow is not a substitute for
   public-visitor acceptance; carry this explicitly into the release gate.
 - Deployed Netlify-origin CORS/full workflow, independent release-level load and
   licensing review, and video/browser playback belong to later tickets. No
   screen-reader session or interactive legacy Streamlit run was attempted here.
+
+### Closeout review
+
+Reviewed the integrated diff against the previously user-confirmed baseline
+`27da2808a07400c84d4b8e7800b911d8341d6e61`, through commit `7f637a0`.
+
+#### Standards
+
+**0 documented-rule violations; 1 retained low-priority judgment call:** duplicated
+CSV-to-detection assertions in local and hosted tests. Leave unchanged; a shared
+test oracle is optional cleanup, not a missing requirement. No new closeout or
+integrated-regression finding was identified.
+
+#### Spec
+
+**0 confirmed implementation bugs/scope creep; 1 acceptance finding at review
+time (resolved below):** the
+actual thirty-minute hosted retention test was still pending at review time. The
+reviewer confirmed that native anonymous successful browser completion, deployed
+Netlify-origin requests, integrated video, and release licensing/resource checks
+belong to #7, not additional #3 closure blockers. The authenticated submission
+relay was not treated as native anonymous or deployed-origin proof. #2's narrower
+feasibility closeout was accepted. No reviewer reran GPU tests or read credentials.
+
+### Final retention result and #3 closure
+
+The previously pending real hosted retention test passed: **1 test in 1,810.025
+seconds**, from launch at **17:03:39 UTC** to process completion at **17:33:53 UTC**
+on 2026-11-14. The isolated test waited until the server-supplied completion expiry
+plus two seconds, without browser activity or deletion, then observed **404** for
+status, annotated image, PNG download, JSON download, and CSV download. See
+[issue-3-hosted-30-minute-expiry.log](issue-3-hosted-30-minute-expiry.log).
+
+This resolves the single pending #3 gate identified by Spec review. Close #3 for
+its implemented image-workspace scope, keeping the explicit #7 release limitations
+above. The native anonymous quota failure was not relabeled as successful
+inference. No additional GPU job was submitted to repeat the expiry result.
