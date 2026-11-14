@@ -1,11 +1,11 @@
 # Issue #4 verification
 
-Date: 2026-11-14. **Implemented; authenticated hosted success/selected-only/empty
-exports and real hosted-backed browser downloads now pass.** See the shared #3
-closeout below. Actual thirty-minute hosted retention now passes as well. Native
-anonymous inference remains quota-blocked; anonymous-public/deployed-origin
-verification stays an explicit release gate. #4 remains the current ticket after
-the earlier #2/#3 closeout; no new #4 feature was added during that closeout.
+Date: 2026-11-14. **Implemented and verified for issue #4's image-export scope.**
+All nine acceptance criteria are covered by the reconciliation below, including
+authenticated hosted success/selected-only/empty exports, actual hosted-backed
+browser downloads, and real thirty-minute expiry. Native anonymous inference
+remains quota-blocked; anonymous-public/deployed-origin verification stays an
+explicit release gate under #7. This closeout is not production-release approval.
 
 ## Scope and contract
 
@@ -14,7 +14,7 @@ PNG, JSON, and CSV downloads. See [the versioned schema](../image-exports.md).
 There is no new inference path, persistent export storage, dependency, OCR,
 tracking, video feature, checkpoint change, or legacy Streamlit modification.
 
-## Local checks
+## Initial local checks
 
 - Red/green at the already-approved HTTP-job boundary: the first export-content
   test failed on the absent download routes, then passed after implementation.
@@ -36,7 +36,7 @@ tracking, video feature, checkpoint change, or legacy Streamlit modification.
   hosted API URL configured (Vite build: 2.95 seconds).
 - Whitespace check passed. Impeccable mechanical detector returned `[]`.
 
-## Actual browser downloads
+## Initial local-backed browser downloads
 
 Edge/Chromium version **157.0.8103.52**, using the actual workspace at
 `http://127.0.0.1:5173/detect` and the production API code over real HTTP on port
@@ -63,7 +63,7 @@ verification script, not the production service or shipping frontend.
   `C:\Users\User\AppData\Local\Temp\opencode\issue4-*` (tool-managed copies also
   reside in the pre-existing untracked `.playwright-mcp/` directory).
 
-## Hosted service
+## Initial hosted attempts (historical)
 
 - Updated only `image_service/api.py` in the existing free image Space, using the
   documented explicit-file deployment and a pinned parent revision. Space
@@ -73,25 +73,27 @@ verification script, not the production service or shipping frontend.
 - One real anonymous all-model inference/export test was attempted: **1 failed**,
   2.813 seconds, with **“Free GPU quota is exhausted. Try again after the platform
   resets its quota.”** Test cleanup deleted the failed job. No further GPU jobs
-  were submitted. The failure happened before successful export assertions.
+  were submitted in that initial attempt. The failure happened before successful
+  export assertions; later authenticated checks are recorded below.
 - GPU-free hosted preview/input-validation method: **1 passed**, 8.879 seconds.
   This proves preview/validation still works, not that hosted downloads passed.
 - Hosted tests now include schema/runtime metadata, JSON/status/CSV consistency,
   readable identical preview/download bytes, selected-only/empty exports,
   special-character/formula-like filenames, capability protection, deletion, and
   expiry. The initial anonymous run did not reach success/export assertions; the
-  later user-run result is recorded below. Selected-only/empty checks remain open.
-  `AUTOSCAN_TEST_30_MINUTE_EXPIRY=1` is separately opt-in and was **not run**.
+  later user-run and shared #3 results are recorded below. Selected-only/empty and
+  actual retention checks had not run at this initial stage; they subsequently
+  passed during the shared closeout.
 
-## Remaining gates
+## Remaining release gates and untested extras
 
-- Successful anonymous inference after the platform's quota resets; the
-  authenticated developer result does not establish public-visitor availability.
+- Successful anonymous inference after the platform's quota resets belongs to #7;
+  the authenticated developer result does not establish public-visitor availability.
 - Deployed Netlify-origin browser/CORS verification belongs to release issue #7.
 - No spreadsheet-application interoperability matrix, screen-reader session,
   detection-accuracy benchmark, video check, or public-load test was attempted.
 
-## Independent review
+## Independent review (historical finding resolved below)
 
 Reviewed against user-confirmed starting commit
 `27da2808a07400c84d4b8e7800b911d8341d6e61`, using separate standards/spec reviewers.
@@ -107,8 +109,9 @@ oracles are small, and a shared helper is optional cleanup, not a blocker.
 **0 confirmed implementation bugs or scope-creep findings; 1 open acceptance
 finding at review time:** successful real hosted exports and actual thirty-minute
 expiry were unverified due to quota/the opt-in elapsed-time test. The subsequent
-user-run result below advances only the hosted success/export gate. Keep #4 open
-for the remaining gates. The reviewer also independently ran the local API file:
+user-run result below advanced only the hosted success/export gate; the shared
+#3 closeout subsequently resolved the selected-only/empty/browser/retention gates.
+The reviewer also independently ran the local API file:
 **11 tests passed**.
 
 These findings do not constitute production-release approval.
@@ -174,3 +177,42 @@ recorded in [issue-3-verification.md](issue-3-verification.md#closeout-checks--2
   This does not establish anonymous-public availability or deployed-origin CORS.
 
 No new #4 feature was added during this earlier-ticket closeout.
+
+## Final acceptance reconciliation
+
+Checked the issue and parent specification against the unchanged export
+implementation, its callers, schema documentation, tests, and shared evidence.
+No additional product-code change is required.
+
+| #4 criterion | Implementation and verification |
+| --- | --- |
+| 1. Accessible PNG/JSON/CSV actions and useful unavailable/error states | `web/src/main.tsx` download controls, live status, retry alerts, abort handling, and stale-job clearing; initial browser error/deletion checks plus actual hosted browser downloads. |
+| 2. All selected detections and stable documented fields | `docs/image-exports.md` schema 1.0 and twelve CSV columns; `test_downloads_match_all_detections_and_preserve_raw_identities`, real selected-only hosted check, and seven-detection browser result. |
+| 3. Job/settings/model/runtime metadata and raw identities, no invented OCR | JSON equals job status; model digests/classes and runtime versions included; raw plate class `0` retains readable label `Plate`. Local contract, user-reported real hosted test, and shared real browser checks cover these fields. |
+| 4. CSV rows, escaping, encoding, formula-like text | Standard CSV writer, UTF-8 BOM, text-cell formula protection; six local filename cases and user-reported real hosted Unicode/comma/quote/formula filename test. Numeric values remain numbers. |
+| 5. Exact result/image consistency | No extra export filtering or numeric rounding; PNG returns the preview's bytes. Local oriented red/blue check, hosted JSON/status/CSV assertions, and saved 792,328-byte real browser PNG comparison passed. |
+| 6. Valid empty exports, not failure | Real hosted plate-only 100% empty job and keyboard browser downloads: empty detection array, header-only CSV, readable unchanged no-box PNG. |
+| 7. Capability isolation, deletion, expiry, no file-route bypass | Same authorization and lifecycle as the existing job. Local/hosted denial and deletion checks, independent browser context, generic-route probes, and real 1,810.025-second hosted retention pass. Local shortened-expiry inspection also observed physical storage cleanup. |
+| 8. Safe failures without unrelated/partial files or payload logs | Exports assembled in memory before attaching; sanitized errors. Local storage fault injection preserves both jobs and emits no attachment; browser CSV failure/retry passed. Existing production access-log suppression, sanitized inference errors, and disabled prediction verbosity remain unchanged. |
+| 9. Hosted API and actual browser verification | User-reported hosted all-model/special-filename pass, agent-run selected-only/empty checks, actual hosted-backed success/empty browser downloads, and elapsed-time retention log. Submission authentication and evidence limits are explicitly recorded above. |
+
+### Final local rerun
+
+- `python -m unittest discover -s tests -v`: **30 tests, 21 passed, 9 explicitly
+  skipped**, 18.501 seconds. Hosted/model opt-in skips are not fresh passes.
+- Mypy: **7 source files passed**, with the documented third-party import flags.
+- `npm run build` with the public image API URL: TypeScript and production build
+  passed (Vite: 19.57 seconds).
+- `node --check tests/browser_image_layout.js`: passed syntax validation; this
+  is not a new rendered browser run.
+
+The earlier independent reviews against
+`27da2808a07400c84d4b8e7800b911d8341d6e61` found no implementation bugs or standards
+violations. The integrated review through `7f637a0` repeated that conclusion; its
+remaining elapsed-time finding is resolved by the retained retention pass. The
+optional duplicated CSV test assertions remain unchanged.
+
+**Close #4 for its image-only scope.** This final pass changes evidence only:
+no new GPU submission, credential handoff, deployment, dependency, video feature,
+or optional refactor. Native anonymous/deployed-origin release checks remain #7;
+the authenticated submission adapter is not claimed as either of those passes.
