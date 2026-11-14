@@ -1,8 +1,9 @@
 # Issue #3 verification
 
-Date: 2026-11-14. **Implemented, not a production-release pass.** Real image
-inference verification is blocked by anonymous ZeroGPU quota, and Netlify has not
-been deployed. Keep issue #3 open until these gates are verified.
+Date: 2026-11-14. **Implemented, image verification incomplete.** Real image
+inference verification is blocked by anonymous ZeroGPU quota. Keep issue #3 open
+until its image-specific gates below are verified. Netlify deployment and
+deployed-origin verification belong to release issue #7, not a blocker for #3.
 
 ## Hosted service
 
@@ -18,8 +19,8 @@ been deployed. Keep issue #3 open until these gates are verified.
 - A real anonymous all-model image job was submitted. The first hosted test
   failed honestly with **“Free GPU quota is exhausted. Try again after the
   platform resets its quota.”** The fail-fast run stopped after **1 failed test**
-  (2.459 seconds). No further GPU requests were made. No successful detections
-  from this new service are claimed.
+  (2.459 seconds). No further GPU requests were made in that initial run. No
+  successful detections from this new service are claimed.
 - A separate GPU-free hosted validation run observed successful PNG, JPG, JPEG,
   BMP, and WebP previews, corrupt-content rejection, checkpoint rejection, and
   misleading-extension rejection. Its oversized-upload assertion failed because
@@ -33,9 +34,26 @@ been deployed. Keep issue #3 open until these gates are verified.
   curl client with `Expect: 100-continue`, which can receive early rejection while
   sending. An actual anonymous curl probe completed with **exit 0 / HTTP 413** on
   the corrected deployment. Four separate hosted invalid-settings requests each
-  returned **422**. The entire GPU-free test method was not rerun after the client
-  correction; its individual format/content/size/settings checks were observed as
-  described, not retroactively counted as a passing full method.
+  returned **422**. At that point the entire GPU-free test method had not been
+  rerun after the client correction; the subsequent full-method pass is recorded
+  separately below, not retroactively applied to those failed attempts.
+
+### Recheck — 2026-11-14, approximately 11:38 UTC
+
+- Anonymous health check: **200**, still reporting 1,800-second retention, one
+  active inference job, and two pending slots.
+- The complete GPU-free hosted validation method
+  `test_b_supported_previews_and_invalid_content_and_settings`: **1 test passed**,
+  exit 0, **9.030 seconds**. This closes the earlier client/oversized-upload
+  verification gap: supported formats, corrupt/misleading/checkpoint uploads,
+  oversize rejection, invalid settings, and reported retention passed together.
+- One anonymous real-inference compatibility test was attempted: **1 test
+  failed**, exit 1, **2.756 seconds**, with “Free GPU quota is exhausted. Try again
+  after the platform resets its quota.” Its job was deleted by the test's cleanup.
+  No further GPU jobs were submitted after that response; no owner credentials,
+  alternate identity, or paid resources were used to bypass the quota.
+- Real inference, selected-only predictions, real empty inference, GPU-backed
+  lifecycle checks, and the actual 30-minute expiry test remain unverified.
 
 The initial large-checkpoint upload attempts failed locally (full C: drive/Xet
 I/O problems and a timed-out upload). No checkpoints were replaced. The service
