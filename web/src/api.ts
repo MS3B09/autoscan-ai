@@ -7,6 +7,8 @@ export type Detection = {
   label: string;
   confidence: number;
   bbox: [number, number, number, number];
+  frame_index?: number;
+  timestamp_seconds?: number;
 };
 export type Job = {
   state: 'queued' | 'processing' | 'cancelling' | 'success' | 'empty' | 'error' | 'cancelled';
@@ -17,6 +19,11 @@ export type Job = {
   detections: Detection[];
   error: string | null;
   expires_at: number | null;
+  media_type: 'image' | 'video';
+  frame_count?: number;
+  processed_frames?: number;
+  duration_seconds?: number;
+  queue_position: number | null;
 };
 
 const base = (import.meta.env.VITE_AUTOSCAN_API ?? '').replace(/\/$/, '');

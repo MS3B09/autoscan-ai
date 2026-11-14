@@ -14,6 +14,7 @@ from starlette.routing import Mount
 
 from image_service.api import create_app
 from image_service.detector import detect
+from image_service.video import detect_video
 from scripts.validate_inference import ROOT, load_models
 
 
@@ -28,9 +29,9 @@ MODELS, PATHS, HASHES = load_models(ROOT / "models/yolov8n.pt", "cuda")
 @spaces.GPU(duration=60)
 def gpu_image(source, settings, cancelled):
     try:
-        return detect(MODELS, source, settings, cancelled)
+        return (detect_video if source.suffix == ".video" else detect)(MODELS, source, settings, cancelled)
     except Exception:
-        raise gr.Error("Image inference failed.", print_exception=False) from None
+        raise gr.Error("Media inference or video encoding failed. Re-export the clip or try again later.", print_exception=False) from None
 
 
 def run_image(source, settings, cancelled, context):
@@ -65,7 +66,7 @@ if __name__ == "__main__":
                      model_metadata={kind: {"sha256": HASHES[kind], "classes": model.names}
                                      for kind, model in MODELS.items()})
     with gr.Blocks(analytics_enabled=False) as demo:
-        gr.Markdown("AutoScan AI image service. Use the /detect workspace.")
+        gr.Markdown("AutoScan AI media service. Use the /detect workspace.")
     # Ordinary launch is required by spaces==0.51.3's GPU initialization hook.
     # The first mount intercepts ALL public routes: Gradio uploads/files/events are unreachable.
     logging.getLogger("uvicorn.access").disabled = True

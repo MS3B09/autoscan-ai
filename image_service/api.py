@@ -1,4 +1,4 @@
-"""Private, bounded image-job HTTP API. No framework upload or static-file routes."""
+"""Private, bounded media-job HTTP API. No framework upload or static-file routes."""
 
 from collections import deque
 from contextlib import asynccontextmanager, contextmanager
@@ -23,6 +23,8 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 from starlette.concurrency import run_in_threadpool
+
+from image_service.video import VIDEO_FORMATS, MAX_VIDEO_BYTES, VideoError, prepare_video
 
 
 FORMATS = {".png": "PNG", ".jpg": "JPEG", ".jpeg": "JPEG", ".bmp": "BMP", ".webp": "WEBP"}
@@ -67,6 +69,7 @@ class Job:
     settings: dict
     width: int
     height: int
+    video: dict | None = None
     context: Any = None
     state: str = "queued"
     detections: list = field(default_factory=list)
@@ -122,17 +125,19 @@ class Jobs:
                     continue
                 job.state = "processing"
             try:
-                image, detections = self.runner(job.directory / "source.png", job.settings,
+                source = job.directory / ("source.video" if job.video else "source.png")
+                image, detections = self.runner(source, job.settings,
                                                job.directory / "cancel", job.context)
                 with self.lock:
-                    (job.directory / "source.png").unlink(missing_ok=True)
+                    source.unlink(missing_ok=True)
+                    (job.directory / "video.json").unlink(missing_ok=True)
                     if job.state == "cancelling":
                         for path in job.directory.iterdir():
                             path.unlink()
                         job.state = "cancelled"
                         job.expires = time.monotonic() + 60
                     else:
-                        (job.directory / "result.png").write_bytes(image)
+                        (job.directory / ("result.mp4" if job.video else "result.png")).write_bytes(image)
                         job.detections = detections
                         job.state = "success" if detections else "empty"
                         job.expires = time.monotonic() + self.retention
@@ -145,9 +150,11 @@ class Jobs:
                     job.state = "cancelled" if cancelled else "error"
                     # Only known infrastructure categories leave the process; never payloads or tracebacks.
                     message = str(error).lower()
-                    job.error = None if cancelled else ("Free GPU quota is exhausted. Try again after the platform resets its quota."
+                    job.error = None if cancelled else (str(error) if isinstance(error, VideoError) else
+                                 "Free GPU quota is exhausted. Try again after the platform resets its quota."
                                  if "quota" in message or "runs limit" in message else
-                                 "Inference is unavailable or failed. The free backend may be starting; try again later.")
+                                 "Video processing failed or the free backend is unavailable. Try again later; if it repeats, re-export the complete clip as H.264 MP4."
+                                 if job.video else "Inference is unavailable or failed. The free backend may be starting; try again later.")
                     job.expires = time.monotonic() + 60
             finally:
                 with self.lock:
@@ -170,7 +177,7 @@ class Jobs:
 def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
                 origins=("http://localhost:5173",), model_metadata=None):
     packages = {}
-    for name in ["torch", "torchvision", "ultralytics", "numpy", "pillow", "gradio", "spaces", "fastapi", "starlette"]:
+    for name in ["torch", "torchvision", "ultralytics", "numpy", "pillow", "gradio", "spaces", "fastapi", "starlette", "av"]:
         try:
             packages[name] = version(name)
         except PackageNotFoundError:
@@ -179,8 +186,9 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
     root = Path(storage_root) if storage_root else Path(tempfile.gettempdir()) / "autoscan-image-jobs"
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     # This dedicated directory belongs exclusively to this single-process service.
-    for old in root.glob("job-*"):
-        shutil.rmtree(old)
+    for pattern in ["job-*", "preview-*"]:
+        for old in root.glob(pattern):
+            shutil.rmtree(old)
     jobs = Jobs(runner, retention, root)
     uploading = [0]
     attempts: dict[str, deque[float]] = {"job": deque(), "preview": deque()}
@@ -251,30 +259,42 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
             recent.append(now)
             uploading[0] += 1
         try:
+            is_video = Path(filename).suffix.lower() in VIDEO_FORMATS
+            maximum = MAX_VIDEO_BYTES if is_video else MAX_BYTES
+            too_large = "Video exceeds 20 MB." if is_video else "Image exceeds 10 MB."
             length = request.headers.get("content-length")
             if length is not None:
                 if len(length) > 12 or not length.isascii() or not length.isdecimal():
                     raise HTTPException(400, "Invalid upload length.")
-                if int(length) > MAX_BYTES:
-                    raise HTTPException(413, "Image exceeds 10 MB.")
+                if int(length) > maximum:
+                    raise HTTPException(413, too_large)
             content = bytearray()
             try:
                 with fail_after(30):
                     async for chunk in request.stream():
-                        if len(content) + len(chunk) > MAX_BYTES:
-                            raise HTTPException(413, "Image exceeds 10 MB.")
+                        if len(content) + len(chunk) > maximum:
+                            raise HTTPException(413, too_large)
                         content.extend(chunk)
             except TimeoutError:
-                raise HTTPException(408, "Upload timed out; try a smaller image.") from None
-            normalized, size = await run_in_threadpool(normalize, content, filename)
-            yield normalized, size
+                raise HTTPException(408, "Upload timed out; try a smaller file.") from None
+            if is_video:
+                try:
+                    normalized, info = await run_in_threadpool(prepare_video, content, Path(filename).suffix.lower(), root, kind == "preview")
+                except VideoError as error:
+                    raise HTTPException(error.status, str(error)) from None
+                yield normalized, (info["width"], info["height"]), info
+            else:
+                normalized, size = await run_in_threadpool(normalize, content, filename)
+                yield normalized, size, None
         finally:
             with jobs.lock:
                 uploading[0] -= 1
 
     @app.post("/api/preview")
     async def preview(request: Request, filename: str):
-        async with upload(request, filename, "preview") as (normalized, size):
+        async with upload(request, filename, "preview") as (normalized, size, video):
+            if video:
+                return Response(normalized, media_type="video/mp4")
             return Response(normalized, media_type="image/png")
 
     @app.post("/api/jobs", status_code=202)
@@ -286,29 +306,46 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
         if (len(confidence) > 3 or not confidence.isascii() or not confidence.isdecimal()
                 or not 25 <= int(confidence) <= 100):
             raise HTTPException(422, "Confidence must be a whole percentage from 25 to 100.")
-        async with upload(request, filename, "job") as (normalized, size):
+        async with upload(request, filename, "job") as (normalized, size, video):
             with jobs.lock:
                 identifier, token = secrets.token_hex(16), secrets.token_urlsafe(32)
                 directory = Path(tempfile.mkdtemp(prefix="job-", dir=root))
                 try:
-                    (directory / "source.png").write_bytes(normalized)
+                    (directory / ("source.video" if video else "source.png")).write_bytes(normalized)
+                    if video:
+                        (directory / "video.json").write_text(json.dumps(video))
                 except OSError:
                     shutil.rmtree(directory)
                     raise HTTPException(503, "Temporary storage is unavailable. Try again later.") from None
                 jobs.items[identifier] = Job(token, directory, filename,
                                              {"types": selected, "confidence": int(confidence)}, width=size[0], height=size[1],
-                                             context={"headers": {"x-ip-token": request.headers.get("x-ip-token", "")}})
+                                             video=video, context={"headers": {"x-ip-token": request.headers.get("x-ip-token", "")}})
                 jobs.pending.append(identifier)
                 jobs.lock.notify_all()
         return {"id": identifier, "token": token, "state": "queued"}
 
     def result(identifier, job):
+        progress = 0
+        if job.video:
+            if job.state in ["success", "empty"]:
+                progress = job.video["frame_count"]
+            elif job.state in ["processing", "cancelling"]:
+                try:
+                    progress = json.loads((job.directory / "progress.json").read_text())["processed_frames"]
+                except (OSError, ValueError, KeyError):
+                    pass
         return {"schema_version": "1.0", "id": identifier, "state": job.state, "filename": job.filename, "settings": job.settings,
+                    "media_type": "video" if job.video else "image",
+                    **({"frame_count": job.video["frame_count"], "processed_frames": progress,
+                        "duration_seconds": job.video["duration_seconds"],
+                        "output_width": job.width + job.width % 2, "output_height": job.height + job.height % 2} if job.video else {}),
+                    "queue_position": list(jobs.pending).index(identifier) + 1 if identifier in jobs.pending else None,
                     "width": job.width, "height": job.height,
                     "detections": [{**detection, "source_filename": job.filename} for detection in job.detections],
                     "error": job.error, "expires_at": job.expires_at, "models": model_metadata or {},
                     "runtime": runtime,
-                    "coordinate_system": "xyxy pixels from top-left of EXIF-oriented, white-composited RGB input"}
+                    "coordinate_system": ("xyxy pixels from top-left of upright source frame; zero-based frame_index; timestamp_seconds relative to first presentation timestamp"
+                                          if job.video else "xyxy pixels from top-left of EXIF-oriented, white-composited RGB input")}
 
     @app.get("/api/jobs/{identifier}")
     def status(identifier: str, request: Request):
@@ -320,45 +357,56 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
     def health():
         return {"status": "ready", "retention_seconds": retention, "max_active": 1, "max_pending": 2}
 
-    def image_bytes(job):
+    def media_bytes(job, kind):
+        if kind != ("video" if job.video else "image"):
+            raise HTTPException(404, "Media format unavailable for this job.")
         if job.state not in ["success", "empty"]:
-            raise HTTPException(409, "Annotated image is not ready.")
+            raise HTTPException(409, "Annotated media is not ready.")
         try:
-            return (job.directory / "result.png").read_bytes()
+            return (job.directory / ("result.mp4" if job.video else "result.png")).read_bytes()
         except OSError:
-            raise HTTPException(503, "Result image is unavailable. Try again or run a new detection.") from None
+            raise HTTPException(503, "Result media is unavailable. Try again or run a new detection.") from None
 
     @app.get("/api/jobs/{identifier}/image")
     def result_image(identifier: str, request: Request):
         with jobs.lock:
             job = authorized(identifier, request)
-            return Response(image_bytes(job), media_type="image/png")
+            return Response(media_bytes(job, "image"), media_type="image/png")
+
+    @app.get("/api/jobs/{identifier}/video")
+    def result_video(identifier: str, request: Request):
+        with jobs.lock:
+            job = authorized(identifier, request)
+            return Response(media_bytes(job, "video"), media_type="video/mp4")
 
     @app.get("/api/jobs/{identifier}/download/{format}")
     def download(identifier: str, format: str, request: Request):
         with jobs.lock:
             job = authorized(identifier, request)
-            if format not in ["image", "json", "csv"]:
+            if format not in ["image", "video", "json", "csv"]:
                 raise HTTPException(404, "Download format unavailable.")
             if job.state not in ["success", "empty"]:
                 raise HTTPException(409, "Downloads are available after detection completes successfully.")
             try:
                 if format == "image":
-                    content, media_type, extension = image_bytes(job), "image/png", "png"
+                    content, media_type, extension = media_bytes(job, "image"), "image/png", "png"
+                elif format == "video":
+                    content, media_type, extension = media_bytes(job, "video"), "video/mp4", "mp4"
                 elif format == "json":
                     content = json.dumps(result(identifier, job), ensure_ascii=False, allow_nan=False).encode("utf-8")
                     media_type, extension = "application/json", "json"
                 else:
                     output = StringIO(newline="")
                     writer = csv.writer(output)
-                    writer.writerow(CSV_COLUMNS)
+                    columns = CSV_COLUMNS + (["frame_index", "timestamp_seconds"] if job.video else [])
+                    writer.writerow(columns)
                     for detection in job.detections:
                         row = {**detection, "source_filename": job.filename,
                                **dict(zip(["x1", "y1", "x2", "y2"], detection["bbox"]))}
                         # Quoting alone does not stop spreadsheets interpreting text as formulas.
                         writer.writerow(["'" + value if isinstance(value, str) and
                                          value.lstrip().startswith(("=", "+", "-", "@", "＝", "＋", "－", "＠", "\t", "\r", "\n"))
-                                         else value for value in (row[column] for column in CSV_COLUMNS)])
+                                          else value for value in (row[column] for column in columns)])
                     content = output.getvalue().encode("utf-8-sig")
                     media_type, extension = "text/csv", "csv"
             except (OSError, ValueError, TypeError, KeyError):

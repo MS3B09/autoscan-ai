@@ -10,6 +10,13 @@ def detect(models, source, settings, cancelled):
     with Image.open(source) as opened:
         image = opened.convert("RGB")
     source.unlink(missing_ok=True)
+    annotated, detections = annotate_image(models, image, settings, cancelled)
+    output = BytesIO()
+    annotated.save(output, format="PNG")
+    return output.getvalue(), detections
+
+
+def annotate_image(models, image, settings, cancelled):
     width, height = image.size
     detections = []
     annotated = image.copy()
@@ -18,7 +25,7 @@ def detect(models, source, settings, cancelled):
     colors = {"vehicle": "#0059b3", "logo": "#00696c", "plate": "#a92316"}
     for kind in settings["types"]:
         if cancelled.exists():
-            return b"", []
+            raise InterruptedError("Cancelled")
         model = models[kind]
         result = model.predict(source=image, conf=settings["confidence"] / 100, imgsz=640,
                                device="cuda", classes=[2, 5, 7] if kind == "vehicle" else None,
@@ -48,6 +55,4 @@ def detect(models, source, settings, cancelled):
             left, top = max(0, min(x1, width - text_width - 8)), max(0, y1 - text_height)
             draw.rectangle((left, top, min(width, left + text_width + 8), top + text_height), fill=color)
             draw.text((left + 4, top), text, fill="white", font=font)
-    output = BytesIO()
-    annotated.save(output, format="PNG")
-    return output.getvalue(), detections
+    return annotated, detections

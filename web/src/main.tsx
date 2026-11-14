@@ -12,7 +12,7 @@ const objectTypes: { value: ObjectType; label: string; note: string }[] = [
   { value: 'plate', label: 'Plates', note: 'Detection, not transcription' },
 ];
 const states = {
-  queued: 'Queued. Your image is waiting for the single inference slot.',
+  queued: 'Queued. Your media is waiting for the single inference slot.',
   processing: 'Processing. The free GPU may need to start or wait for capacity.',
   cancelling: 'Cancelling. Waiting for the current detector to reach a safe stopping point.',
   success: 'Detection complete.',
@@ -21,6 +21,7 @@ const states = {
   cancelled: 'Cancelled. Server-side source and partial results have been removed.',
 };
 const activeStates: Job['state'][] = ['queued', 'processing', 'cancelling'];
+const pageSize = 25;
 
 function Workspace() {
   const [file, setFile] = useState<File | null>(null);
@@ -36,6 +37,7 @@ function Workspace() {
   const [retry, setRetry] = useState(0);
   const [pollFailed, setPollFailed] = useState(false);
   const [downloading, setDownloading] = useState('');
+  const [page, setPage] = useState(0);
   const [notice, setNotice] = useState('Choose an image to begin. Nothing runs until you select Detect image.');
   const input = useRef<HTMLInputElement>(null);
   const focusUpload = useRef(false);
@@ -43,6 +45,8 @@ function Workspace() {
   const downloadURL = useRef('');
   const locked = !!capability || working;
   const active = capability && (!job || activeStates.includes(job.state));
+  const video = !!file && /\.(mp4|mov|avi|asf|m4v|mpeg)$/i.test(file.name);
+  const media = video ? 'video' : 'image';
 
   useEffect(() => {
     setDownloading('');
@@ -62,7 +66,7 @@ function Workspace() {
 
   function forgetJob(message: string) {
     downloadController.current?.abort();
-    setCapability(null); setJob(null); setAnnotated(''); setPollFailed(false); setNotice(message);
+    setCapability(null); setJob(null); setAnnotated(''); setPage(0); setPollFailed(false); setNotice(message);
   }
 
   useEffect(() => {
@@ -71,7 +75,7 @@ function Workspace() {
     const urls: string[] = [];
     setPreview('');
     setReady(false);
-    setNotice('Validating the image and preparing its orientation. No inference has started.');
+    setNotice('Validating the file and preparing its preview. No inference has started.');
     request('/preview?' + new URLSearchParams({ filename: file.name }),
       { method: 'POST', body: file, signal: controller.signal })
       .then(response => response.blob())
@@ -81,7 +85,7 @@ function Workspace() {
         urls.push(url);
         setPreview(url);
         setReady(true);
-        setNotice('Image ready. Choose object types and confidence, then Detect image.');
+        setNotice(`${video ? 'Video' : 'Image'} ready. Choose object types and confidence, then Detect ${media}.`);
       })
       .catch((reason: Error) => { if (!controller.signal.aborted) setError(reason.message); });
     return () => { controller.abort(); urls.forEach(url => URL.revokeObjectURL(url)); };
@@ -99,14 +103,18 @@ function Workspace() {
         const next: Job = await response.json();
         if (controller.signal.aborted) return;
         setJob(next);
-        setNotice(states[next.state]);
+        setNotice(next.state === 'queued' ? `Queued. Position ${next.queue_position ?? 1} in the pending queue.` :
+          next.media_type === 'video' && next.state === 'processing' ?
+            next.processed_frames === next.frame_count ? 'All frames processed. Finalizing and verifying the complete MP4.' :
+            next.processed_frames ? `Processing frame ${next.processed_frames} of ${next.frame_count}. Every frame is included.` :
+            'Waiting for the free GPU or preparing the first frame. No frames processed yet.' : states[next.state]);
         if (activeStates.includes(next.state)) {
           timer = setTimeout(poll, 1200);
         } else if (next.state === 'success' || next.state === 'empty') {
           timer = setTimeout(() => {
             forgetJob('Results expired and are no longer available. You can run a new detection.');
           }, Math.max(0, (next.expires_at! * 1000) - Date.now()));
-          const image = await request(jobPath(capability!) + '/image', { signal: controller.signal }, capability!);
+          const image = await request(jobPath(capability!) + (next.media_type === 'video' ? '/video' : '/image'), { signal: controller.signal }, capability!);
           const blob = await image.blob();
           if (controller.signal.aborted) return;
           url = URL.createObjectURL(blob);
@@ -149,11 +157,11 @@ function Workspace() {
     finally { setWorking(false); }
   }
 
-  async function download(format: 'image' | 'json' | 'csv') {
+  async function download(format: 'image' | 'video' | 'json' | 'csv') {
     if (!capability || downloading) return;
     const controller = new AbortController();
     downloadController.current = controller;
-    const label = format === 'image' ? 'Annotated image' : format.toUpperCase();
+    const label = format === 'image' || format === 'video' ? `Annotated ${format}` : format.toUpperCase();
     setDownloading(format); setError(''); setNotice(`Preparing ${label} download…`);
     try {
       const response = await request(jobPath(capability) + '/download/' + format,
@@ -164,7 +172,7 @@ function Workspace() {
       downloadURL.current = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadURL.current;
-      link.download = `autoscan-${capability.id}.${format === 'image' ? 'png' : format}`;
+      link.download = `autoscan-${capability.id}.${format === 'image' ? 'png' : format === 'video' ? 'mp4' : format}`;
       document.body.append(link);
       link.click();
       link.remove();
@@ -187,7 +195,7 @@ function Workspace() {
     try {
       try { await request(jobPath(capability), { method: 'DELETE' }, capability); }
       catch (reason) { if (!(reason instanceof APIError && reason.status === 404)) throw reason; }
-      forgetJob(keepSource ? 'Server results cleared. Change your image or settings, then select Detect image.' :
+      forgetJob(keepSource ? `Server results cleared. Change your media or settings, then select Detect ${media}.` :
         'Job deleted or already unavailable. Its access key no longer works. Active compute stops at the next safe boundary.');
       if (!keepSource) {
         setFile(null);
@@ -209,21 +217,23 @@ function Workspace() {
     </header>
     <main id="workspace" className="shell">
       <div className="intro"><h1>See what your image holds.</h1>
-        <p>Detect vehicles, brand logos, and plates. Inspect the real model results.</p></div>
-      <section className="controls" aria-label="Image and detection settings">
+        <p>Detect vehicles, brand logos, and plates in images and short videos. Inspect the real model results.</p></div>
+      <section className="controls" aria-label="Media and detection settings">
         <div className="upload">
-          <label htmlFor="image">Source image</label>
-          <input ref={input} id="image" type="file" accept=".png,.jpg,.jpeg,.bmp,.webp" disabled={locked}
+          <label htmlFor="image">Source image or short video</label>
+          <input ref={input} id="image" type="file" accept=".png,.jpg,.jpeg,.bmp,.webp,.mp4,.mov,.avi,.asf,.m4v,.mpeg" disabled={locked}
             aria-describedby="image-help" onChange={event => {
               const next = event.target.files?.[0];
               setError('');
               if (!next) return;
-              if (next.size > 10_000_000 || !/\.(png|jpe?g|bmp|webp)$/i.test(next.name)) {
-                setFile(null); setError('Choose a PNG, JPG, BMP, or WebP image up to 10 MB.'); return;
+              const isVideo = /\.(mp4|mov|avi|asf|m4v|mpeg)$/i.test(next.name);
+              if (next.size > (isVideo ? 20_000_000 : 10_000_000) || !/\.(png|jpe?g|bmp|webp|mp4|mov|avi|asf|m4v|mpeg)$/i.test(next.name)) {
+                setFile(null); setError('Choose a supported image up to 10 MB or video up to 20 MB.'); return;
               }
               setFile(next);
             }} />
           <p id="image-help">PNG, JPG, BMP, WebP. Up to 10 MB and 12 megapixels.</p>
+          <p>MP4, MOV, AVI, ASF, M4V, MPEG. Up to 20 MB, 10 seconds, 720p, and 600 frames. Video previews and results are silent.</p>
         </div>
         <fieldset disabled={locked}>
           <legend>Object types</legend>
@@ -241,35 +251,46 @@ function Workspace() {
         </div>
         <div className="actions">
           <button className="primary" onClick={() => void detect()} disabled={!ready || !types.length || locked}>
-            {working && !capability ? 'Uploading…' : 'Detect image'}</button>
+            {working && !capability ? 'Uploading…' : `Detect ${media}`}</button>
           {active && <button onClick={() => void cancel()} disabled={working || job?.state === 'cancelling'}>Cancel</button>}
           {capability && <button onClick={() => void remove()} disabled={working}>Delete now</button>}
         </div>
       </section>
       <div className="feedback">
         <p role="status" aria-live="polite">{!types.length ? 'Select at least one object type.' : notice}</p>
+        {job?.media_type === 'video' && job.state === 'processing' && !!job.processed_frames &&
+          <progress aria-label="Frames processed" value={job.processed_frames} max={job.frame_count} />}
         {error && <p role="alert" className="error">{error}</p>}
         {pollFailed && <button onClick={() => { setError(''); setRetry(value => value + 1); }}>Retry job status</button>}
-        {file && !ready && error && <button onClick={() => { setError(''); setFile(new File([file], file.name)); }}>Retry image validation</button>}
+        {file && !ready && error && <button onClick={() => { setError(''); setFile(new File([file], file.name)); }}>Retry {media} validation</button>}
       </div>
       <section className="comparison" aria-label="Source and detection comparison" aria-busy={!!active}>
         <figure><figcaption><h2>Original</h2><span>{file?.name || 'Your selected image'}</span></figcaption>
-          <div className="image-stage">{preview ? <img src={preview} alt="Selected source, normalized for detection" /> :
+          <div className="image-stage">{preview ? video ?
+            <video src={preview} controls playsInline preload="metadata" aria-label="Source video preview"
+              onError={() => setError('Your browser could not play the video preview. Try another browser or re-export the clip.')} /> :
+            <img src={preview} alt="Selected source, normalized for detection" /> :
             <p>Choose your image above.<br />Its preview will appear here.</p>}</div></figure>
         <figure><figcaption><h2>Detections</h2><span>{job ? `${job.width} × ${job.height} pixels` : 'Actual inference, no example boxes'}</span></figcaption>
-          <div className="image-stage">{annotated ? <img src={annotated} alt={`Annotated result with ${job?.detections.length ?? 0} detections`} /> :
-            <p>{job ? states[job.state] : 'Your annotated image will appear here after detection.'}</p>}</div></figure>
+          <div className="image-stage">{annotated ? job?.media_type === 'video' ?
+            <video src={annotated} controls playsInline preload="metadata" aria-label="Annotated silent video"
+              onError={() => setError('Your browser could not play the annotated MP4. Try another browser; JSON and CSV remain available.')} /> :
+            <img src={annotated} alt={`Annotated result with ${job?.detections.length ?? 0} detections`} /> :
+            <p>{job ? states[job.state] : 'Your annotated media will appear here after detection.'}</p>}</div></figure>
       </section>
       {job && <section className="results" aria-labelledby="result-heading">
         <div className="result-heading"><h2 id="result-heading">Detection details</h2>
           <p>{job.detections.length} detections at {job.settings.confidence}% minimum confidence</p></div>
         {job.error && <p className="error">{job.error}</p>}
-        {job.state === 'empty' && <p>No matching objects found. Use Change image or settings to try another image or lower confidence.</p>}
+        {job.media_type === 'video' && <p>{job.frame_count} frames, {job.duration_seconds?.toFixed(3)} seconds.
+          Frame-level observations are repeated detections, not tracked or unique objects. Frame indices start at zero; timestamps start at the first source frame.</p>}
+        {job.state === 'empty' && <p>No matching objects found. Change your media or settings to try another source or lower confidence.</p>}
         {(job.state === 'success' || job.state === 'empty') && <div className="downloads">
           <h3 id="download-heading">Download results</h3>
           <div className="actions" role="group" aria-labelledby="download-heading" aria-describedby="download-help" aria-busy={!!downloading}>
-            <button onClick={() => void download('image')} disabled={working || !!downloading}>
-              {downloading === 'image' ? 'Preparing image…' : 'Download annotated image (PNG)'}</button>
+            <button onClick={() => void download(job.media_type === 'video' ? 'video' : 'image')} disabled={working || !!downloading}>
+              {downloading === 'image' || downloading === 'video' ? 'Preparing media…' :
+                job.media_type === 'video' ? 'Download annotated video (MP4)' : 'Download annotated image (PNG)'}</button>
             <button onClick={() => void download('json')} disabled={working || !!downloading}>
               {downloading === 'json' ? 'Preparing JSON…' : 'Download JSON'}</button>
             <button onClick={() => void download('csv')} disabled={working || !!downloading}>
@@ -279,14 +300,20 @@ function Workspace() {
             CSV is spreadsheet-safe. Downloads expire with this job. Saved files stay on your device after Delete now.</p>
         </div>}
         {!activeStates.includes(job.state) &&
-          <button onClick={() => void remove(true)} disabled={working}>Change image or settings</button>}
+          <button onClick={() => void remove(true)} disabled={working}>Change {media} or settings</button>}
+        {job.detections.length > pageSize && <div className="actions" aria-label="Detection pages">
+          <button disabled={page === 0} onClick={() => setPage(value => value - 1)}>Previous detections</button>
+          <span>Page {page + 1} of {Math.ceil(job.detections.length / pageSize)}. Downloads include every observation.</span>
+          <button disabled={(page + 1) * pageSize >= job.detections.length} onClick={() => setPage(value => value + 1)}>Next detections</button>
+        </div>}
         {job.detections.length > 0 && <table>
           <caption>Pixel coordinates refer to the {job.width} × {job.height} oriented input, measured from its top-left corner.</caption>
-          <thead><tr><th>Object</th><th>Model class</th><th>Confidence</th><th>Box (x1, y1, x2, y2)</th></tr></thead>
-          <tbody>{job.detections.map((detection, index) => <tr key={index}>
+          <thead><tr><th>Object</th><th>Model class</th><th>Confidence</th>{job.media_type === 'video' && <th>Frame / time</th>}<th>Box (x1, y1, x2, y2)</th></tr></thead>
+          <tbody>{job.detections.slice(page * pageSize, (page + 1) * pageSize).map((detection, index) => <tr key={index}>
             <td data-label="Object"><span className={'type-label ' + detection.object_type}>{detection.label}</span></td>
             <td data-label="Model class">{detection.class_name} (ID {detection.class_id})</td>
             <td data-label="Confidence">{(detection.confidence * 100).toFixed(1)}%</td>
+            {job.media_type === 'video' && <td data-label="Frame / time">{detection.frame_index} / {detection.timestamp_seconds?.toFixed(3)} s</td>}
             <td data-label="Box" className="coordinates">{detection.bbox.map(value => value.toFixed(1)).join(', ')}</td>
           </tr>)}</tbody>
         </table>}
@@ -294,7 +321,7 @@ function Workspace() {
           {new Date(job.expires_at * 1000).toLocaleTimeString()}</time>, 30 minutes after completion.</p>}
       </section>}
       <section className="privacy" aria-labelledby="privacy-heading"><h2 id="privacy-heading">Temporary by design.</h2>
-        <p>Your image is sent to the Python service for validation; inference starts only on your command.
+        <p>Your media is sent to the Python service for validation; inference starts only on your command.
           Sources are removed when no longer needed. Results expire automatically after 30 minutes.
           Delete now revokes access immediately and removes remaining files at a safe boundary.
           Refreshing this page loses your job key; a server restart also loses jobs.</p>
