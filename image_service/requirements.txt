@@ -1,0 +1,15 @@
+# Self-contained for the Space build; preserve the T1 model/runtime pins.
+torch==2.8.0
+torchvision==0.23.0
+ultralytics==8.4.189
+numpy==1.26.4
+opencv-python==4.11.0.86
+pillow==11.3.0
+dill==0.4.1
+psutil==7.2.2
+gradio==6.32.0
+spaces==0.51.3
+fastapi==0.162.5
+starlette==1.7.0
+uvicorn==0.54.0
+anyio==4.15.1

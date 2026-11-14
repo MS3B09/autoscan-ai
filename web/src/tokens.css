@@ -1,0 +1,27 @@
+/* Hallmark · tokens: approved Option A / Furrow · v2.0.0 */
+:root {
+  --color-paper: #fae9c1;
+  --color-paper-3: #f1eadb;
+  --color-sheet: #fffcf5;
+  --color-image: #fefdfb;
+  --color-ink: #191b17;
+  --color-muted: #5c584f;
+  --color-rule: #b9af99;
+  --color-accent: #f7802d;
+  --color-accent-ink: #191b17;
+  --color-accent-hover: #ef6e18;
+  --color-focus: #8c3800;
+  --color-error: #98281d;
+  --color-vehicle: #0059b3;
+  --color-logo: #00696c;
+  --color-plate: #a92316;
+  --font-display: 'Red Hat Display', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Red Hat Text', ui-sans-serif, system-ui, sans-serif;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 48px;
+  --radius-control: 6px;
+  --radius-panel: 8px;
+}
