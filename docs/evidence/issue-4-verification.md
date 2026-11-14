@@ -1,9 +1,10 @@
 # Issue #4 verification
 
-Date: 2026-11-14. **Implemented; the user reports a passing authenticated hosted
-image/export check.** Anonymous inference remains quota-blocked in our recorded
-attempts. Keep issue #4 open for selected-only/empty hosted exports, actual hosted
-browser downloads, and the actual thirty-minute retention check.
+Date: 2026-11-14. **Implemented; authenticated hosted success/selected-only/empty
+exports and real hosted-backed browser downloads now pass.** See the shared #3
+closeout below. Native anonymous inference remains quota-blocked; actual
+thirty-minute retention is still running. #4 remains open while earlier-ticket
+verification is completed and these remaining gates are reviewed.
 
 ## Scope and contract
 
@@ -83,10 +84,10 @@ verification script, not the production service or shipping frontend.
 
 ## Remaining gates
 
-- Selected-only/empty hosted exports and actual hosted browser downloads.
 - Successful anonymous inference after the platform's quota resets; the
   authenticated developer result does not establish public-visitor availability.
-- Actual thirty-minute hosted expiry; accelerated local retention is not that pass.
+- Actual thirty-minute hosted expiry is running, not yet passed; accelerated local
+  retention is not that pass.
 - Deployed Netlify-origin browser/CORS verification belongs to release issue #7.
 - No spreadsheet-application interoperability matrix, screen-reader session,
   detection-accuracy benchmark, video check, or public-load test was attempted.
@@ -149,3 +150,26 @@ remaining-quota value, or quota-reset timestamp was supplied; exact account quot
 attribution is not independently established from this test summary. This result
 does not cover selected-only/empty jobs, anonymous inference, actual browser
 downloads against the hosted backend, or the thirty-minute expiry test.
+
+## Shared earlier-ticket closeout
+
+The user requested completing #2/#3 before resuming #4. New agent-run evidence is
+recorded in [issue-3-verification.md](issue-3-verification.md#closeout-checks--2026-11-14):
+
+- Dedicated READ token identity/role/free account verified without GPU use; the
+  encrypted handoff was subsequently removed and the saved WRITE login unchanged.
+- Real hosted plate-only/empty export check: **1 passed in 12.811 seconds**, using
+  two jobs. Admission/cancellation and preview/input-validation checks also passed.
+- Actual browser success with seven real selected detections, and a real 100%
+  plate-only empty result: saved PNG/JSON/CSV files decoded and agreed with
+  status/preview, including empty/header-only/no-box behavior. A private temporary
+  adapter supplied submission authentication server-side only; result access and
+  downloads went directly from the browser to the hosted API. The HF token never
+  entered the frontend. This is **not** native anonymous submission success.
+- Independent browser-context access was denied; Delete now revoked every old
+  download, and restored keyboard focus. Shared-limit and native anonymous GPU
+  quota errors did not create false success or failed-job downloads.
+- Actual thirty-minute hosted expiry is still awaiting terminal output. No
+  completion or anonymous-public availability claim is made from a pending test.
+
+No new #4 feature was added during this earlier-ticket closeout.

@@ -84,7 +84,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: va
   .image-stage { min-height: 180px; }
   .privacy h2 { grid-row: auto; margin-bottom: var(--space-md); }
   thead { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: clip; }
-  table, tbody, tr { display: block; }
+  table, caption, tbody, tr { display: block; }
   tr { padding-block: var(--space-sm); border-bottom: 1px solid var(--color-rule); }
   td { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: var(--space-sm); padding: var(--space-xs) 0; border: 0; }
   td::before { content: attr(data-label); color: var(--color-muted); }

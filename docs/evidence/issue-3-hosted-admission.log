@@ -1,0 +1,6 @@
+test_a_admission_is_bounded_and_jobs_can_be_cancelled (test_hosted_image_api.HostedImageTests.test_a_admission_is_bounded_and_jobs_can_be_cancelled) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 8.207s
+
+OK

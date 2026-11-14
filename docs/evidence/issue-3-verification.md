@@ -1,9 +1,11 @@
 # Issue #3 verification
 
-Date: 2026-11-14. **Implemented, image verification incomplete.** Real image
-inference verification is blocked by anonymous ZeroGPU quota. Keep issue #3 open
-until its image-specific gates below are verified. Netlify deployment and
-deployed-origin verification belong to release issue #7, not a blocker for #3.
+Date: 2026-11-14. **Implemented; closeout verification advanced below.** Real
+authenticated image/empty inference, queue/cancellation, and hosted-backed browser
+flows now pass. Actual thirty-minute retention is running; native anonymous
+inference still hits platform quota. Do not read the historical failed attempts
+below as a description of the later authenticated results. Netlify deployment and
+deployed-origin verification belong to release issue #7.
 
 ## Hosted service
 
@@ -175,7 +177,7 @@ limits are unchanged. The reviewer verified the correction. One further finding
 covers acknowledged release-verification gaps below. **2 findings: test bug
 resolved, verification gate open.** No scope creep was identified.
 
-## Still not established
+## Original open gates (see later closeout results below)
 
 - New-service real inference success, selected-only predictions and real empty
   inference, annotation inspection, or GPU-backed concurrency/cancellation under
@@ -188,3 +190,96 @@ resolved, verification gate open.** No scope creep was identified.
   or site were configured, and no public frontend URL is claimed.
 - Screen-reader testing or the legacy Streamlit app running interactively in this
   disk-constrained environment. Its source/requirements/checkpoints are preserved.
+
+## Closeout checks — 2026-11-14
+
+Scope: finish earlier #2/#3 work before returning to #4. #2 was reconciled and
+closed as a feasibility pass; this is not public-release approval. No new video,
+showcase, Netlify deployment, or paid resource was introduced.
+
+### Hosted API
+
+Verified through the Hub identity API, without GPU use: account `MS3B09`, token
+name `autoscan-inference`, role `read`, `isPro: false`. The dedicated token was
+supplied via a Windows DPAPI-encrypted temporary handoff, never a repository file
+or frontend variable. The saved WRITE deployment login was not replaced.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Bounded admission and cancellation | 1 passed, 8.207 s | `issue-3-hosted-admission.log` |
+| Plate-only selection at 40%, and successful empty result at 100%, including exports | 1 passed, 12.811 s (two image jobs) | `issue-3-hosted-selection-empty.log` |
+| Supported previews, corrupt/misleading/checkpoint/oversized inputs, invalid settings | 1 passed, 18.498 s | `issue-3-hosted-validation-closeout.log` |
+| Actual thirty-minute hosted retention | Running, not yet a pass | Await terminal test output |
+
+The tests retain their protected image/result/download checks. Local API contract
+file independently passed **11 tests in 6.200 seconds**. Full default suite:
+**30 tests, 21 passed, 9 explicitly skipped**, 10.395 seconds. Mypy passed seven
+service/test files; TypeScript and production build passed (Vite: 5.07 seconds).
+The design detector returned `[]`. No failed/skipped check is counted as a pass.
+
+### Actual browser with real hosted inference
+
+The real workspace ran at `http://127.0.0.1:5173/detect`, configured to the public
+image Space. A temporary, one-use localhost adapter added HF authentication only
+to submission server-side. The browser's original submission had no HF token;
+native preview/status/image/export/delete requests went directly to the hosted
+API with the ordinary job capability. **Submission was instrumented developer
+verification, not a successful native anonymous submission or deployed-origin
+CORS proof.** No production code or service configuration gained a relay or key.
+
+- Existing public composite fixture: **seven real detections** across vehicles,
+  logos, and plates; displayed count matches hosted status. Saved actual browser
+  PNG/JSON/CSV downloads were independently decoded/compared: every selected
+  detection, raw identity, dimension, coordinate, and confidence agrees. The
+  792,328-byte PNG exactly equals the annotated preview. This already-annotated
+  compatibility fixture does not establish accuracy or new example photography.
+- Clean white 48×32 fixture, plate-only at 100%: keyboard submission and all three
+  browser downloads passed; `state: empty`, zero detections, valid header-only
+  CSV, no error, and image bytes identical to the normalized no-box source.
+- An independent browser context could not retrieve status/images/any download,
+  cancel, or delete the successful job. UI Delete now succeeded, cleared the
+  result, restored upload focus, and left all old protected URLs returning 404.
+  The empty and quota-failed verification jobs were also deleted.
+- Hosted preview before explicit Detect image made **zero inference submissions**.
+  Default selections/40%, empty-selection rejection, keyboard 25–100% bounds,
+  desktop/mobile wrapping, and no horizontal overflow were verified.
+- A native anonymous browser submission first received the actual shared upload
+  limit (429), with a useful error and enabled retry rather than false success.
+  After that window cleared, one native anonymous submission was admitted (202)
+  but ended in explicit **ZeroGPU quota exhaustion**, not empty success; no
+  downloads were offered. No further anonymous GPU submissions were made.
+- Desktop/mobile captures were opened and inspected. They remain in the approved
+  temporary directory as `issue-3-*`, not shipping assets. Full-page capture made
+  the fixed skip link appear visible; live focus/scroll assertions showed it was
+  actually hidden correctly, so no skip-link styling was changed.
+- Initial browser verification code hit a large-buffer spread stack error and a
+  thirty-second download-event timeout. Chunk iteration and a ninety-second test
+  event budget fixed the harness; saved outputs were then rechecked. Production
+  request timeouts were unchanged, and recovering download checks did not submit
+  additional inference jobs.
+
+### Minimal UI correction
+
+Mobile CSS changed the table to block layout but left its coordinate caption as
+`table-caption`, shrinking it to about 73 px in a 343 px table. A one-property
+probe confirmed the cause. The mobile block rule now includes `caption`, which
+fills the table width; desktop table semantics/styling remain unchanged.
+
+`tests/browser_image_layout.js` reproduces the width failure on a completed job,
+passes after the fix, and checks skip-link focus/visibility at 390 and 1440 px.
+Run it using `browser_run_code_unsafe` with that filename after completing an
+image job. It is an explicit browser check, not part of Python test discovery.
+
+The temporary auth adapter was stopped and the encrypted handoff file removed.
+The retention test had already loaded its credential before that cleanup. No
+owner token entered frontend code, URLs, captured output, or shipping assets.
+
+### Still open at this point
+
+- The real thirty-minute hosted retention test must reach its terminal result.
+- A native anonymous successful image/browser flow remains unverified while the
+  platform denies GPU quota. The authenticated relay flow is not a substitute for
+  public-visitor acceptance; carry this explicitly into the release gate.
+- Deployed Netlify-origin CORS/full workflow, independent release-level load and
+  licensing review, and video/browser playback belong to later tickets. No
+  screen-reader session or interactive legacy Streamlit run was attempted here.

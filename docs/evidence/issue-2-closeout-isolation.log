@@ -1,0 +1,7 @@
+test_temporary_result_expires_without_a_browser_cleanup_request (test_hosted_validation.HostedValidationTests.test_temporary_result_expires_without_a_browser_cleanup_request) ... ok
+test_temporary_result_requires_its_capability_and_cannot_bypass_file_routes (test_hosted_validation.HostedValidationTests.test_temporary_result_requires_its_capability_and_cannot_bypass_file_routes) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 39.282s
+
+OK

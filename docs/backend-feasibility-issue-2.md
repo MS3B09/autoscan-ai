@@ -9,7 +9,8 @@ under [the parent specification](https://github.com/MS3B09/autoscan-ai/issues/1)
 anonymous browser completion, measured ten-second-video capacity, and the bounded
 temporary-result isolation/deletion/expiry mechanism pass. This is a feasibility
 experiment, not the production backend or a release/accuracy/availability pass.
-No downstream implementation was started.
+No downstream implementation had been started at the time of this original
+feasibility decision. Subsequent image work is tracked in #3 and #4.
 
 **Final rerun is not green:** the anonymous inference test hit the platform's
 daily runs limit after earlier successful real calls. Latest result: **8 passed,
@@ -244,3 +245,30 @@ report was retained; the failed rerun did not replace it.
 - Dataset/model usage-rights approval for release; preserve the original credits
   and dataset references. The fixture's open-license attribution is recorded but
   its Commons review flag is not treated as legal clearance.
+
+## Closeout — 2026-11-14
+
+The evidence supports closing **#2 as a feasibility pass**, not a production
+release approval. The later anonymous quota failure above remains a failure; it
+does not erase the earlier successful hosted image/video/browser observations.
+
+- Rechecked the retained final hosted and anonymous-browser reports: the browser
+  used `credentials: omit` and completed with HTTP 200; the final report preserves
+  all three pinned checkpoint identities, all 24 logo classes, plate class `0`,
+  and the expected car/bus/truck classes.
+- The representative video report independently records **300 source frames,
+  300 processed/written frames, 300 decoded output frames**, 1280×720, 30 fps,
+  ten seconds, and 5,447,771 input bytes. This is capacity/compatibility evidence,
+  not accuracy, arbitrary-codec coverage, or browser-playable MP4 evidence.
+- Current local custom-checkpoint digests match the trusted identities. Git
+  comparison against `b2d35e76f8d220677a54ee5437635748427a7f1a` shows no changes to
+  the legacy Streamlit source, its requirements, or the two custom checkpoints.
+- Management API again observed both diagnostic/image Spaces **RUNNING**, with
+  current/requested **zero-a10g**; no hardware or billing change was requested.
+- Fresh GPU-free diagnostic hosted checks: **2 passed in 39.282 seconds**,
+  covering protected result access, wrong/missing capabilities, generic file-route
+  denial, deletion, and actual thirty-second expiry without browser cleanup.
+  Output: [issue-2-closeout-isolation.log](evidence/issue-2-closeout-isolation.log).
+- No new diagnostic GPU inference was submitted. Production-image verification,
+  actual thirty-minute retention, public frontend deployment, video playback,
+  and licensing/release review remain with their respective later tickets.
