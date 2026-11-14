@@ -3,8 +3,12 @@
 from collections import deque
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
-from io import BytesIO
+import csv
+from importlib.metadata import PackageNotFoundError, version
+from io import BytesIO, StringIO
+import json
 from pathlib import Path
+import platform
 import secrets
 import shutil
 import tempfile
@@ -24,6 +28,8 @@ from starlette.concurrency import run_in_threadpool
 FORMATS = {".png": "PNG", ".jpg": "JPEG", ".jpeg": "JPEG", ".bmp": "BMP", ".webp": "WEBP"}
 MAX_BYTES = 10_000_000
 MAX_PIXELS = 12_000_000
+CSV_COLUMNS = ["source_filename", "object_type", "class_id", "class_name", "label", "confidence",
+               "x1", "y1", "x2", "y2", "width", "height"]
 
 
 def normalize(content, filename):
@@ -162,7 +168,14 @@ class Jobs:
 
 
 def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
-               origins=("http://localhost:5173",), model_metadata=None):
+                origins=("http://localhost:5173",), model_metadata=None):
+    packages = {}
+    for name in ["torch", "torchvision", "ultralytics", "numpy", "pillow", "gradio", "spaces", "fastapi", "starlette"]:
+        try:
+            packages[name] = version(name)
+        except PackageNotFoundError:
+            continue
+    runtime = {"python": platform.python_version(), "packages": packages}
     root = Path(storage_root) if storage_root else Path(tempfile.gettempdir()) / "autoscan-image-jobs"
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     # This dedicated directory belongs exclusively to this single-process service.
@@ -289,28 +302,69 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
                 jobs.lock.notify_all()
         return {"id": identifier, "token": token, "state": "queued"}
 
-    @app.get("/api/jobs/{identifier}")
-    def status(identifier: str, request: Request):
-        with jobs.lock:
-            job = authorized(identifier, request)
-            return {"id": identifier, "state": job.state, "filename": job.filename, "settings": job.settings,
+    def result(identifier, job):
+        return {"schema_version": "1.0", "id": identifier, "state": job.state, "filename": job.filename, "settings": job.settings,
                     "width": job.width, "height": job.height,
                     "detections": [{**detection, "source_filename": job.filename} for detection in job.detections],
                     "error": job.error, "expires_at": job.expires_at, "models": model_metadata or {},
+                    "runtime": runtime,
                     "coordinate_system": "xyxy pixels from top-left of EXIF-oriented, white-composited RGB input"}
+
+    @app.get("/api/jobs/{identifier}")
+    def status(identifier: str, request: Request):
+        with jobs.lock:
+            return result(identifier, authorized(identifier, request))
 
     @app.get("/")
     @app.get("/api/health")
     def health():
         return {"status": "ready", "retention_seconds": retention, "max_active": 1, "max_pending": 2}
 
+    def image_bytes(job):
+        if job.state not in ["success", "empty"]:
+            raise HTTPException(409, "Annotated image is not ready.")
+        try:
+            return (job.directory / "result.png").read_bytes()
+        except OSError:
+            raise HTTPException(503, "Result image is unavailable. Try again or run a new detection.") from None
+
     @app.get("/api/jobs/{identifier}/image")
     def result_image(identifier: str, request: Request):
         with jobs.lock:
             job = authorized(identifier, request)
+            return Response(image_bytes(job), media_type="image/png")
+
+    @app.get("/api/jobs/{identifier}/download/{format}")
+    def download(identifier: str, format: str, request: Request):
+        with jobs.lock:
+            job = authorized(identifier, request)
+            if format not in ["image", "json", "csv"]:
+                raise HTTPException(404, "Download format unavailable.")
             if job.state not in ["success", "empty"]:
-                raise HTTPException(409, "Annotated image is not ready.")
-            return Response((job.directory / "result.png").read_bytes(), media_type="image/png")
+                raise HTTPException(409, "Downloads are available after detection completes successfully.")
+            try:
+                if format == "image":
+                    content, media_type, extension = image_bytes(job), "image/png", "png"
+                elif format == "json":
+                    content = json.dumps(result(identifier, job), ensure_ascii=False, allow_nan=False).encode("utf-8")
+                    media_type, extension = "application/json", "json"
+                else:
+                    output = StringIO(newline="")
+                    writer = csv.writer(output)
+                    writer.writerow(CSV_COLUMNS)
+                    for detection in job.detections:
+                        row = {**detection, "source_filename": job.filename,
+                               **dict(zip(["x1", "y1", "x2", "y2"], detection["bbox"]))}
+                        # Quoting alone does not stop spreadsheets interpreting text as formulas.
+                        writer.writerow(["'" + value if isinstance(value, str) and
+                                         value.lstrip().startswith(("=", "+", "-", "@", "＝", "＋", "－", "＠", "\t", "\r", "\n"))
+                                         else value for value in (row[column] for column in CSV_COLUMNS)])
+                    content = output.getvalue().encode("utf-8-sig")
+                    media_type, extension = "text/csv", "csv"
+            except (OSError, ValueError, TypeError, KeyError):
+                raise HTTPException(503, "Download could not be prepared. Try again or run a new detection.") from None
+            return Response(content, media_type=media_type,
+                            headers={"Content-Disposition": f'attachment; filename="autoscan-{identifier}.{extension}"'})
 
     @app.delete("/api/jobs/{identifier}", status_code=204)
     def delete(identifier: str, request: Request):

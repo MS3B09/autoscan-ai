@@ -3,7 +3,8 @@
 The React/TypeScript/Vite workspace lives in `web/`, at `/detect`. Until T5 ships
 the showcase, Netlify redirects `/` there. The original Streamlit app, its
 requirements, and all checkpoint bytes remain unchanged. Video, downloadable
-media, JSON, and CSV controls are deliberately not part of this ticket.
+media, JSON, and CSV controls were not part of issue #3; issue #4 adds them as
+documented in [image-exports.md](image-exports.md).
 
 ## Run and build
 
@@ -38,6 +39,7 @@ All responses, including errors and images, are `Cache-Control: no-store`.
 | `POST /api/jobs?filename=photo.jpg&types=vehicle,logo,plate&confidence=40` | Validate again, admit an isolated job, return `202 {id, token, state}` |
 | `GET /api/jobs/{id}` | Protected status, settings, dimensions, detections, trusted model metadata, expiry |
 | `GET /api/jobs/{id}/image` | Protected annotated PNG, only after success/empty; otherwise 409 |
+| `GET /api/jobs/{id}/download/{image,json,csv}` | Protected attachments; same job lifecycle, selections, and data as the preview/status |
 | `POST /api/jobs/{id}/cancel` | Remove queued work immediately; active work becomes cancelling until a safe detector boundary |
 | `DELETE /api/jobs/{id}` | Revoke access immediately, remove queued/completed data, safely stop and clean active work |
 

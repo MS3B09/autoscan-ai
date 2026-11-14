@@ -1,6 +1,7 @@
 """Opt-in real HTTP/model checks. Uses anonymous free GPU quota; never retries submission."""
 
 from concurrent.futures import ThreadPoolExecutor
+import csv
 from io import BytesIO
 import json
 import os
@@ -47,17 +48,60 @@ class HostedImageTests(unittest.TestCase):
             if error.code != 404:
                 raise
 
+    def check_downloads(self, job, result):
+        endpoint = "/api/jobs/" + job["id"]
+        downloads = {}
+        for kind, extension, media_type in [("image", "png", "image/png"), ("json", "json", "application/json"),
+                                             ("csv", "csv", "text/csv")]:
+            with self.call(endpoint + "/download/" + kind, job=job) as response:
+                self.assertEqual(response.headers["Content-Disposition"],
+                                 f'attachment; filename="autoscan-{job["id"]}.{extension}"')
+                self.assertIn("no-store", response.headers["Cache-Control"])
+                self.assertTrue(response.headers["Content-Type"].startswith(media_type))
+                downloads[kind] = response.read()
+        data = json.loads(downloads["json"])
+        self.assertEqual(data, result)
+        self.assertEqual(data["schema_version"], "1.0")
+        self.assertNotIn(job["token"], downloads["json"].decode())
+        self.assertTrue(data["runtime"]["python"])
+        for package in ["torch", "torchvision", "ultralytics", "pillow", "spaces"]:
+            self.assertTrue(data["runtime"]["packages"][package])
+        rows = list(csv.DictReader(downloads["csv"].decode("utf-8-sig").splitlines()))
+        self.assertEqual(len(rows), len(result["detections"]))
+        for row, detection in zip(rows, result["detections"]):
+            for key in ["source_filename", "object_type", "class_id", "class_name", "label", "width", "height"]:
+                value = str(detection[key])
+                if value.lstrip().startswith(("=", "+", "-", "@")):
+                    value = "'" + value
+                self.assertEqual(row[key], value)
+            self.assertEqual(float(row["confidence"]), detection["confidence"])
+            self.assertEqual([float(row[key]) for key in ["x1", "y1", "x2", "y2"]], detection["bbox"])
+        if not rows:
+            self.assertEqual(next(csv.reader(downloads["csv"].decode("utf-8-sig").splitlines())),
+                             ["source_filename", "object_type", "class_id", "class_name", "label", "confidence",
+                              "x1", "y1", "x2", "y2", "width", "height"])
+        with self.call(endpoint + "/image", job=job) as response:
+            self.assertEqual(downloads["image"], response.read())
+        with Image.open(BytesIO(downloads["image"])) as image:
+            image.load()
+            self.assertEqual(image.size, (result["width"], result["height"]))
+            if result["state"] == "empty":
+                self.assertEqual(image.convert("RGB").tobytes(), Image.new("RGB", image.size, "white").tobytes())
+
     def test_a_real_selection_confidence_raw_classes_and_private_result(self):
         # Existing composite is a compatibility fixture, never an accuracy target.
         source = Path(__file__).resolve().parents[1] / "imgs/image.JPG"
-        job = self.submit(source.read_bytes(), "sample.jpg")
+        filename = '=été, "photo".jpg'
+        job = self.submit(source.read_bytes(), filename)
         try:
             result = self.wait(job)
             self.assertEqual(result["state"], "success")
             self.assertTrue(result["detections"])
             self.assertEqual(len(result["models"]["logo"]["classes"]), 24)
             self.assertEqual(result["models"]["plate"]["classes"], {"0": "0"})
+            self.check_downloads(job, result)
             for detection in result["detections"]:
+                self.assertEqual(detection["source_filename"], filename)
                 self.assertIn(detection["object_type"], ["vehicle", "logo", "plate"])
                 self.assertGreaterEqual(detection["confidence"], .4 - 1e-6)
                 if detection["object_type"] == "vehicle":
@@ -69,7 +113,8 @@ class HostedImageTests(unittest.TestCase):
                 self.assertIn("no-store", response.headers["Cache-Control"])
                 with Image.open(BytesIO(response.read())) as image:
                     self.assertEqual(image.size, (result["width"], result["height"]))
-            for path, method in [("", "GET"), ("/image", "GET"), ("/cancel", "POST"), ("", "DELETE")]:
+            for path, method in [("", "GET"), ("/image", "GET"), ("/download/image", "GET"),
+                                 ("/download/json", "GET"), ("/download/csv", "GET"), ("/cancel", "POST"), ("", "DELETE")]:
                 for visitor in [None, {"token": "another-visitor"}]:
                     with self.assertRaises(HTTPError) as caught:
                         self.call("/api/jobs/" + job["id"] + path, method, job=visitor)
@@ -81,9 +126,10 @@ class HostedImageTests(unittest.TestCase):
                 self.assertIn(caught.exception.code, [403, 404, 405])
         finally:
             self.delete(job)
-        with self.assertRaises(HTTPError) as caught:
-            self.call("/api/jobs/" + job["id"], job=job)
-        self.assertEqual(caught.exception.code, 404)
+        for suffix in ["", "/image", "/download/image", "/download/json", "/download/csv"]:
+            with self.assertRaises(HTTPError) as caught:
+                self.call("/api/jobs/" + job["id"] + suffix, job=job)
+            self.assertEqual(caught.exception.code, 404)
 
     def test_b_supported_previews_and_invalid_content_and_settings(self):
         with self.call("/api/health") as response:
@@ -121,6 +167,7 @@ class HostedImageTests(unittest.TestCase):
             self.assertEqual(selected["state"], "success")
             self.assertTrue(selected["detections"])
             self.assertTrue(all(item["object_type"] == "plate" for item in selected["detections"]))
+            self.check_downloads(selected_job, selected)
         finally:
             self.delete(selected_job)
         output = BytesIO()
@@ -132,6 +179,7 @@ class HostedImageTests(unittest.TestCase):
             self.assertEqual(result["detections"], [])
             self.assertEqual(result["settings"], {"types": ["plate"], "confidence": 100})
             self.assertAlmostEqual(result["expires_at"] - time.time(), 1800, delta=20)
+            self.check_downloads(job, result)
         finally:
             self.delete(job)
 
@@ -174,8 +222,9 @@ class HostedImageTests(unittest.TestCase):
         try:
             result = self.wait(job)
             time.sleep(max(0, result["expires_at"] - time.time()) + 2)
-            with self.assertRaises(HTTPError) as caught:
-                self.call("/api/jobs/" + job["id"], job=job)
-            self.assertEqual(caught.exception.code, 404)
+            for suffix in ["", "/image", "/download/image", "/download/json", "/download/csv"]:
+                with self.assertRaises(HTTPError) as caught:
+                    self.call("/api/jobs/" + job["id"] + suffix, job=job)
+                self.assertEqual(caught.exception.code, 404)
         finally:
             self.delete(job)

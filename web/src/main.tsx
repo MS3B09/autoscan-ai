@@ -35,11 +35,23 @@ function Workspace() {
   const [working, setWorking] = useState(false);
   const [retry, setRetry] = useState(0);
   const [pollFailed, setPollFailed] = useState(false);
+  const [downloading, setDownloading] = useState('');
   const [notice, setNotice] = useState('Choose an image to begin. Nothing runs until you select Detect image.');
   const input = useRef<HTMLInputElement>(null);
   const focusUpload = useRef(false);
+  const downloadController = useRef<AbortController | null>(null);
+  const downloadURL = useRef('');
   const locked = !!capability || working;
   const active = capability && (!job || activeStates.includes(job.state));
+
+  useEffect(() => {
+    setDownloading('');
+    return () => {
+      downloadController.current?.abort();
+      URL.revokeObjectURL(downloadURL.current);
+      downloadURL.current = '';
+    };
+  }, [capability]);
 
   useEffect(() => {
     if (!locked && focusUpload.current) {
@@ -49,6 +61,7 @@ function Workspace() {
   }, [locked]);
 
   function forgetJob(message: string) {
+    downloadController.current?.abort();
     setCapability(null); setJob(null); setAnnotated(''); setPollFailed(false); setNotice(message);
   }
 
@@ -136,6 +149,38 @@ function Workspace() {
     finally { setWorking(false); }
   }
 
+  async function download(format: 'image' | 'json' | 'csv') {
+    if (!capability || downloading) return;
+    const controller = new AbortController();
+    downloadController.current = controller;
+    const label = format === 'image' ? 'Annotated image' : format.toUpperCase();
+    setDownloading(format); setError(''); setNotice(`Preparing ${label} download…`);
+    try {
+      const response = await request(jobPath(capability) + '/download/' + format,
+        { signal: controller.signal }, capability);
+      const blob = await response.blob();
+      if (controller.signal.aborted) return;
+      URL.revokeObjectURL(downloadURL.current);
+      downloadURL.current = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadURL.current;
+      link.download = `autoscan-${capability.id}.${format === 'image' ? 'png' : format}`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setNotice(`${label} download sent to your browser.`);
+    } catch (reason) {
+      if (controller.signal.aborted) return;
+      if (reason instanceof APIError && reason.status === 404) {
+        forgetJob('Downloads are no longer available. The job was deleted, expired, or lost on restart. Run a new detection.');
+      } else {
+        setError(`${label} download failed. ${(reason as Error).message} Select the download again to retry.`);
+      }
+    } finally {
+      if (!controller.signal.aborted) setDownloading('');
+    }
+  }
+
   async function remove(keepSource = false) {
     if (!capability || !window.confirm('Delete this job and its remaining server-side results? This cannot be undone.')) return;
     setWorking(true); setError('');
@@ -220,6 +265,19 @@ function Workspace() {
           <p>{job.detections.length} detections at {job.settings.confidence}% minimum confidence</p></div>
         {job.error && <p className="error">{job.error}</p>}
         {job.state === 'empty' && <p>No matching objects found. Use Change image or settings to try another image or lower confidence.</p>}
+        {(job.state === 'success' || job.state === 'empty') && <div className="downloads">
+          <h3 id="download-heading">Download results</h3>
+          <div className="actions" role="group" aria-labelledby="download-heading" aria-describedby="download-help" aria-busy={!!downloading}>
+            <button onClick={() => void download('image')} disabled={working || !!downloading}>
+              {downloading === 'image' ? 'Preparing image…' : 'Download annotated image (PNG)'}</button>
+            <button onClick={() => void download('json')} disabled={working || !!downloading}>
+              {downloading === 'json' ? 'Preparing JSON…' : 'Download JSON'}</button>
+            <button onClick={() => void download('csv')} disabled={working || !!downloading}>
+              {downloading === 'csv' ? 'Preparing CSV…' : 'Download CSV'}</button>
+          </div>
+          <p id="download-help">Includes all {job.detections.length} selected detections. JSON retains raw model identities and settings;
+            CSV is spreadsheet-safe. Downloads expire with this job. Saved files stay on your device after Delete now.</p>
+        </div>}
         {!activeStates.includes(job.state) &&
           <button onClick={() => void remove(true)} disabled={working}>Change image or settings</button>}
         {job.detections.length > 0 && <table>
