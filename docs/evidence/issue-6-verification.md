@@ -87,7 +87,7 @@ Tests follow the repository's existing Playwright function-file convention:
   stable CSV columns and all four rows/coordinates/confidences; contributor and
   24-brand preservation; image/video entries; direct refresh and trailing slash;
   keyboard skip/focus/disclosure/downloads; no clipped controls/overflow at
-  **320, 390, 768, 1280, 1440, 1536, and 1920px**.
+  **320, 390, 640, 641, 700, 768, 800, 1280, 1440, 1536, and 1920px**.
 - Run `tests/browser_detector_states.js` at the same origin: explicit submission,
   unchanged defaults, job capability headers, locked controls, queued/processing/
   success/empty/error/cancelled/expired/unavailable UI, download failure/retry,
@@ -150,3 +150,28 @@ web assets. Native browser viewport checks are not a physical-device matrix.
 Not checked here: physical iOS/Safari/Android codecs, screen-reader session,
 accuracy benchmark, public load, a new hosted expiry wait or active video
 cancellation, fresh full hosted integration suite, or production deployment.
+
+## Completion addendum
+
+- Configured production build and TypeScript passed after the review fix.
+- Final `python -m unittest discover -s tests -v`: **40 tests, 30 passed,
+  10 explicitly skipped**, 33.091 seconds, exit zero. Hosted/model opt-ins are
+  not reported as fresh passes; the one real sample job is separate evidence.
+- Both browser function files passed against the configured production preview
+  at `http://127.0.0.1:5174`, not only Vite's development server.
+- JSON/CSV/JPEG/PNG samples were verified **byte-identical in Git's index**.
+  `.gitattributes` preserves their original bytes across platforms and recognizes
+  the service's intentional CSV CRLF endings; Git whitespace checks passed.
+- Required two-axis review ran in fresh parallel contexts against the confirmed
+  starting commit. **Standards: 0 documented violations, 0 actionable smells.**
+  **Spec: 1 responsive defect and 1 unresolved rights criterion.**
+- The spec reviewer reproduced clipped navigation at **641px**, just above the
+  compact-header breakpoint. A new browser regression first failed with
+  `Clipped controls at 641: GitHub`. A single shared `flex-wrap: wrap` fixes both
+  routes without inventing a menu or moving the mobile breakpoint. Expanded
+  root checks cover eleven widths; detector navigation is also checked at
+  640/641/700/768/800px. The configured production-preview rerun passed.
+
+The responsive defect is fixed; the rights criterion remains open as documented
+above. This completion does not authorize deployment, licensing changes, or
+closing the issue as fully accepted.

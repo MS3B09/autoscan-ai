@@ -45,7 +45,7 @@ async (page) => {
   for (const name of ['El-Ouaragli Zayd', 'El-Abbass Ossama', 'Nassiri Mosab', 'Hassan Fares', 'Aly Guinga']) {
     if (!await page.getByRole('link', { name, exact: true }).isVisible()) throw new Error('Missing contributor: ' + name);
   }
-  for (const width of [320, 390, 768, 1280, 1440, 1536, 1920]) {
+  for (const width of [320, 390, 640, 641, 700, 768, 800, 1280, 1440, 1536, 1920]) {
     await page.setViewportSize({ width, height: width < 640 ? 844 : 1024 });
     if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)) throw new Error('Horizontal overflow: ' + width);
     const clipped = await page.locator('a, summary').evaluateAll(elements => elements.filter(element => {
@@ -76,6 +76,12 @@ async (page) => {
   await page.goto(origin + '/detect/');
   await page.reload();
   await upload.waitFor();
+  for (const width of [640, 641, 700, 768, 800]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const clipped = await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link').evaluateAll(links =>
+      links.some(link => link.getBoundingClientRect().right > innerWidth || link.getBoundingClientRect().left < 0));
+    if (clipped) throw new Error('Detector navigation clips at ' + width);
+  }
   page.off('pageerror', onError);
   if (errors.length) throw new Error(errors.join('\n'));
   return { navigation: 'root, image/video entry, detector refresh and trailing slash', samples: 'native JSON/CSV downloads match real data', brands: 24, responsiveWidths: checks, keyboard: 'skip, focus, details and downloads' };

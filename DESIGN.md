@@ -153,7 +153,7 @@ Red Hat Display supplies the grotesk headings and wordmark; Red Hat Text supplie
 
 ## Layout
 
-The effective shared shell is `min(100% - 64px, 1440px)`, centered; the earlier 1360px declaration is overridden. The ruled header has a (68px) minimum height. Spacing uses the frontmatter steps; (24px) section rhythm, (32px) showcase columns, and (48px) larger separations do different jobs.
+The effective shared shell is `min(100% - 64px, 1440px)`, centered; the earlier 1360px declaration is overridden. The ruled header has a (68px) minimum height and wraps naturally whenever the wordmark and navigation no longer fit on one row, including widths just above the mobile breakpoint. Spacing uses the frontmatter steps; (24px) section rhythm, (32px) showcase columns, and (48px) larger separations do different jobs.
 
 - **Wide:** showcase comparison has two equal image columns and a narrower legend (`1fr 1fr minmax(190px, .38fr)`). Images preserve their aspect ratio. Its container uses (16px 24px) padding. Workspace comparison uses two equal columns, (24px) gap/padding, and contained media rather than cropping.
 - **At 1000px and below:** showcase legend moves beneath the still-paired images; structured data becomes two columns with introduction/downloads spanning both. Workspace controls become two columns.

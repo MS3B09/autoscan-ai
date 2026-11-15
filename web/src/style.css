@@ -95,7 +95,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: va
 @media (prefers-reduced-motion: reduce) { button:active { transform: none; } }
 
 .shell { width: min(100% - 64px, 1440px); }
-.topbar { min-height: 68px; padding-block: var(--space-sm); }
+.topbar { min-height: 68px; padding-block: var(--space-sm); flex-wrap: wrap; }
 .wordmark { display: inline-flex; align-items: center; gap: var(--space-md); font-size: 2rem; font-weight: 900; white-space: nowrap; }
 .wordmark svg { width: 48px; height: 36px; }
 .topbar nav { font-size: 1.25rem; font-weight: 500; gap: var(--space-xl); }
