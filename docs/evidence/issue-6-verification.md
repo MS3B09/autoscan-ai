@@ -175,3 +175,19 @@ cancellation, fresh full hosted integration suite, or production deployment.
 The responsive defect is fixed; the rights criterion remains open as documented
 above. This completion does not authorize deployment, licensing changes, or
 closing the issue as fully accepted.
+
+### Independent follow-up
+
+Source commits: `fe87aea` (showcase) and `8bac723` (navigation regression fix),
+both local and not pushed. The standards reviewer rechecked the follow-up diff:
+**0 documented violations, 0 actionable smells**. The spec reviewer independently
+checked both routes on the production preview at **640, 641, 650, 660, 680, 700,
+768, and 800px** and confirmed no clipped or overlapping navigation. No remaining
+implementation defect or scope creep was identified in that focused follow-up.
+
+Review totals remain separated: **Standards 0 findings; Spec 2 initial findings,
+1 fixed, 1 open (model/dataset rights).** The narrowly scoped visual-fix ship
+verdict and the independent responsive check do not certify the blocked native
+Impeccable pipeline. Its `finish --disposition ship` refused while the authorized
+photography exception leaves `plates` open; no automated completion is claimed.
+Design tokens and the exception are documented; no original reference was altered.
