@@ -1,6 +1,6 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Furrow (approved Option A) · nav: ruled topbar · footer: attribution line · signature: paired image inspection · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V3 · weakest: V, retained the approved comparison rather than inventing a new composition */
-/* Hallmark · waive: 28b — private blob videos use native controls and preload metadata; no public or invented poster asset. */
+/* Hallmark · waive 28b · private blob videos below the workspace controls · native previews have no public or invented poster. */
 @import './tokens.css';
 
 * { box-sizing: border-box; }
@@ -93,3 +93,20 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: va
   .type-label { justify-self: start; }
 }
 @media (prefers-reduced-motion: reduce) { button:active { transform: none; } }
+
+.shell { width: min(100% - 64px, 1440px); }
+.topbar { min-height: 68px; padding-block: var(--space-sm); }
+.wordmark { display: inline-flex; align-items: center; gap: var(--space-md); font-size: 2rem; font-weight: 900; white-space: nowrap; }
+.wordmark svg { width: 48px; height: 36px; }
+.topbar nav { font-size: 1.25rem; font-weight: 500; gap: var(--space-xl); }
+.topbar nav a { gap: var(--space-sm); }
+.topbar nav svg { width: 18px; height: 18px; }
+.topbar a[aria-current=page] { text-decoration-thickness: 2px; }
+.skip { top: 0; left: 0; }
+@media (max-width: 640px) {
+  .shell { width: calc(100% - 32px); }
+  .topbar { flex-wrap: wrap; gap: 0; }
+  .wordmark { font-size: 1.5rem; gap: var(--space-sm); }
+  .wordmark svg { width: 32px; height: 24px; }
+  .topbar nav { width: 100%; justify-content: space-between; gap: var(--space-md); font-size: .9375rem; }
+}

@@ -1,7 +1,9 @@
 # Image workspace — issue #3
 
-The React/TypeScript/Vite workspace lives in `web/`, at `/detect`. Until T5 ships
-the showcase, Netlify redirects `/` there. The original Streamlit app, its
+The React/TypeScript/Vite workspace lives in `web/`, at `/detect`. Issue #6 adds
+the showcase at `/`; Netlify rewrites `/detect` and `/detect/` to the app entry
+for direct navigation and refresh, without redirecting the public root.
+The original Streamlit app, its
 requirements, and all checkpoint bytes remain unchanged. Video, downloadable
 media, JSON, and CSV controls were not part of issue #3; issue #4 adds them as
 documented in [image-exports.md](image-exports.md).

@@ -1,0 +1,38 @@
+AutoScan AI published demonstration (not visitor media)
+
+Photograph: Lexus LX 570, 20 June 2009, by M 93 (Matthias).
+Source and permission, verified 15 November 2026:
+https://commons.wikimedia.org/w/index.php?title=File:Lexus_LX_570_20090620_rear.JPG&oldid=1254744190
+Author: https://commons.wikimedia.org/wiki/User:M_93
+Permission: attribution only. The copyright holder allows use for any purpose,
+including redistribution, derivative works and commercial use, with attribution.
+https://commons.wikimedia.org/wiki/Template:Attribution
+
+Downloaded Wikimedia's 1280px thumbnail, preserving the full composition and
+existing image content. No watermark was removed. lexus-lx570.jpg is the source;
+lexus-detections.png adds actual model annotations. No synthetic boxes or scores.
+The German vehicle has no Moroccan plate; the false plate detection on the side
+step and SUV classification as truck are deliberately retained, not ground truth.
+
+One anonymous production API job on 15 November 2026, all three object types,
+40% confidence, returned four detections at 1280 x 915 pixels. PNG, JSON and CSV
+are the byte-for-byte downloaded results of that same job. The job was deleted
+after retrieval. These deliberately published static samples do not expire;
+JSON's original expires_at records the historical temporary job, not this copy.
+Live visitor results remain private and expire after thirty minutes.
+
+JSON retains the actual model digests, runtime, settings and raw identities.
+CSV retains the service's stable twelve-column image-export schema.
+This is a demonstration of model output, not an accuracy or performance benchmark.
+
+Original project contributors:
+El-Ouaragli Zayd; El-Abbass Ossama; Nassiri Mosab; Hassan Fares; Aly Guinga.
+Source: https://github.com/MS3B09/autoscan-ai
+Logo dataset: https://universe.roboflow.com/ms3b/logos-teamx/dataset/1
+Plate dataset: https://universe.roboflow.com/plate-detection/plate_detection-tp5h9
+Inference: https://github.com/ultralytics/ultralytics (AGPL-3.0 / enterprise terms).
+
+Photograph reuse permission does not clear model or dataset licensing. The
+repository's Apache-2.0 license does not override upstream model/software/data
+terms. Confirm the AGPL source-disclosure/license arrangement and training-data
+permissions before public release. No enterprise license is claimed or purchased.

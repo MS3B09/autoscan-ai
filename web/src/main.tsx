@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@fontsource/red-hat-display/latin-600.css';
+import '@fontsource/red-hat-display/latin-900.css';
 import '@fontsource/red-hat-text/latin-400.css';
 import '@fontsource/red-hat-text/latin-500.css';
 import { APIError, jobPath, request, type Capability, type Job, type ObjectType } from './api';
+import { Showcase } from './showcase';
+import { SiteFooter, SiteHeader } from './site';
 import './style.css';
 
 const objectTypes: { value: ObjectType; label: string; note: string }[] = [
@@ -208,14 +211,8 @@ function Workspace() {
 
   return <>
     <a className="skip" href="#workspace">Skip to detector</a>
-    <header className="shell topbar">
-      <a className="wordmark" href="/detect">AutoScan AI</a>
-      <nav aria-label="Main navigation">
-        <a href="/detect" aria-current="page">Detector</a>
-        <a href="https://github.com/MS3B09/autoscan-ai">GitHub</a>
-      </nav>
-    </header>
-    <main id="workspace" className="shell">
+    <SiteHeader detector />
+    <main id="workspace" className="shell" tabIndex={-1}>
       <div className="intro"><h1>See what your image holds.</h1>
         <p>Detect vehicles, brand logos, and plates in images and short videos. Inspect the real model results.</p></div>
       <section className="controls" aria-label="Media and detection settings">
@@ -328,8 +325,10 @@ function Workspace() {
         <p>Shared free GPU capacity can mean queues, cold starts, or quota errors. Plate detection does not read plate text.</p>
       </section>
     </main>
-    <footer className="shell"><span>AutoScan AI</span><a href="https://github.com/MS3B09/autoscan-ai#about-the-project-and-authors">Original contributors and datasets</a></footer>
+    <SiteFooter />
   </>;
 }
 
-createRoot(document.getElementById('root')!).render(<Workspace />);
+const detector = window.location.pathname.replace(/\/$/, '') === '/detect';
+document.title = detector ? 'Image and video detector | AutoScan AI' : 'AutoScan AI | See what the models detect';
+createRoot(document.getElementById('root')!).render(detector ? <Workspace /> : <Showcase />);

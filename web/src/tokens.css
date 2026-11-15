@@ -7,9 +7,9 @@
   --color-ink: #191b17;
   --color-muted: #5c584f;
   --color-rule: #b9af99;
-  --color-accent: #f7802d;
+  --color-accent: #e96f1b;
   --color-accent-ink: #191b17;
-  --color-accent-hover: #ef6e18;
+  --color-accent-hover: #db5f10;
   --color-focus: #8c3800;
   --color-error: #98281d;
   --color-vehicle: #0059b3;
@@ -17,10 +17,13 @@
   --color-plate: #a92316;
   --font-display: 'Red Hat Display', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Red Hat Text', ui-sans-serif, system-ui, sans-serif;
+  --font-code: ui-monospace, monospace;
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
+  --space-label: 12px;
+  --space-columns: 32px;
   --space-xl: 48px;
   --radius-control: 6px;
   --radius-panel: 8px;

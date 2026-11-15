@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-15T16:14:32Z",
+  "title": "Design System: AutoScan AI",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Warm manila" },
+      "paper-3": { "role": "neutral", "displayName": "Muted paper" },
+      "sheet": { "role": "neutral", "displayName": "Warm sheet" },
+      "image": { "role": "neutral", "displayName": "Image white" },
+      "ink": { "role": "neutral", "displayName": "Dark ink" },
+      "muted": { "role": "neutral", "displayName": "Muted ink" },
+      "rule": { "role": "neutral", "displayName": "Quiet rule" },
+      "accent": { "role": "primary", "displayName": "Action orange" },
+      "accent-ink": { "role": "neutral", "displayName": "Dark action ink" },
+      "accent-hover": { "role": "primary", "displayName": "Action orange hover" },
+      "focus": { "displayName": "Focus brown" },
+      "error": { "displayName": "Error red" },
+      "vehicle": { "displayName": "Vehicle blue" },
+      "logo": { "displayName": "Logo teal" },
+      "plate": { "displayName": "Plate red" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Showcase display", "purpose": "Heavy showcase headline; weight 900 also identifies the wordmark." },
+      "workspace-headline": { "displayName": "Workspace headline", "purpose": "Quieter operating hierarchy; 2rem at 640px and below." },
+      "compare-title": { "displayName": "Compare title", "purpose": "Showcase image captions and legend; image captions become 1.25rem on mobile." },
+      "workspace-title": { "displayName": "Workspace title", "purpose": "Workspace comparison, results, and privacy headings." },
+      "body": { "displayName": "Body", "purpose": "Regular prose; normally capped at 72ch." },
+      "label": { "displayName": "Label", "purpose": "Medium-weight native control labels." },
+      "code": { "displayName": "Code only", "purpose": "JSON/CSV preview contents, never general metadata or controls." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "active-press", "value": "transform: translateY(1px)", "purpose": "Immediate native-button and entry-link press feedback; no transition." },
+      { "name": "reduced-motion", "value": "@media (prefers-reduced-motion: reduce) { button:active, .entry:active { transform: none; } }", "purpose": "Remove active movement for reduced-motion preferences." }
+    ],
+    "breakpoints": [
+      { "name": "two-column", "value": "1000px" },
+      { "name": "mobile", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Native Detect action; real workspace disables it until ready and while locked.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Detect image</button>",
+      "css": ".ds-primary { min-height:44px; border:1px solid var(--color-ink); border-radius:var(--radius-control); background:var(--color-accent); color:var(--color-accent-ink); padding:var(--space-sm) var(--space-md); font:500 1rem/1.55 var(--font-body); cursor:pointer; } .ds-primary:hover:enabled { background:var(--color-accent-hover); } .ds-primary:focus-visible { outline:3px solid var(--color-focus); outline-offset:4px; } .ds-primary:active { transform:translateY(1px); } .ds-primary:disabled { opacity:.55; cursor:not-allowed; } @media (prefers-reduced-motion:reduce) { .ds-primary:active { transform:none; } }"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Native workspace actions including result downloads, cancellation, and deletion.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Download JSON</button>",
+      "css": ".ds-secondary { min-height:44px; border:1px solid var(--color-ink); border-radius:var(--radius-control); background:var(--color-sheet); color:var(--color-ink); padding:var(--space-sm) var(--space-md); font:500 1rem/1.55 var(--font-body); cursor:pointer; } .ds-secondary:hover { background:var(--color-paper-3); } .ds-secondary:focus-visible { outline:3px solid var(--color-focus); outline-offset:4px; } .ds-secondary:active { transform:translateY(1px); } .ds-secondary:disabled { opacity:.55; cursor:not-allowed; } @media (prefers-reduced-motion:reduce) { .ds-secondary:active { transform:none; } }"
+    },
+    {
+      "name": "Detector entry link",
+      "kind": "button",
+      "refersTo": "entry",
+      "description": "Substantial orange navigation, not a fake upload control or cross-route file transfer.",
+      "html": "<a class=\"ds-entry\" href=\"/detect#image\">Open image detector</a>",
+      "css": ".ds-entry { display:inline-flex; align-items:center; justify-content:center; width:372px; max-width:100%; min-height:64px; padding:var(--space-sm) var(--space-xl); border:1px solid var(--color-ink); border-radius:var(--radius-control); background:var(--color-accent); color:var(--color-accent-ink); font:500 1.75rem/1.55 var(--font-body); text-decoration:none; white-space:nowrap; } .ds-entry:hover { background:var(--color-accent-hover); } .ds-entry:focus-visible { outline:3px solid var(--color-focus); outline-offset:4px; } .ds-entry:active { transform:translateY(1px); } @media (max-width:640px) { .ds-entry { width:auto; min-height:52px; font-size:1.125rem; padding-inline:var(--space-lg); } } @media (prefers-reduced-motion:reduce) { .ds-entry:active { transform:none; } }"
+    },
+    {
+      "name": "Native file input",
+      "kind": "input",
+      "refersTo": "input-file",
+      "description": "Labeled native picker with linked help; media selection does not trigger inference.",
+      "html": "<div class=\"ds-upload\"><label for=\"ds-media\">Source image or short video</label><input id=\"ds-media\" type=\"file\" accept=\".png,.jpg,.jpeg,.bmp,.webp,.mp4,.mov,.avi,.asf,.m4v,.mpeg\" aria-describedby=\"ds-media-help\"><p id=\"ds-media-help\">PNG, JPG, BMP, WebP. Up to 10 MB and 12 megapixels.</p></div>",
+      "css": ".ds-upload { color:var(--color-ink); font:400 1rem/1.55 var(--font-body); } .ds-upload label { display:block; margin-bottom:var(--space-sm); font-weight:500; font-size:.9375rem; } .ds-upload input { width:100%; color:var(--color-ink); font:400 .875rem/1.55 var(--font-body); } .ds-upload input::file-selector-button { min-height:44px; margin-right:var(--space-sm); padding:var(--space-sm) var(--space-md); border:1px solid var(--color-ink); border-radius:var(--radius-control); background:var(--color-sheet); color:var(--color-ink); font:500 .875rem/1.55 var(--font-body); cursor:pointer; } .ds-upload input::file-selector-button:hover { background:var(--color-paper-3); } .ds-upload input:focus-visible { outline:3px solid var(--color-focus); outline-offset:4px; } .ds-upload input:disabled { opacity:.55; cursor:not-allowed; } .ds-upload p { color:var(--color-muted); font-size:.8125rem; margin-block:var(--space-sm); }"
+    },
+    {
+      "name": "Native object selection",
+      "kind": "input",
+      "description": "Native checkbox with associated label and a detection-not-transcription note.",
+      "html": "<fieldset class=\"ds-types\"><legend>Object types</legend><label><input type=\"checkbox\" checked><span>Plates<small>Detection, not transcription</small></span></label></fieldset>",
+      "css": ".ds-types { min-width:0; margin:0; padding:0; border:0; color:var(--color-ink); font:500 .9375rem/1.55 var(--font-body); } .ds-types legend { padding:0; margin-bottom:var(--space-sm); } .ds-types label { display:flex; align-items:center; gap:var(--space-sm); min-height:48px; cursor:pointer; } .ds-types input { width:20px; height:20px; flex-shrink:0; margin:0; accent-color:var(--color-ink); } .ds-types input:hover { cursor:pointer; } .ds-types input:focus-visible { outline:3px solid var(--color-focus); outline-offset:4px; } .ds-types input:disabled { opacity:.55; cursor:not-allowed; } .ds-types small { display:block; color:var(--color-muted); font-size:.8125rem; font-weight:400; }"
+    },
+    {
+      "name": "Main navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Underlined semantic links with current-page indication; mobile is a navigation row.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"/\" aria-current=\"page\">Project</a><a href=\"/detect\">Detector</a><a href=\"https://github.com/MS3B09/autoscan-ai\">GitHub<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M14 3h7v7m0-7L10 14M10 5H4v15h15v-6\"/></svg></a></nav>",
+      "css": ".ds-nav { display:flex; gap:var(--space-xl); color:var(--color-ink); font:500 1.25rem/1.55 var(--font-body); } .ds-nav a { display:inline-flex; align-items:center; min-height:44px; gap:var(--space-sm); color:inherit; text-underline-offset:.25em; } .ds-nav a:hover, .ds-nav a[aria-current=page] { text-decoration-thickness:2px; } .ds-nav a:focus-visible { outline:3px solid var(--color-focus); outline-offset:4px; } .ds-nav svg { width:18px; height:18px; } @media (max-width:640px) { .ds-nav { width:100%; justify-content:space-between; gap:var(--space-md); font-size:.9375rem; } }"
+    },
+    {
+      "name": "Workspace comparison",
+      "kind": "card",
+      "refersTo": "comparison",
+      "description": "Instructional empty source/result pair; actual media replaces the wells, never fabricated annotations.",
+      "html": "<section class=\"ds-comparison\" aria-label=\"Source and detection comparison\" aria-busy=\"false\"><figure><figcaption><h2>Original</h2><span>Your selected image</span></figcaption><div class=\"ds-stage\"><p>Choose your image above.<br>Its preview will appear here.</p></div></figure><figure><figcaption><h2>Detections</h2><span>Actual inference, no example boxes</span></figcaption><div class=\"ds-stage\"><p>Your annotated media will appear here after detection.</p></div></figure></section>",
+      "css": ".ds-comparison { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-lg); padding:var(--space-lg); border:1px solid var(--color-ink); border-radius:var(--radius-panel); background:var(--color-sheet); color:var(--color-ink); font:400 1rem/1.55 var(--font-body); } .ds-comparison figure { min-width:0; margin:0; } .ds-comparison figcaption { display:flex; flex-direction:column; gap:var(--space-xs); margin-bottom:var(--space-md); } .ds-comparison h2 { margin:0; font:600 1.5rem/1.15 var(--font-display); } .ds-comparison figcaption span { color:var(--color-muted); font-size:.8125rem; overflow-wrap:anywhere; } .ds-stage { min-height:260px; aspect-ratio:4/3; display:grid; place-items:center; background:var(--color-paper-3); } .ds-stage p { margin-block:var(--space-sm); padding:var(--space-lg); text-align:center; color:var(--color-muted); } @media (max-width:640px) { .ds-comparison { grid-template-columns:minmax(0,1fr); padding:var(--space-md); } .ds-stage { min-height:180px; } }"
+    },
+    {
+      "name": "Data preview",
+      "kind": "card",
+      "refersTo": "data-preview",
+      "description": "Body-font heading and focusable, internally scrolling code pane for published sample data.",
+      "html": "<div class=\"ds-data\"><h3>JSON (detection excerpt)</h3><pre role=\"region\" aria-label=\"JSON sample preview\" tabindex=\"0\"><code>{\n  &quot;filename&quot;: &quot;lexus-lx570.jpg&quot;\n}</code></pre></div>",
+      "css": ".ds-data { min-width:0; border:1px solid var(--color-rule); border-radius:var(--radius-panel); background:var(--color-sheet); color:var(--color-ink); overflow:clip; } .ds-data h3 { margin:0; padding:var(--space-sm) var(--space-md); border-bottom:1px solid var(--color-rule); font:500 1rem/1.4 var(--font-body); } .ds-data pre { height:128px; overflow:auto; margin:0; padding:var(--space-sm) var(--space-md); font:400 .8125rem/1.5 var(--font-code); } .ds-data code { font:inherit; } .ds-data pre:focus-visible { outline:3px solid var(--color-focus); outline-offset:-3px; }"
+    },
+    {
+      "name": "Detection legend markers",
+      "kind": "custom",
+      "refersTo": "legend-label",
+      "description": "Non-interactive category labels with outlined swatches; not chips or toggles.",
+      "html": "<ul class=\"ds-legend\"><li><span class=\"ds-legend-label\">truck</span><span>82.8%</span></li><li><span class=\"ds-legend-label ds-logo\">lexus</span><span>95.4%</span></li><li><span class=\"ds-legend-label ds-plate\">Plate</span><span>75.4%</span></li></ul>",
+      "css": ".ds-legend { margin-block:var(--space-lg); padding:0; list-style:none; color:var(--color-ink); font:400 1rem/1.55 var(--font-body); } .ds-legend li { display:flex; align-items:baseline; justify-content:space-between; gap:var(--space-sm); margin-block:var(--space-md); font-variant-numeric:tabular-nums; } .ds-legend-label { display:inline-flex; align-items:center; gap:var(--space-sm); } .ds-legend-label::before { content:''; width:20px; height:16px; border:3px solid var(--color-vehicle); border-radius:2px; } .ds-legend-label.ds-logo::before { border-color:var(--color-logo); } .ds-legend-label.ds-plate::before { border-color:var(--color-plate); } @media (max-width:1000px) { .ds-legend { display:flex; flex-wrap:wrap; gap:var(--space-lg); margin-block:var(--space-sm); } .ds-legend li { margin:0; gap:var(--space-md); } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Compare",
+    "overview": "Warm manila ground, dark ink rules, orange actions, heavy grotesk typography, and paired-image hierarchy describe the implemented authority. The showcase lets real source/output images lead; the detector carries the same materials into a quieter, native-control workspace. Comparison, not decoration or performance claims, supplies the emphasis.\n\nThis records shipped issue #6, approved Option A; it does not introduce a new world. Ground truth is `web/src/tokens.css`, `style.css`, `showcase.css`, `site.tsx`, `showcase.tsx`, and `main.tsx`. Product constraints live in `PRODUCT.md`; the surface-specific contract remains in `docs/design/showcase.md`.",
+    "keyCharacteristics": [
+      "Warm manila ground and dark ruled structure.",
+      "Orange actions with dark ink text.",
+      "Heavy showcase grotesks; quieter workspace hierarchy.",
+      "Real paired imagery, readable data, and explicit limitations.",
+      "Native controls, visible focus, and distinct responsive layouts."
+    ],
+    "rules": [
+      { "name": "The Dark Action Ink Rule", "body": "Preserve dark ink on orange in both default and hover states; do not copy the comp's white button lettering.", "section": "colors" },
+      { "name": "The Two Weights of Attention Rule", "body": "Keep showcase display at 900 and workspace headings at 600; body text remains 400/500 and monospace remains code-only.", "section": "typography" }
+    ],
+    "dos": [
+      "Do preserve dark action ink, visible focus, labeled native controls, and reduced-motion behavior.",
+      "Do keep the showcase image pair side by side on mobile while stacking the workspace comparison.",
+      "Do show real inference and matching exports, including mistakes, provenance, and temporary-result limitations.",
+      "Do retain Display 900/600, Text 400/500, and code-only monospace in their existing roles."
+    ],
+    "donts": [
+      "Don't replace semantic links, buttons, inputs, tables, or disclosures with decorative imitations.",
+      "Don't invent boxes, benchmark claims, OCR, persistence, automatic retries, or new service features.",
+      "Don't add shadows, pills, decorative metadata kickers, or a new visual metaphor to this recorded system.",
+      "Don't treat photo-matching bypass or the four-fix ship verdict as a machine plate-gate pass or licensing clearance."
+    ]
+  }
+}
