@@ -20,6 +20,12 @@ fallback is added. The original Streamlit application/checkpoints are unchanged.
   16.1.0 was rejected after a Windows native MPEG-opening crash during testing.
   Existing model/runtime dependencies retain their pins. Native codec diagnostics
   are suppressed so untrusted media metadata cannot become application logs.
+- Validation/preview codecs run in a separate process with a **fifty-second wall
+  limit**, two encoder threads and one decoder thread. A crash, timeout, or temporary
+  disk failure returns an actionable 503, releases admission, and removes files
+  instead of hanging the HTTP process. AVI RIFF/LIST chunk bounds are checked
+  recursively so truncated containers cannot masquerade as complete shorter clips,
+  even when the outer RIFF length has been rewritten.
 - Process every decoded frame using every selected trusted detector, preserving
   validation of class identities, coordinates, dimensions, and confidence. Source
   timing is checked again while processing; no assumed FPS drives progress/exports.

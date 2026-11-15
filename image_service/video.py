@@ -54,6 +54,23 @@ def inspect_video(content, suffix):
         with open_source(BytesIO(content)) as container:
             if VIDEO_FORMATS[suffix] not in container.format.name.split(","):
                 raise VideoError("The decoded video container does not match its filename.", 415)
+            if container.format.name == "avi":
+                # AVI frame headers can count empty time slots; RIFF bounds independently catch truncation.
+                containers = [(0, len(content))]
+                while containers:
+                    offset, boundary = containers.pop()
+                    while offset < boundary:
+                        if offset + 8 > boundary:
+                            raise VideoError("AVI container is truncated. Re-export the complete clip.")
+                        length = int.from_bytes(content[offset + 4:offset + 8], "little")
+                        end = offset + 8 + length
+                        if end > boundary:
+                            raise VideoError("AVI container is truncated. Re-export the complete clip.")
+                        if content[offset:offset + 4] in [b"RIFF", b"LIST"]:
+                            if length < 4:
+                                raise VideoError("AVI container has invalid chunk lengths. Re-export the clip.")
+                            containers.append((offset + 12, end))
+                        offset = end + length % 2
             stream = container.streams.video[0] if container.streams.video else None
             timestamps: list[Fraction] = []
             durations = []
@@ -214,10 +231,10 @@ def detect_video(models, source, settings, cancelled):
 
 def prepare_video(content, suffix, root, preview):
     # Native decoders can crash or hang: never run untrusted upload codecs in the HTTP process.
-    with tempfile.TemporaryDirectory(prefix="preview-", dir=root) as directory:
-        path = Path(directory)
-        (path / "input").write_bytes(content)
-        try:
+    try:
+        with tempfile.TemporaryDirectory(prefix="preview-", dir=root) as directory:
+            path = Path(directory)
+            (path / "input").write_bytes(content)
             subprocess.run([sys.executable, "-m", "image_service.video", str(path), suffix,
                             "preview" if preview else "validate"],
                            cwd=Path(__file__).resolve().parents[1], check=True, timeout=50,
@@ -226,10 +243,10 @@ def prepare_video(content, suffix, root, preview):
             if "error" in info:
                 raise VideoError(info["error"], info["status"])
             return (path / "preview.mp4").read_bytes() if preview else bytes(content), info
-        except subprocess.TimeoutExpired:
-            raise VideoError("Video validation/preview timed out. Try a shorter clip or re-export as H.264 MP4.", 503) from None
-        except (subprocess.CalledProcessError, OSError, json.JSONDecodeError):
-            raise VideoError("Video validation/encoding is unavailable or failed safely. Re-export the clip or try again later.", 503) from None
+    except subprocess.TimeoutExpired:
+        raise VideoError("Video validation/preview timed out. Try a shorter clip or re-export as H.264 MP4.", 503) from None
+    except (subprocess.CalledProcessError, OSError, json.JSONDecodeError):
+        raise VideoError("Video validation/encoding or temporary storage is unavailable. Re-export the clip or try again later.", 503) from None
 
 
 if __name__ == "__main__":

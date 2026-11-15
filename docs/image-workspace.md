@@ -142,7 +142,7 @@ Deploy only this explicit mapping; never upload the working tree or visitor medi
 
 | Local | Space |
 | --- | --- |
-| `image_service/{__init__,api,detector,app}.py` | Same paths |
+| `image_service/{__init__,api,detector,video,app}.py` | Same paths |
 | `image_service/space-entry.py` | `app.py` |
 | `image_service/space-README.md` | `README.md` |
 | `image_service/requirements.txt` | `requirements.txt` |

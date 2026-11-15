@@ -266,6 +266,39 @@ class VideoAPITests(unittest.TestCase):
                 self.assertEqual(client.get("/api/health").status_code, 200)
                 self.assertEqual(list(Path(storage).iterdir()), [])
 
+    def test_truncated_avi_is_not_presented_as_a_shorter_completed_clip(self):
+        original = clip(frames=20, rate=25, format="avi", codec="mpeg4")
+        position = original.index(b"movi") + 4
+        pictures = 0
+        while position + 8 <= len(original):
+            if original[position:position + 4] in [b"00dc", b"00db"]:
+                if pictures == 10:
+                    break
+                pictures += 1
+            length = int.from_bytes(original[position + 4:position + 8], "little")
+            position += 8 + length + length % 2
+        self.assertEqual(pictures, 10)
+        shortened = bytearray(original[:position])
+        shortened[4:8] = (len(shortened) - 8).to_bytes(4, "little")
+        with tempfile.TemporaryDirectory() as storage:
+            with TestClient(create_app(lambda *args: None, storage_root=storage)) as client:
+                for content in [original[:position], shortened]:
+                    with self.subTest(rewritten_outer_length=content is shortened):
+                        response = client.post("/api/preview?filename=truncated.avi", content=bytes(content))
+                        self.assertEqual(response.status_code, 422)
+                        self.assertEqual(list(Path(storage).iterdir()), [])
+
+    def test_video_storage_failure_is_actionable_and_leaves_no_upload(self):
+        with tempfile.TemporaryDirectory() as storage:
+            with TestClient(create_app(lambda *args: None, storage_root=storage), raise_server_exceptions=False) as client:
+                content = clip()
+                for target in ["tempfile.TemporaryDirectory", "pathlib.Path.write_bytes"]:
+                    with self.subTest(operation=target), patch(target, side_effect=OSError("private disk path")):
+                        response = client.post("/api/preview?filename=storage.mp4", content=content)
+                    self.assertEqual(response.status_code, 503)
+                    self.assertNotIn("private", response.text)
+                    self.assertEqual(list(Path(storage).iterdir()), [])
+
 
 if __name__ == "__main__":
     unittest.main()
