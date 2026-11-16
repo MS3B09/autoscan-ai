@@ -18,6 +18,7 @@ export type Job = {
   settings: { types: ObjectType[]; confidence: number };
   detections: Detection[];
   error: string | null;
+  retry_at?: number;
   expires_at: number | null;
   media_type: 'image' | 'video';
   frame_count?: number;
@@ -27,9 +28,10 @@ export type Job = {
 };
 
 const base = (import.meta.env.VITE_AUTOSCAN_API ?? '').replace(/\/$/, '');
+export const developerMode = base === 'http://127.0.0.1:7862';
 
 export class APIError extends Error {
-  constructor(readonly status: number, message: string) { super(message); }
+  constructor(readonly status: number, message: string, readonly retry_at?: number) { super(message); }
 }
 
 export async function request(path: string, init: RequestInit = {}, capability?: Capability) {
@@ -53,7 +55,9 @@ export async function request(path: string, init: RequestInit = {}, capability?:
     throw new APIError(response.status, typeof body?.detail === 'string' ? body.detail :
       response.status === 404 ? 'Job unavailable, deleted, or expired.' :
       response.status === 429 ? 'The free backend quota is exhausted. Try again later.' :
-      'The free backend is busy, starting, or unavailable. Try again later.');
+      'The free backend is busy, starting, or unavailable. Try again later.',
+      response.status === 429 && typeof body?.retry_at === 'number' && body.retry_at > 0 &&
+        Number.isFinite(new Date(body.retry_at * 1000).getTime()) ? body.retry_at : undefined);
   }
   return response;
 }

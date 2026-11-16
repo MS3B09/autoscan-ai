@@ -6,13 +6,61 @@ not change the saved Hugging Face login, write a token file, expose a token to
 the frontend, or enable paid hardware/credits. Tokens share their account's quota;
 creating another token does not create another allowance.
 
+## Local browser testing
+
+Use two local PowerShell terminals. Install the backend/test environment described
+in [image-workspace.md](image-workspace.md) first; the adapter uses the existing
+FastAPI, HTTPX, AnyIO, and Uvicorn dependencies. It never reads cached HF credentials.
+
+**Terminal 1**, from `E:\autoscan-ai`:
+
+```powershell
+python -m scripts.dev_api
+```
+
+Enter the dedicated `autoscan-inference` READ token at the hidden prompt, not in
+chat or the command itself. Startup verifies the free `MS3B09` personal account
+and READ role without running inference. The token stays in process memory;
+Ctrl+C stops the adapter. Do not expose or deploy it, tunnel its port, enable
+paid GPU usage, or share this local frontend with untrusted code/users.
+
+**Terminal 2**, from `E:\autoscan-ai\web`:
+
+```powershell
+$env:VITE_AUTOSCAN_API = 'http://127.0.0.1:7862'
+npm run dev -- --port 5173 --strictPort
+```
+
+Open **http://127.0.0.1:5173/detect**, not `localhost`. The notice identifies local
+developer mode. Selecting media only validates/previews it. Detect submits one
+job and can consume your personal free quota; do not repeatedly retry failures.
+The adapter checks quota before every submission, requiring the Space's full
+60-second reservation and a remaining run. Known exhaustion returns the latest
+required platform reset time; missing timing remains explicitly unavailable.
+Quota checks are a preflight, not a reservation or a GPU-availability guarantee.
+
+Only new-job submissions receive HF authentication. Preview stays anonymous;
+status, media, exports, cancellation, and deletion retain the per-job key. The
+adapter accepts only loopback requests with the exact frontend Origin and API
+Host, forwards only known routes to the fixed HTTPS Space, and never retries a
+submission. These browser protections do not defend against malicious local
+processes or code running on the trusted frontend origin.
+
+When done, stop both terminals with Ctrl+C. Before restarting the ordinary public
+frontend, replace the URL with
+`https://ms3b09-autoscan-ai-images.hf.space` or remove the temporary variable.
+Never use the loopback adapter URL in a public build or any token in `VITE_*`.
+Public visitors remain anonymous; developer mode adds no public login flow.
+
+## Command-line hosted check
+
 Run these commands in **one local PowerShell terminal** from `E:\autoscan-ai`.
 Do not paste the token into chat, a command argument, a repository file, or any
 `VITE_` variable. Close the terminal or remove the environment variable afterward.
 The hidden prompt keeps the token out of command history; the resulting process
 environment is still a secret, not encrypted storage.
 
-## 1. Enter the token and verify identity (no GPU use)
+### 1. Enter the token and verify identity (no GPU use)
 
 ```powershell
 $env:AUTOSCAN_TEST_HF_TOKEN = [System.Net.NetworkCredential]::new('', (Read-Host 'Paste autoscan-inference token (hidden)' -AsSecureString)).Password
@@ -24,7 +72,7 @@ token name `autoscan-inference`, and role `read`. This calls the Hub identity AP
 not an inference endpoint; it does not establish remaining GPU quota or verify
 that the platform attributes a custom image-job invocation to that account.
 
-## 2. Run one hosted inference/export check
+### 2. Run one hosted inference/export check
 
 This requests inference using your token and can spend your account's free quota. Do not
 run the entire hosted suite or repeatedly retry a quota failure. The command
@@ -64,4 +112,7 @@ Remove-Item Env:AUTOSCAN_TEST_HF_TOKEN -ErrorAction SilentlyContinue
 
 Local `test_hosted_image_client.py` checks outgoing HTTP credential selection
 with fake tokens at the external HTTP boundary. Those checks consume no GPU and
-are not hosted-authentication evidence. The public frontend remains unchanged.
+are not hosted-authentication evidence. `test_dev_api.py` checks the local adapter
+at its HTTP boundary with fake Hub/Space responses. The developer browser replay
+checks preview, explicit submission, result, keyboard download, and deletion;
+it does **not** prove live HF authentication or quota attribution.

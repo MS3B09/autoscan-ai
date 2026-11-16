@@ -304,6 +304,58 @@ class ImageAPITests(unittest.TestCase):
                     self.assertEqual(client.get("/api/jobs/" + job["id"] + suffix,
                                                  headers={"Authorization": "Bearer " + job["token"]}).status_code, 409)
 
+    def test_quota_failure_preserves_only_platform_retry_time(self):
+        def limited_gpu(source, settings, cancelled, context):
+            raise RuntimeError("You have exceeded your free ZeroGPU quota (60s requested vs. 10s left). "
+                               "Try again in 1:02:03.500000. sensitive/path hf_private_token")
+
+        with tempfile.TemporaryDirectory() as storage:
+            with TestClient(create_app(limited_gpu, storage_root=storage)) as client:
+                self.client = client
+                with patch("image_service.api.time.time", return_value=1704067200):
+                    job = self.submit().json()
+                    result = self.wait(job).json()
+                self.assertEqual(result["state"], "error")
+                self.assertEqual(result["retry_at"], 1704070924)
+                self.assertIn("2024-01-01 01:02:04 UTC", result["error"])
+                self.assertNotIn("sensitive", str(result))
+                self.assertNotIn("hf_private", str(result))
+                endpoint = "/api/jobs/" + job["id"]
+                self.assertEqual(client.get(endpoint).status_code, 404)
+                self.assertEqual(client.get(endpoint + "/download/json",
+                                           headers={"Authorization": "Bearer " + job["token"]}).status_code, 409)
+
+    def test_quota_without_valid_timing_does_not_invent_a_reset(self):
+        message = ""
+
+        def limited_gpu(source, settings, cancelled, context):
+            raise RuntimeError(message)
+
+        cases = ["Space app has reached its GPU limit. ZeroGPU quota exceeded.",
+                 "You have exceeded your ZeroGPU runs limit.",
+                 "Quota exceeded. Try again in 0:00:00.",
+                 "Quota exceeded. Try again in 25:00:00.",
+                 "Quota exceeded. Try again in 0:65:00.",
+                 "Quota exceeded. Try again in -1:00:00.",
+                 "Quota exceeded. Try again in 0:01:00.1234567."]
+        with tempfile.TemporaryDirectory() as storage:
+            with TestClient(create_app(limited_gpu, storage_root=storage, submission_limit=100)) as client:
+                self.client = client
+                for message in cases:
+                    with self.subTest(message=message):
+                        job = self.submit().json()
+                        result = self.wait(job).json()
+                        self.assertEqual(result["state"], "error")
+                        self.assertNotIn("retry_at", result)
+                        self.assertIn("did not provide a reset time", result["error"])
+                        client.delete("/api/jobs/" + job["id"], headers={"Authorization": "Bearer " + job["token"]})
+
+                message = "ZeroGPU quota exceeded. Try again in 1 day, 0:00:00."
+                with patch("image_service.api.time.time", return_value=1704067200):
+                    result = self.wait(self.submit().json()).json()
+                self.assertEqual(result["retry_at"], 1704153600)
+                self.assertIn("2024-01-02 00:00:00 UTC", result["error"])
+
     def test_download_storage_failure_is_sanitized_and_does_not_damage_other_jobs(self):
         first, second = self.submit().json(), self.submit().json()
         self.wait(first)

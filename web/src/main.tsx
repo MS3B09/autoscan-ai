@@ -4,7 +4,7 @@ import '@fontsource/red-hat-display/latin-600.css';
 import '@fontsource/red-hat-display/latin-900.css';
 import '@fontsource/red-hat-text/latin-400.css';
 import '@fontsource/red-hat-text/latin-500.css';
-import { APIError, jobPath, request, type Capability, type Job, type ObjectType } from './api';
+import { APIError, developerMode, jobPath, request, type Capability, type Job, type ObjectType } from './api';
 import { Showcase } from './showcase';
 import { SiteFooter, SiteHeader } from './site';
 import './style.css';
@@ -26,6 +26,13 @@ const states = {
 const activeStates: Job['state'][] = ['queued', 'processing', 'cancelling'];
 const pageSize = 25;
 
+function QuotaReset({ retryAt }: { retryAt: number }) {
+  const reset = new Date(retryAt * 1000);
+  return <>Free GPU quota is exhausted. Try again after <time dateTime={reset.toISOString()}>
+    {reset.toLocaleString(undefined, { timeZoneName: 'short' })}</time> (your local time).
+    {' '}GPU availability is not guaranteed.</>;
+}
+
 function Workspace() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
@@ -35,7 +42,7 @@ function Workspace() {
   const [capability, setCapability] = useState<Capability | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [annotated, setAnnotated] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | APIError>('');
   const [working, setWorking] = useState(false);
   const [retry, setRetry] = useState(0);
   const [pollFailed, setPollFailed] = useState(false);
@@ -146,7 +153,7 @@ function Workspace() {
         filename: file.name, types: types.join(','), confidence: String(confidence),
       }), { method: 'POST', body: file });
       setCapability(await response.json());
-    } catch (reason) { setError((reason as Error).message); }
+    } catch (reason) { setError(reason instanceof APIError ? reason : (reason as Error).message); }
     finally { setWorking(false); }
   }
 
@@ -214,7 +221,8 @@ function Workspace() {
     <SiteHeader detector />
     <main id="workspace" className="shell" tabIndex={-1}>
       <div className="intro"><h1>See what your image holds.</h1>
-        <p>Detect vehicles, brand logos, and plates in images and short videos. Inspect the real model results.</p></div>
+        <p>Detect vehicles, brand logos, and plates in images and short videos. Inspect the real model results.</p>
+        {developerMode && <p>Local developer mode. Detection uses your personal Hugging Face quota.</p>}</div>
       <section className="controls" aria-label="Media and detection settings">
         <div className="upload">
           <label htmlFor="image">Source image or short video</label>
@@ -257,7 +265,8 @@ function Workspace() {
         <p role="status" aria-live="polite">{!types.length ? 'Select at least one object type.' : notice}</p>
         {job?.media_type === 'video' && job.state === 'processing' && !!job.processed_frames &&
           <progress aria-label="Frames processed" value={job.processed_frames} max={job.frame_count} />}
-        {error && <p role="alert" className="error">{error}</p>}
+        {error && <p role="alert" className="error">{error instanceof APIError ?
+          error.retry_at ? <QuotaReset retryAt={error.retry_at} /> : error.message : error}</p>}
         {pollFailed && <button onClick={() => { setError(''); setRetry(value => value + 1); }}>Retry job status</button>}
         {file && !ready && error && <button onClick={() => { setError(''); setFile(new File([file], file.name)); }}>Retry {media} validation</button>}
       </div>
@@ -278,7 +287,7 @@ function Workspace() {
       {job && <section className="results" aria-labelledby="result-heading">
         <div className="result-heading"><h2 id="result-heading">Detection details</h2>
           <p>{job.detections.length} detections at {job.settings.confidence}% minimum confidence</p></div>
-        {job.error && <p className="error">{job.error}</p>}
+        {job.error && <p className="error" role="alert">{job.retry_at ? <QuotaReset retryAt={job.retry_at} /> : job.error}</p>}
         {job.media_type === 'video' && <p>{job.frame_count} frames, {job.duration_seconds?.toFixed(3)} seconds.
           Frame-level observations are repeated detections, not tracked or unique objects. Frame indices start at zero; timestamps start at the first source frame.</p>}
         {job.state === 'empty' && <p>No matching objects found. Change your media or settings to try another source or lower confidence.</p>}

@@ -3,12 +3,15 @@
 from collections import deque
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 import csv
 from importlib.metadata import PackageNotFoundError, version
 from io import BytesIO, StringIO
 import json
+import math
 from pathlib import Path
 import platform
+import re
 import secrets
 import shutil
 import tempfile
@@ -32,6 +35,19 @@ MAX_BYTES = 10_000_000
 MAX_PIXELS = 12_000_000
 CSV_COLUMNS = ["source_filename", "object_type", "class_id", "class_name", "label", "confidence",
                "x1", "y1", "x2", "y2", "width", "height"]
+
+
+def quota_retry_at(message):
+    # spaces==0.51.3 includes a Python timedelta in timed quota rejections, not every rejection.
+    match = re.search(r"\btry again in (?:(\d{1,2}) days?, )?(\d{1,2}):([0-5]\d):"
+                      r"([0-5]\d(?:\.\d{1,6})?)(?=\.?(?:\s|$))", message.lower())
+    if not match:
+        return None
+    days, hours, minutes, seconds = match.groups()
+    wait = int(days or 0) * 86400 + int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+    if int(hours) < 24 and 0 < wait <= 86400:
+        return math.ceil(time.time() + wait)
+    return None
 
 
 def normalize(content, filename):
@@ -74,6 +90,7 @@ class Job:
     state: str = "queued"
     detections: list = field(default_factory=list)
     error: str | None = None
+    retry_at: int | None = None
     deleted: bool = False
     expires: float = field(default_factory=lambda: time.monotonic() + 300)
     expires_at: float | None = None
@@ -150,9 +167,12 @@ class Jobs:
                     job.state = "cancelled" if cancelled else "error"
                     # Only known infrastructure categories leave the process; never payloads or tracebacks.
                     message = str(error).lower()
+                    quota = not isinstance(error, VideoError) and ("quota" in message or "runs limit" in message)
+                    job.retry_at = quota_retry_at(message) if quota and not cancelled else None
+                    retry = ("Try again after " + datetime.fromtimestamp(job.retry_at, timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC") + "."
+                             if job.retry_at is not None else "Hugging Face did not provide a reset time. Try again later.")
                     job.error = None if cancelled else (str(error) if isinstance(error, VideoError) else
-                                 "Free GPU quota is exhausted. Try again after the platform resets its quota."
-                                 if "quota" in message or "runs limit" in message else
+                                 "Free GPU quota is exhausted. " + retry if quota else
                                  "Video processing failed or the free backend is unavailable. Try again later; if it repeats, re-export the complete clip as H.264 MP4."
                                  if job.video else "Inference is unavailable or failed. The free backend may be starting; try again later.")
                     job.expires = time.monotonic() + 60
@@ -343,6 +363,7 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
                     "width": job.width, "height": job.height,
                     "detections": [{**detection, "source_filename": job.filename} for detection in job.detections],
                     "error": job.error, "expires_at": job.expires_at, "models": model_metadata or {},
+                    **({"retry_at": job.retry_at} if job.retry_at is not None else {}),
                     "runtime": runtime,
                     "coordinate_system": ("xyxy pixels from top-left of upright source frame; zero-based frame_index; timestamp_seconds relative to first presentation timestamp"
                                           if job.video else "xyxy pixels from top-left of EXIF-oriented, white-composited RGB input")}

@@ -11,6 +11,9 @@ async (page) => {
   let statusFailure = false;
   let downloadFailure = false;
   let expired = false;
+  let quotaTiming = true;
+  let submissionQuota = false;
+  let submissionRetryAt = 1893456000;
   let submissions = 0;
   let expiresAt = Date.now() / 1000 + 1800;
   const handler = async route => {
@@ -21,6 +24,10 @@ async (page) => {
     if (url.pathname === '/api/jobs') {
       submissions++;
       if (url.searchParams.get('confidence') !== '40' || url.searchParams.get('types') !== 'vehicle,logo,plate') throw new Error('Default settings changed');
+      if (submissionQuota) return route.fulfill({ status: 429, contentType: 'application/json', body: JSON.stringify({
+        detail: 'Free GPU quota is exhausted. Hugging Face did not provide a reset time. Try again later.',
+        ...(quotaTiming ? { retry_at: submissionRetryAt } : {}),
+      }) });
       return json({ id: 'browser-regression', token: 'test-only-capability' });
     }
     if (request.headers().authorization !== 'Bearer test-only-capability') throw new Error('Workspace dropped job capability');
@@ -36,7 +43,8 @@ async (page) => {
       contentType: state === 'empty' ? 'image/jpeg' : 'image/png', body: state === 'empty' ? source : annotated });
     if (statusFailure) return route.fulfill({ status: 503, contentType: 'application/json', body: '{"detail":"Backend unavailable. Try again."}' });
     return json({ ...example, state, expires_at: expiresAt, detections: state === 'success' ? example.detections : [],
-      error: state === 'error' ? 'Free GPU quota exhausted. Try later.' : null });
+      ...(state === 'error' && quotaTiming ? { retry_at: 1893456000 } : {}),
+      error: state === 'error' ? 'Free GPU quota is exhausted. Hugging Face did not provide a reset time. Try again later.' : null });
   };
   await page.route('**/api/**', handler);
   try {
@@ -92,9 +100,38 @@ async (page) => {
     await page.screenshot({ path: 'E:/autoscan-ai/.impeccable/review/detector-empty.png', fullPage: true });
     state = 'error';
     await prepare();
-    await page.getByText('Free GPU quota exhausted. Try later.', { exact: true }).waitFor();
+    const quotaAlert = page.getByRole('alert').filter({ hasText: 'Free GPU quota is exhausted' });
+    await quotaAlert.waitFor({ timeout: 5000 });
+    const reset = quotaAlert.locator('time');
+    if (await reset.getAttribute('datetime') !== '2030-01-01T00:00:00.000Z' || !await reset.isVisible()) {
+      throw new Error('Platform reset time is missing from the quota alert');
+    }
     if (await page.getByRole('button', { name: 'Download JSON', exact: true }).count()) throw new Error('Failed result offers downloads');
     await page.screenshot({ path: 'E:/autoscan-ai/.impeccable/review/detector-error.png', fullPage: true });
+    quotaTiming = false;
+    await prepare();
+    const fallback = page.getByRole('alert').filter({ hasText: 'Hugging Face did not provide a reset time' });
+    await fallback.waitFor();
+    if (await fallback.locator('time').count()) throw new Error('Quota fallback invented a reset time');
+    submissionQuota = true; quotaTiming = true;
+    await prepare();
+    const rejected = page.getByRole('alert').filter({ hasText: 'your local time' });
+    await rejected.waitFor();
+    if (await rejected.locator('time').getAttribute('datetime') !== '2030-01-01T00:00:00.000Z') {
+      throw new Error('Submission quota rejection lost its local reset time');
+    }
+    await page.screenshot({ path: 'E:/autoscan-ai/.impeccable/review/submission-quota.png', fullPage: true });
+    quotaTiming = false;
+    await prepare();
+    await fallback.waitFor();
+    if (await fallback.locator('time').count()) throw new Error('Submission quota fallback invented timing');
+    quotaTiming = true;
+    for (submissionRetryAt of ['2030-01-01', -1, 1e20]) {
+      await prepare();
+      await fallback.waitFor();
+      if (await fallback.locator('time').count()) throw new Error('Malformed submission timing was displayed');
+    }
+    submissionQuota = false;
     state = 'queued'; statusFailure = true;
     await prepare();
     await page.getByRole('button', { name: 'Retry job status', exact: true }).waitFor();
@@ -112,6 +149,7 @@ async (page) => {
     await prepare();
     await page.getByRole('status').filter({ hasText: 'no longer available' }).waitFor();
     return { simulatedStates: ['queued', 'processing', 'success', 'empty', 'error', 'cancelled', 'expired', 'unavailable'], submissions,
-      checks: ['explicit submit', 'unchanged defaults', 'capability headers', 'download retry', 'keyboard download', 'deletion focus', 'mobile caption', 'responsive layouts'] };
+      checks: ['explicit submit', 'unchanged defaults', 'capability headers', 'download retry', 'keyboard download', 'deletion focus',
+        'job and submission quota reset times', 'missing and malformed timing fallback', 'mobile caption', 'responsive layouts'] };
   } finally { await page.unroute('**/api/**', handler); }
 }

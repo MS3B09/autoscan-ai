@@ -27,7 +27,9 @@ Set the backend Space variable `AUTOSCAN_ORIGINS` to the exact deployed frontend
 origin, plus any development origins you need, separated by commas. The default
 allows `http://localhost:5173` and `http://127.0.0.1:5173`. CORS is only browser
 policy: every private operation also requires the job capability. No browser
-credentials, cookies, accounts, localStorage, analytics, or persistent history.
+HF credentials, cookies, accounts, localStorage, analytics, or persistent history
+in the browser. For local-only authenticated developer testing, see
+[authenticated-image-tests.md](authenticated-image-tests.md); never deploy that adapter.
 
 ## API contract
 
@@ -56,7 +58,14 @@ startup, and inference share the processing state; no invented progress or ETA.
 Busy/storage errors return 503, shared upload limits 429, oversize images 413,
 format mismatch/unsupported types 415, corrupt images/invalid settings 422, and
 uploads exceeding the streaming-time budget 408.
-Quota failures have an explicit job error. Submission is never silently retried.
+Quota failures have an explicit job error. When the pinned ZeroGPU SDK provides
+a valid wait duration, status also includes `retry_at` (Unix epoch seconds, rounded
+up). The sanitized error includes the UTC reset timestamp; the browser shows it
+in local time with its timezone. If the platform provides no valid timing, the
+message explicitly says no reset time was supplied. No midnight or 24-hours-from-
+error reset is invented. Submission is never silently retried, and a reset time
+does not guarantee GPU availability. This backend change needs deployment before
+public hosted failures can include the timestamp.
 
 ### Input and coordinates
 
@@ -136,7 +145,8 @@ queues, and event calls cannot bypass the job contract; a guard also closes thes
 during launch. Neither source nor result paths are returned. Access logging is
 disabled, and exceptions return only sanitized infrastructure categories. No
 uploaded image or detection payload is logged, committed, or served as a static
-asset. Owner authentication is used only by local deployment tooling.
+asset. Owner WRITE authentication is used only by local deployment tooling;
+optional developer inference uses an explicitly supplied READ token server-side.
 
 ## Space packaging
 
