@@ -7,6 +7,10 @@ resources and any new inference/video testing remain outside those approvals.
 The licensing disposition remains owner exception/unverified; notices and private
 training boundaries are unchanged.
 
+**Later step:** the connection blocker described below was resolved and an
+approved draft was created. See [the current Netlify handoff](issue-7-netlify-draft.md).
+The no-draft statements below describe this earlier backend-update step only.
+
 ## Completed
 
 ### Backend update

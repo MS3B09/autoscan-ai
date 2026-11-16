@@ -7,6 +7,11 @@ The final candidate video check belongs to the owner. Licensing remains an
 [owner-directed exception / unverified](evidence/release-licensing.md#owner-directed-workflow-decision--2026-11-16).
 Preserve the original Streamlit app, checkpoint bytes, credits and notices.
 
+Current approved draft IDs/URLs, artifact manifest and remaining owner/release
+gates: [Netlify draft handoff](evidence/issue-7-netlify-draft.md). A draft is not
+production approval; do not duplicate/import the project or link Git in a way
+that automatically publishes it.
+
 ## Runtime and dependencies
 
 | Component | Reproducible input |
@@ -174,8 +179,8 @@ Use an existing owner-approved **free** site/account; check its actual free quot
 and disable paid additions/automatic recharge. Do not link/push a production
 branch that can auto-publish unreviewed work. Lock automatic publishing on an
 existing Git-connected site before release changes. Record its previous production
-deploy ID and URL for rollback. No Netlify site or preview URL has been verified
-by this preparation task.
+deploy ID and URL for rollback. The current project and immutable draft are
+recorded in the handoff above; that new site has no previous production deploy.
 
 Build from the approved source with `npm ci` and the public backend URL above;
 inspect `web/dist` for secrets and record hashes before uploading. From the root,
@@ -206,6 +211,21 @@ candidate; record playback, MP4/JSON/CSV and Delete now outcome. Do not expand t
 run into cancellation/expiry/load tests. Independently disposition remaining #7
 requirements (including image/empty results, isolation, cleanup, expiry, bounds
 and failure states); leave safely unexercised ones unverified, not passed.
+
+**CLI-unavailable alternative (used for the current candidate):** with authorized
+Netlify authentication, create an empty site in the verified Free team via
+`POST /api/v1/{account_slug}/sites`, without a `repo` or initial file upload.
+Stage only `web/dist` and literal `_redirects`/`_headers` equivalents of this
+repository's TOML rules. Create a file-digest deploy with
+`POST /api/v1/sites/{site_id}/deploys` and JSON
+`{"draft":true,"files":{"/index.html":"SHA1_OF_BYTES"}}`, including **all** staged
+paths/digests, not just the example. Verify returned `context: deploy-preview`
+and site `published_deploy: null` **before** uploading files. The API need not
+echo a `draft` boolean. Upload each known path with
+`PUT /api/v1/deploys/{deploy_id}/files/{path}`; verify ready/preview/unpublished
+again after processing. Never call restore/publish or attach Git under draft-only
+approval. Retain SHA-256 hashes and compare actual public bytes and rule effects
+afterward. No credential belongs in those files or public URLs.
 
 ## Promotion, rollback and closeout — separate approvals
 

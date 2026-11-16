@@ -8,6 +8,8 @@ The React showcase and detector are implemented; public release is not yet appro
 See [local setup and deployment/rollback instructions](docs/release-runbook.md),
 [current release gates](docs/release-checklist.md), and
 [local preparation evidence](docs/evidence/issue-7-preparation.md).
+[The current Netlify draft handoff](docs/evidence/issue-7-netlify-draft.md) records
+the preview URL and remaining release gates; it is not a production release.
 The original Streamlit application and its requirements remain below/alongside this demo.
 
 <h2 id="about-the-project-and-authors"> 👋 About This Project and Authors</h2>

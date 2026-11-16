@@ -16,6 +16,12 @@ records the quota-message API update and reviewed-source GitHub push. Netlify
 dashboard access is blocked; no draft, production URL or deployed-origin pass
 exists yet. No #7 checkbox is newly accepted by those partial results.
 
+**Current draft step:** [issue-7-netlify-draft.md](issue-7-netlify-draft.md) supersedes
+the earlier no-draft/access-blocker status. A Free-plan immutable preview now has
+verified routing/headers/layout/keyboard and native anonymous still-preview CORS.
+No live inference, video, production or complete lifecycle criterion is newly
+accepted from those scoped checks.
+
 ## How to read the tracker
 
 - **Evidenced:** implemented and supported by the cited retained checks; may be

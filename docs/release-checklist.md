@@ -27,8 +27,8 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
   block preparation on the same already-disclosed issue.
 - **Limited deployment approval (2026-11-16):** the owner approved the backend
   quota-message update and Netlify draft, then separately approved pushing the
-  reviewed commits to GitHub. Backend update and source push are complete; the
-  draft is blocked by Netlify dashboard/tooling access. This is not approval for
+  reviewed commits to GitHub. Backend update, source push and Netlify draft are
+  complete; only permitted non-inference draft checks ran. This is not approval for
   production publication/promotion, paid resources or inference/video tests.
   Never expose HF tokens in frontend variables, bundles, URLs, logs or repositories.
 
@@ -42,7 +42,7 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Quota reset messages and developer adapter | Backend API update deployed at `b6c91e2`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
 | Local release preparation | Runbook, Node pin, 29 safe local tests, typechecks, clean frontend build and scoped artifact/history secret checks completed; final review recorded in the linked evidence. No deployed-origin pass. | #7 |
-| Approved source push / Netlify draft | Reviewed source through `472677d` pushed to GitHub with approval. Netlify signed in but dashboard cannot connect; no site/draft created, no plan/deployed-origin pass verified. | #7 |
+| Approved source push / Netlify draft | Source through `7fb3fc1` pushed; Free-plan draft `6afb394cb63bcc5d8c896112` ready, no published deploy, Git unlinked. Routing/headers/keyboard/layout and native anonymous still-preview/preflights passed; no live inference/lifecycle acceptance. | #7 |
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
@@ -62,6 +62,12 @@ results above are not a new full-suite run.
 Later approved deployment/source-push results and the Netlify blocker:
 [issue-7-backend-update.md](evidence/issue-7-backend-update.md). Earlier statements
 that no deployment/push had occurred are historical, not the current status.
+
+The Netlify connection blocker is now resolved. Exact draft URLs, artifact hashes,
+origin wiring, non-inference browser checks and owner handoff:
+[issue-7-netlify-draft.md](evidence/issue-7-netlify-draft.md). Use that immutable
+draft, not the unpromoted production hostname. Git integration remains unlinked
+to avoid automatic publication.
 
 ## Licensing disposition — #6 / #7
 
@@ -87,12 +93,12 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
    status-wording finding. Fresh deployed source/model/runtime inventory and final
    uploaded-artifact checks still belong to the approved deployment, not the local
    preparation pass.
-2. **Approved preview — #7.** Backend update and source push are complete. Resolve
-   Netlify access, verify free-tier controls, create/select the project without
-   automatic production publication, and prepare a draft. Add its exact backend
-   origin, then check HTTPS, root/detector refresh, navigation, desktop/mobile/
-   keyboard UI, headers and image preview without inference. These checks alone
-   cannot prove GPU execution or the full deployed job lifecycle.
+2. **Approved preview — #7, completed at permitted scope.** Free-plan draft ready;
+   exact origin added, HTTPS/refresh/headers/keyboard/desktop/mobile and native
+   still-preview/preflight checks passed without inference. This was a local-build
+   file-digest deployment, not a Netlify Git build, full inference workflow or
+   production promotion. Remaining job/lifecycle/runtime/resource evidence stays
+   explicit in the linked handoff.
 3. **Owner's final video test — #5 / #7.** After preparation, the owner tests a
    representative accepted clip against the release candidate, checking actual
    playback, MP4/JSON/CSV downloads, and deletion. Record outcome and exact build;
