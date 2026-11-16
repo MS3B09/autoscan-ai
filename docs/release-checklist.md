@@ -14,10 +14,12 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
   consume quota just to exercise an error, or retry submissions automatically.
 - After each upcoming task, report remaining work in the conversation with its
   ticket number. Keep unverified checks distinct from failures and passes.
-- MS3B09 confirms training both custom models. **Training notebooks/configuration
-  will not be shared:** do not request or publish them, assume a new checkpoint
-  license, or treat trainer identity as clearing upstream rights. Assess a
-  compatible source/licensing arrangement before clearing the release gate.
+- MS3B09 confirms training both custom models on the README-linked datasets,
+  starting from `yolov8n.pt`, and permits public app code/model files. **Training
+  materials stay private:** do not request or publish notebooks/configuration.
+  These factual/publication-scope questions are answered; do not ask repeatedly.
+  This is not approval to change licenses or push/deploy immediately. Assess
+  upstream source/licensing compatibility before clearing the release gate.
 - Pushing source, updating the existing Space, and publishing/promoting Netlify
   deployments still require approval. Never enable paid resources or expose HF
   tokens in frontend variables, bundles, URLs, logs, or repositories.
@@ -40,10 +42,11 @@ Prior evidence: [video](evidence/issue-5-verification.md),
 
 1. **Licensing/attribution — #6, blocking #7.** Evidence audit complete: original
    dataset declarations are logo CC BY 4.0 and plate CC0/Public Domain; photo
-   permission is reconfirmed. MS3B09 confirms training both custom models but will
-   not share notebooks/configuration. Resolve the remaining checkpoint/training-
-   chain questions and an owner-approved compliant
-   source/license arrangement. Do not infer permission from public downloads or
+   permission is reconfirmed. Owner confirms the linked training datasets,
+   `yolov8n.pt` starting weights, and public app/model files; training materials
+   remain private. Owner provenance questions are answered. Resolve whether the
+   upstream source/license terms permit that arrangement, rather than requesting
+   more private training evidence. Do not infer permission from public downloads or
    the repository's Apache-2.0 file. Do not change licenses or buy permission
    without approval. See [the licensing evidence](evidence/release-licensing.md).
 2. **Ticket/evidence reconciliation — #5 / #6 / #7, parent #1.** Reconcile

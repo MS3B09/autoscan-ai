@@ -21,9 +21,9 @@ after remaining work; historic evidence is not a fresh pass or authorization.
 | Project software | Root `LICENSE` contains Apache-2.0; README names five contributors and both datasets. | This does not license third-party code, weights or images. Owner must approve an appropriate combined-work/source arrangement. |
 | `ultralytics==8.4.189` | `image_service/requirements.txt` pins it; tagged LICENSE is GNU AGPLv3 and package metadata says AGPL-3.0 [U1,U2]. | No approved compliance inventory/source offer tied to the actual release; no alternative grant evidenced. **Blocked.** |
 | Vehicle `models/yolov8n.pt` | Backend evidence pins official `Ultralytics/YOLOv8` revision below; that revision's model card says `license: agpl-3.0` [V1]. | Must be included in the source/license/notice arrangement; model permission does not blanket-license COCO images. |
-| Custom `models/logo.pt` | Owner confirms MS3B09 trained it (2026-11-16); pinned identity below; README points to LOGOS TEAMX; Ultralytics claims AGPL defaults for trained models [U3]. | Specific checkpoint grant, base weights, actual training version/data and required source remain unresolved. Trainer identity is owner-confirmed, not independently audited. Dataset CC BY is not automatically a checkpoint license. **Blocked.** |
-| Custom `models/plate.pt` | Owner confirms MS3B09 trained it (2026-11-16); pinned identity below; README points to plate dataset. | Remaining grant/training-chain/source scope is unresolved; a similarly named Roboflow hosted model is not proof of this checkpoint's identity. **Blocked.** |
-| Logo dataset v1 | Public original version page now accessible: MS3B, CC BY 4.0, 2,782 images, generated 2024-04-19 [D1,D2]. | Need actual training/export linkage and any retained third-party notices/rights exceptions; uploader label is evidence, not a warranty of every image's rights. |
+| Custom `models/logo.pt` | MS3B09 confirms training on the README-linked dataset from `yolov8n.pt` and permits public app/model files (2026-11-16); pinned identity below. | Owner-confirmed provenance/publication scope, not an independent audit or replacement for upstream terms. Source/licensing compatibility with private training materials remains **blocked**. |
+| Custom `models/plate.pt` | Same owner confirmation: README-linked plate dataset, `yolov8n.pt` starting weights, public app/model files permitted. | Same remaining upstream/source question; no need to establish identity through Roboflow's separately hosted model. **Blocked.** |
+| Logo dataset v1 | Public original version page: MS3B, CC BY 4.0, 2,782 images, generated 2024-04-19 [D1,D2]. Owner confirms using the README-linked datasets. | Export/processing history is not independently audited; uploader label is evidence, not a warranty of every image's rights. |
 | Plate dataset v1 / public hosted model | Project and version label Public Domain; project license links CC0 1.0. 1,558 images, generated 2022-06-25; hosted model `/1` is Roboflow 2.0 Object Detection (Fast) [D3–D5]. | No separate downloadable-weight grant/identity tying that model to local `plate.pt` established. CC0 affects only rights the affirmer can waive [C2]. |
 | Showcase source/annotated photograph | Commons fixed revision confirms M 93, self-photographed Lexus LX 570, 2009-06-20; attribution-only permission expressly allows redistribution, derivatives and commercial use [P1,P2]. | Photo copyright permission evidenced with credit retained; does not clear detectors/data or imply brand endorsement. No new byte/image verification here. |
 
@@ -96,6 +96,17 @@ notebook/configuration will be shared."** Source: direct project-owner statement
 in the implementation conversation. Record trainer identity as confirmed by the
 owner, not an independent training-chain audit or a new license grant.
 
+The owner subsequently answers both release-scope questions:
+- **"Yes, app code and model files can be public; training materials stay private."**
+- **"Yes, those datasets, starting from yolov8n.pt."** This refers to the two
+  datasets linked in this repository and both custom checkpoints. It does not
+  establish the exact historical base-file revision or training-software version.
+
+The owner's publication permission and training-source summary are now recorded;
+do not keep asking for them, a model card, or notebooks/configuration. Publication
+scope approval is not an instruction to push/deploy immediately, relicense other
+contributors' work, or waive upstream rights. No private training files were read.
+
 **Respect this publication boundary:** do not request or publish training
 notebooks/configuration, or assume permission to include them in a source offer.
 The statement does not authorize relicensing or clear third-party obligations.
@@ -104,29 +115,34 @@ do not assert either that every training notebook is automatically required by
 AGPL or that withholding it is automatically compliant. Determine the applicable
 source scope/permission with upstream or qualified advice before release.
 
-## Remaining owner decisions/evidence to unblock
+## What remains to unblock
 
-1. **Trainer identity answered; checkpoint grant remains.** MS3B09 confirms
-   training both models. Document the applicable public-inference/redistribution
-   grant and any relevant collaborator or institution restrictions; none are
-   assumed merely from the trainer's identity.
-2. **Training-chain facts remain unverified.** Dataset/export versions, base
-   checkpoint and software versions, additions/preprocessing and checkpoint
-   mapping are not established by the existing README links. Notebooks/configuration
-   will not be shared; do not repeat that request or invent the missing facts.
-3. **What rights accompanied the data?** Retain export LICENSE/README/notices and
-   source/author records; resolve third-party exceptions, disputed sourcing and any
-   relevant privacy/trademark concerns with the responsible holders. Public dataset labels cannot fill an unverified training chain.
-4. **Which FREE source arrangement respects the owner's boundary?** Determine
-   applicable source requirements with upstream/qualified review as needed and
-   obtain owner approval for a compatible arrangement and only the materials the
-   owner authorizes. If required source conflicts with the no-sharing decision,
-   keep release on hold unless an applicable alternative grant is established.
-   Record anonymous access/revisions for any approved source offer. No automatic
-   root-license edit, paid agreement or training-material publication is authorized.
-5. **Who signs off?** A named owner must attach the above evidence and approve the
-   implemented source offer/attribution arrangement. If rights cannot coexist,
-   return the blocker to the user; do not silently replace/retrain models.
+1. **Owner questions answered.** Trainer, linked datasets, starting architecture/
+   weights name, public app/model publication scope, and private-training boundary
+   are confirmed by MS3B09. Retain this as the provenance record; do not present it
+   as an independent audit or invent historical revisions/preprocessing details.
+2. **Upstream/source compatibility.** Clarify whether the intended public hosted
+   application and fine-tuned weights can use the no-fee license path with the
+   training materials private. This is an upstream/legal-scope question, not a
+   request for more owner provenance documents. If applicable required source
+   conflicts with that boundary, hold release unless a suitable grant is established.
+3. **Implement only an approved arrangement.** Preserve dataset notices and all
+   applicable grants, document the source/weights actually authorized for release,
+   and record source access/revisions. Do not replace the root license, buy a
+   license, publish training materials, replace/retrain models, push, or deploy
+   without the relevant approval. Non-inference release preparation may continue.
+
+### Plain-language clarification request (draft only; not sent)
+
+> I trained two custom models from `yolov8n.pt` using the linked Roboflow datasets
+> for a free public portfolio demo using `ultralytics==8.4.189`. The application
+> code and trained weights can be public, but training notebooks/configuration
+> will remain private. Does your no-fee AGPL licensing route permit this exact
+> arrangement, and what corresponding-source materials would be required?
+
+Ask through [Ultralytics' official licensing contact](https://www.ultralytics.com/license)
+or obtain qualified advice. This draft is not an answer, exception, paid-license
+request or permission to contact anyone on the owner's behalf.
 
 ## Free paths and ticket disposition
 

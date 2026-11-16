@@ -35,10 +35,13 @@ Dataset-page declarations rechecked 16 November 2026:
   https://creativecommons.org/licenses/by/4.0/
 - plate_detection by PLATE DETECTION: Public Domain / CC0 1.0.
   https://creativecommons.org/publicdomain/zero/1.0/
-These declarations describe the linked datasets, not a confirmed license or
-training history for AutoScan's exact custom checkpoint files. Training versions,
-base weights, any additions/preprocessing, and checkpoint permissions still need
-creator confirmation. No dataset files are redistributed with these samples.
+MS3B09 confirms training both custom models on the repository-linked datasets,
+starting from yolov8n.pt, and permits public app code/model files (16 November
+2026). Training materials remain private. This is an owner-confirmed provenance
+statement, not an independent training audit or a waiver of upstream terms.
+Dataset-page declarations are not automatically a checkpoint license. No dataset
+files are redistributed with these samples; upstream source/license compatibility
+for the intended release remains unresolved.
 Inference: https://github.com/ultralytics/ultralytics (AGPL-3.0 / enterprise terms).
 
 Photograph reuse permission does not clear model or dataset licensing. The
