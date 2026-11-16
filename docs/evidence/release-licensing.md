@@ -21,8 +21,8 @@ after remaining work; historic evidence is not a fresh pass or authorization.
 | Project software | Root `LICENSE` contains Apache-2.0; README names five contributors and both datasets. | This does not license third-party code, weights or images. Owner must approve an appropriate combined-work/source arrangement. |
 | `ultralytics==8.4.189` | `image_service/requirements.txt` pins it; tagged LICENSE is GNU AGPLv3 and package metadata says AGPL-3.0 [U1,U2]. | No approved compliance inventory/source offer tied to the actual release; no alternative grant evidenced. **Blocked.** |
 | Vehicle `models/yolov8n.pt` | Backend evidence pins official `Ultralytics/YOLOv8` revision below; that revision's model card says `license: agpl-3.0` [V1]. | Must be included in the source/license/notice arrangement; model permission does not blanket-license COCO images. |
-| Custom `models/logo.pt` | Existing pinned identity below; README points to LOGOS TEAMX; Ultralytics claims AGPL defaults for trained models [U3]. | Creator's checkpoint grant, base weights, actual training version/data and required source are unproved. Dataset CC BY is not automatically a checkpoint license. **Blocked.** |
-| Custom `models/plate.pt` | Existing pinned identity below; README points to plate dataset. | Same provenance/grant gap; a similarly named Roboflow hosted model is not proof of this checkpoint's identity. **Blocked.** |
+| Custom `models/logo.pt` | Owner confirms MS3B09 trained it (2026-11-16); pinned identity below; README points to LOGOS TEAMX; Ultralytics claims AGPL defaults for trained models [U3]. | Specific checkpoint grant, base weights, actual training version/data and required source remain unresolved. Trainer identity is owner-confirmed, not independently audited. Dataset CC BY is not automatically a checkpoint license. **Blocked.** |
+| Custom `models/plate.pt` | Owner confirms MS3B09 trained it (2026-11-16); pinned identity below; README points to plate dataset. | Remaining grant/training-chain/source scope is unresolved; a similarly named Roboflow hosted model is not proof of this checkpoint's identity. **Blocked.** |
 | Logo dataset v1 | Public original version page now accessible: MS3B, CC BY 4.0, 2,782 images, generated 2024-04-19 [D1,D2]. | Need actual training/export linkage and any retained third-party notices/rights exceptions; uploader label is evidence, not a warranty of every image's rights. |
 | Plate dataset v1 / public hosted model | Project and version label Public Domain; project license links CC0 1.0. 1,558 images, generated 2022-06-25; hosted model `/1` is Roboflow 2.0 Object Detection (Fast) [D3–D5]. | No separate downloadable-weight grant/identity tying that model to local `plate.pt` established. CC0 affects only rights the affirmer can waive [C2]. |
 | Showcase source/annotated photograph | Commons fixed revision confirms M 93, self-photographed Lexus LX 570, 2009-06-20; attribution-only permission expressly allows redistribution, derivatives and commercial use [P1,P2]. | Photo copyright permission evidenced with credit retained; does not clear detectors/data or imply brand endorsement. No new byte/image verification here. |
@@ -89,23 +89,41 @@ visible author/source credit with shipped originals/derivatives/downloads. The
 Commons site-wide text license is not the photograph's license. This supports the
 photo copyright-permission subcheck, **not** an overall #6 or #7 rights pass.
 
-## Owner evidence/questions required to unblock
+## Owner clarification — 2026-11-16
 
-1. **Who created/controls each custom checkpoint?** Supply a model card or written
-   grant covering the exact digests, public hosted inference and weight/source
-   redistribution under the chosen arrangement; identify any school/employer or
-   collaborator restrictions. Valid public grants can serve as evidence; bespoke permission is needed only where they do not cover the use.
-2. **What actually trained them?** Supply training scripts/configuration/logs or a
-   creator-confirmed record: dataset project/version/export, additions/merges,
-   preprocessing, base checkpoint/revision/license, training software/version and
-   checkpoint mapping. Explain any divergence from logo v1 and plate v1.
+The owner states: **"It's me who train the two models (MS3B09). No training
+notebook/configuration will be shared."** Source: direct project-owner statement
+in the implementation conversation. Record trainer identity as confirmed by the
+owner, not an independent training-chain audit or a new license grant.
+
+**Respect this publication boundary:** do not request or publish training
+notebooks/configuration, or assume permission to include them in a source offer.
+The statement does not authorize relicensing or clear third-party obligations.
+Whether this deployment can comply without those materials remains unresolved;
+do not assert either that every training notebook is automatically required by
+AGPL or that withholding it is automatically compliant. Determine the applicable
+source scope/permission with upstream or qualified advice before release.
+
+## Remaining owner decisions/evidence to unblock
+
+1. **Trainer identity answered; checkpoint grant remains.** MS3B09 confirms
+   training both models. Document the applicable public-inference/redistribution
+   grant and any relevant collaborator or institution restrictions; none are
+   assumed merely from the trainer's identity.
+2. **Training-chain facts remain unverified.** Dataset/export versions, base
+   checkpoint and software versions, additions/preprocessing and checkpoint
+   mapping are not established by the existing README links. Notebooks/configuration
+   will not be shared; do not repeat that request or invent the missing facts.
 3. **What rights accompanied the data?** Retain export LICENSE/README/notices and
    source/author records; resolve third-party exceptions, disputed sourcing and any
    relevant privacy/trademark concerns with the responsible holders. Public dataset labels cannot fill an unverified training chain.
-4. **Which FREE source arrangement is approved?** Owner to approve scope with
-   upstream/qualified review as needed, authorize lawful publication of the exact
-   corresponding source/weights and required notices, then record anonymous source
-   access and release revisions. No automatic root-license edit is authorized.
+4. **Which FREE source arrangement respects the owner's boundary?** Determine
+   applicable source requirements with upstream/qualified review as needed and
+   obtain owner approval for a compatible arrangement and only the materials the
+   owner authorizes. If required source conflicts with the no-sharing decision,
+   keep release on hold unless an applicable alternative grant is established.
+   Record anonymous access/revisions for any approved source offer. No automatic
+   root-license edit, paid agreement or training-material publication is authorized.
 5. **Who signs off?** A named owner must attach the above evidence and approve the
    implemented source offer/attribution arrangement. If rights cannot coexist,
    return the blocker to the user; do not silently replace/retrain models.
@@ -113,8 +131,9 @@ photo copyright-permission subcheck, **not** an overall #6 or #7 rights pass.
 ## Free paths and ticket disposition
 
 - **Existing-model AGPL path:** potentially no licensing fee, if the owner can
-  satisfy the approved AGPL/source obligations and independently establish custom
-  checkpoint/data rights. Evidence and authorized follow-up are still required.
+   satisfy the approved AGPL/source obligations and independently establish custom
+   checkpoint/data rights while respecting the no-sharing boundary. Compatibility
+   with that boundary is not established; evidence and approval remain required.
 - **No-cost explicit permission:** request clarification or an actual written
   exception/grant from the relevant holders; availability is not promised. One
   holder's exception cannot waive another holder's data/photo/software rights.
