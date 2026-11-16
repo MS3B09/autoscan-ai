@@ -46,7 +46,14 @@ Prior evidence: [video](evidence/issue-5-verification.md),
    `yolov8n.pt` starting weights, and public app/model files; training materials
    remain private. Owner provenance questions are answered. Resolve whether the
    upstream source/license terms permit that arrangement, rather than requesting
-   more private training evidence. Do not infer permission from public downloads or
+   more private training evidence. A focused official-source search found no
+   personal/noncommercial disclosure exception: the current and pinned guidance
+   explicitly includes training scripts/configuration. App code plus weights alone
+   does not satisfy that published checklist. Keep the release gate open unless
+   suitable permission or a qualified source-scope determination establishes a
+   compatible path; do not buy a license or publish private materials. See
+   [the focused result](evidence/ultralytics-private-training.md).
+   Do not infer permission from public downloads or
    the repository's Apache-2.0 file. Do not change licenses or buy permission
    without approval. See [the licensing evidence](evidence/release-licensing.md).
 2. **Ticket/evidence reconciliation — #5 / #6 / #7, parent #1.** Reconcile

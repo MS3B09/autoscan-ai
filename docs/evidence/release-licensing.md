@@ -14,6 +14,27 @@ deployments, credential access, dependency/model changes or license replacement.
 **NO VIDEO TESTING OR VIDEO INFERENCE:** the final video test belongs to the user
 after remaining work; historic evidence is not a fresh pass or authorization.
 
+## Focused permission search — 2026-11-16
+
+At the owner's request, checked whether Ultralytics itself permits public app
+code/fine-tuned weights with private training notebooks/configuration for a free
+personal portfolio demo. **No published personal/noncommercial exception was
+found.** Current licensing FAQs and pinned `v8.4.189` guidance explicitly include
+training scripts and configuration in the publication scope. Publishing app code
+and weights alone does not establish compliance with that stated checklist.
+
+See [ultralytics-private-training.md](ultralytics-private-training.md) for exact
+quotations, current/pinned sources, and the distinction between vendor guidance
+and applying the GNU license to this specific work. Their terms preserve rights
+under the actual open-source license; this is not a legal finding that every
+historical notebook must be disclosed. No project-specific permission is evidenced.
+
+With the owner's privacy boundary and no-paid-license constraint unchanged,
+**keep #6/#7's public-release gate open**. A suitable explicit permission or qualified
+source-scope determination could change the assessment; neither was obtained by
+this public-page search. No request was sent and no purchase is authorized.
+Other non-inference release preparation can proceed without clearing the gate.
+
 ## Known / unknown matrix
 
 | Layer / exact asset | Known evidence | Still unknown / release consequence |
@@ -51,6 +72,16 @@ modified works and conveyed object code; §5 distinguishes independent aggregate
 These are not a blanket claim that every network/private/commercial use or unrelated frontend requires a new license. Application
 boundaries and model/source scope require owner review with upstream or qualified
 advice where uncertain; this research does not decide derivative-work law.
+
+Static inspection of this application's integration found `from ultralytics
+import YOLO` in `scripts/validate_inference.py:42` and `model.predict(...)` in
+`image_service/detector.py:30`, using the pinned installed package, rather than a
+vendored Ultralytics source tree. That observation is not a legal finding that
+the application is independent or outside AGPL. GNU §2 does not automatically
+license all program output under AGPL, while the owner specifically confirms
+fine-tuning pretrained `yolov8n.pt`; these facts must not be collapsed into either
+"all notebooks are always required" or "unmodified import means no obligations."
+No model loading, execution or private-file inspection was used for this check.
 
 An old public GitHub link, Apache text alone, or only selected Space service files
 does not demonstrate complete corresponding source for the actual deployed version.
