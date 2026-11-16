@@ -38,6 +38,7 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
 | Quota reset messages and developer adapter | Committed as `839f4b8`; local HTTP/browser checks passed. Public reset messages need the backend update. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
+| Local release preparation | Runbook, Node pin, 29 safe local tests, typechecks, clean frontend build and scoped artifact/history secret checks completed; final review recorded in the linked evidence. No deployed-origin pass. | #7 |
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
@@ -47,6 +48,12 @@ See [the criterion-by-criterion reconciliation](evidence/acceptance-reconciliati
 Prior evidence: [video](evidence/issue-5-verification.md),
 [showcase](evidence/issue-6-verification.md), and
 [quota/developer access](evidence/developer-quota-verification.md).
+
+Current #7 setup/deployment/rollback instructions:
+[release-runbook.md](release-runbook.md). Fresh safe-check results, failed install
+attempts/recovery, artifact hashes, fixed review baseline and remaining gates:
+[issue-7-preparation.md](evidence/issue-7-preparation.md). Historical full-suite
+results above are not a new full-suite run.
 
 ## Licensing disposition — #6 / #7
 
@@ -66,11 +73,11 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
 
 ## Remaining work, in order
 
-1. **Release candidate preparation — #7.** Finish reproducible runtime,
-   dependency, pinned-checkpoint, nonsecret configuration, and deployment/rollback
-   instructions. Check frontend artifacts for credentials, keep the explicit
-   backend file mapping, and record exact source/model/runtime revisions. Run only
-   permitted non-video/non-inference checks and required review after changes.
+1. **Local release candidate preparation — #7.** Instructions, permitted checks
+   and local artifact inspection are recorded in the runbook/evidence above.
+   Complete the required fixed-baseline review before handoff. Fresh deployed
+   source/model/runtime inventory and final uploaded-artifact checks still belong
+   to the approved deployment, not the local preparation pass.
 2. **Approved preview and backend update — #7.** After permission, update the
    free Space's quota-message code and prepare Netlify preview configuration.
    Check HTTPS, root/detector refresh, navigation, desktop/mobile/keyboard UI,

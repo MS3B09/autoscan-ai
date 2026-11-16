@@ -5,6 +5,12 @@ browser, model, image or video tests were run. No inference, push or deployment.
 Baseline: local implementation through `73488a5`; earlier evidence retains its
 own source/deployed revisions and dates. This is not fresh release verification.
 
+**Later #7 preparation:** [issue-7-preparation.md](issue-7-preparation.md) records
+the runbook, Node pin and fresh permitted local checks against `cea69ae`.
+Those results supersede the "next preparation task" wording below, not the
+historical test accounting or any deployed-origin acceptance gate. No #7
+checkbox becomes fully accepted from local preparation alone.
+
 ## How to read the tracker
 
 - **Evidenced:** implemented and supported by the cited retained checks; may be
