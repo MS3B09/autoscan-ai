@@ -191,3 +191,18 @@ verdict and the independent responsive check do not certify the blocked native
 Impeccable pipeline. Its `finish --disposition ship` refused while the authorized
 photography exception leaves `plates` open; no automated completion is claimed.
 Design tokens and the exception are documented; no original reference was altered.
+
+## Licensing follow-up — 2026-11-16
+
+The previous Roboflow 403 observation is historical. A new public-source audit
+found the original logo dataset declares **CC BY 4.0**, and the plate dataset
+declares **Public Domain / CC0 1.0**. Dataset declarations/license links are now
+recorded in the sample attribution notice. Commons photo permission was
+reconfirmed. See [release-licensing.md](release-licensing.md) for primary sources.
+
+**The rights gate remains open:** public dataset declarations do not establish
+the exact custom checkpoints' creators, training chain, redistribution grants,
+or an approved AGPL/source arrangement for this release. No project license,
+checkpoint or dependency was changed, and no release is authorized by the audit.
+The owner's new testing hold is in [../release-checklist.md](../release-checklist.md):
+no agent-run video tests/inference; the owner reserves the final video check.

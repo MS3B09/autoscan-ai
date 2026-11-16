@@ -1,5 +1,11 @@
 # Short videos — issue #5
 
+> **Owner instruction, 2026-11-16:** do not run video tests or inference. The owner
+> will perform the final video check after release preparation, to conserve quota.
+> Commands below describe existing checks, not current authorization to run them.
+> Avoid unfiltered test discovery too. See [release-checklist.md](release-checklist.md)
+> for current gates and ticket-linked remaining work.
+
 The image-first `/detect` workspace also accepts MP4, MOV, AVI, ASF, M4V, and
 MPEG clips. Choosing a file only validates it and builds a silent browser preview.
 **Detect video** explicitly submits the chosen types and 25–100% confidence

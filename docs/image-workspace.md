@@ -174,6 +174,10 @@ Request explicitly free `zero-a10g` hardware. Do not enable billing or paid stor
 
 ## Checks
 
+Current release/testing restrictions are in [release-checklist.md](release-checklist.md).
+The owner reserves the final video test; do not run video checks or unfiltered
+test discovery. Earlier full-suite evidence is historical, not permission to rerun.
+
 ```powershell
 python -m unittest discover -s tests -p test_image_api.py -v
 python -m mypy image_service --ignore-missing-imports --follow-imports skip --check-untyped-defs

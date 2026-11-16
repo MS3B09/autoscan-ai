@@ -1,5 +1,10 @@
 # Developer-only authenticated image checks
 
+Current owner policy: conserve quota; the owner has reported a successful image
+test and will run the final video test after preparation. Agents must not run
+video tests/inference or repeat hosted inference without authorization. Follow
+[release-checklist.md](release-checklist.md) before running these manual checks.
+
 Use the READ token named `autoscan-inference` for manual developer verification.
 Keep the WRITE token `autoscan-validation` for deployment. These instructions do
 not change the saved Hugging Face login, write a token file, expose a token to

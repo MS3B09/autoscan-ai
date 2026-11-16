@@ -30,6 +30,15 @@ El-Ouaragli Zayd; El-Abbass Ossama; Nassiri Mosab; Hassan Fares; Aly Guinga.
 Source: https://github.com/MS3B09/autoscan-ai
 Logo dataset: https://universe.roboflow.com/ms3b/logos-teamx/dataset/1
 Plate dataset: https://universe.roboflow.com/plate-detection/plate_detection-tp5h9
+Dataset-page declarations rechecked 16 November 2026:
+- LOGOS TEAMX by MS3B, version 1: Creative Commons Attribution 4.0 (CC BY 4.0).
+  https://creativecommons.org/licenses/by/4.0/
+- plate_detection by PLATE DETECTION: Public Domain / CC0 1.0.
+  https://creativecommons.org/publicdomain/zero/1.0/
+These declarations describe the linked datasets, not a confirmed license or
+training history for AutoScan's exact custom checkpoint files. Training versions,
+base weights, any additions/preprocessing, and checkpoint permissions still need
+creator confirmation. No dataset files are redistributed with these samples.
 Inference: https://github.com/ultralytics/ultralytics (AGPL-3.0 / enterprise terms).
 
 Photograph reuse permission does not clear model or dataset licensing. The

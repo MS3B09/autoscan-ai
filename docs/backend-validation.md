@@ -1,5 +1,10 @@
 # Backend validation gate
 
+> **Current owner policy (2026-11-16):** do not rerun video tests/inference,
+> including the diagnostic `/validate` below, which processes a video. The final
+> video test is reserved for the owner after preparation. Earlier authorization
+> and results are historical. See [release-checklist.md](release-checklist.md).
+
 ## Status
 
 The build brief and Option A showcase are approved. The user selected hosted-first
