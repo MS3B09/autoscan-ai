@@ -120,6 +120,40 @@ class VideoAPITests(unittest.TestCase):
                         self.assertEqual(response.status_code, status)
                 self.assertEqual(list(Path(storage).iterdir()), [])
 
+    def test_1080p_preview_and_job_preserve_landscape_and_portrait_dimensions(self):
+        def codec_only(source, settings, cancelled, context):
+            info = json.loads((source.parent / "video.json").read_text())
+            output = source.parent / "result.mp4"
+            render_video(source, output, info, cancelled)
+            return output.read_bytes(), []
+
+        with tempfile.TemporaryDirectory() as storage:
+            with TestClient(create_app(codec_only, storage_root=storage)) as client:
+                for size in [(1920, 1080), (1080, 1920)]:
+                    with self.subTest(size=size):
+                        content = clip(frames=3, size=size)
+                        preview = client.post("/api/preview?filename=full-hd.mp4", content=content)
+                        self.assertEqual(preview.status_code, 200, preview.text[:200])
+                        submitted = client.post("/api/jobs?filename=full-hd.mp4", content=content)
+                        self.assertEqual(submitted.status_code, 202, submitted.text)
+                        job = submitted.json()
+                        result = self.wait(client, job)
+                        self.assertEqual(result["state"], "empty", result.get("error"))
+                        self.assertEqual((result["width"], result["height"]), size)
+                        self.assertEqual((result["output_width"], result["output_height"]), size)
+                        endpoint = "/api/jobs/" + job["id"]
+                        headers = {"Authorization": "Bearer " + job["token"]}
+                        movie = client.get(endpoint + "/download/video", headers=headers)
+                        self.assertEqual(movie.status_code, 200)
+                        for response in [preview, movie]:
+                            with av.open(BytesIO(response.content)) as output:
+                                self.assertEqual(output.streams.video[0].codec_context.name, "h264")
+                                self.assertEqual(len(output.streams.audio), 0)
+                                frames = list(output.decode(video=0))
+                                self.assertEqual(len(frames), 3)
+                                self.assertEqual([(frame.width, frame.height) for frame in frames], [size] * 3)
+                        self.assertEqual(client.delete(endpoint, headers=headers).status_code, 204)
+
     def test_all_containers_and_decoded_duration_dimension_frame_and_byte_ceilings(self):
         with tempfile.TemporaryDirectory() as storage:
             with TestClient(create_app(lambda *args: None, storage_root=storage, submission_limit=100)) as client:
@@ -136,8 +170,10 @@ class VideoAPITests(unittest.TestCase):
                                        (clip(frames=41, rate=4), 413),
                                        (clip(size=(1280, 720)), 200),
                                        (clip(size=(720, 1280)), 200),
-                                       (clip(size=(1282, 720)), 413),
-                                       (clip(size=(1280, 722)), 413),
+                                       (clip(size=(1282, 720)), 200),
+                                       (clip(size=(1280, 722)), 200),
+                                       (clip(size=(1922, 1080)), 413),
+                                       (clip(size=(1920, 1082)), 413),
                                        (clip()[:200], 422)]:
                     with self.subTest(bytes=len(data), expected=expected):
                         response = client.post("/api/preview?filename=boundary.mp4", content=data)

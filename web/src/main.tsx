@@ -238,7 +238,7 @@ function Workspace() {
               setFile(next);
             }} />
           <p id="image-help">PNG, JPG, BMP, WebP. Up to 10 MB and 12 megapixels.</p>
-          <p>MP4, MOV, AVI, ASF, M4V, MPEG. Up to 20 MB, 10 seconds, 720p, and 600 frames. Video previews and results are silent.</p>
+          <p>MP4, MOV, AVI, ASF, M4V, MPEG. Up to 20 MB, 10 seconds, 1080p, and 600 frames. Video previews and results are silent.</p>
         </div>
         <fieldset disabled={locked}>
           <legend>Object types</legend>

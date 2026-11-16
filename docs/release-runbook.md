@@ -3,6 +3,8 @@
 This is preparation, **not deployment approval**. Follow the owner's current
 [release checklist](release-checklist.md): no agent-run inference or video tests,
 no push, Space update, Netlify upload/promotion, or paid resources without approval.
+The later owner-approved 1080p update permits local CPU-only codec/API video
+checks and refreshing the backend/draft, not hosted video tests or inference.
 The final candidate video check belongs to the owner. Licensing remains an
 [owner-directed exception / unverified](evidence/release-licensing.md#owner-directed-workflow-decision--2026-11-16).
 Preserve the original Streamlit app, checkpoint bytes, credits and notices.
@@ -127,6 +129,7 @@ python -m pip install fastapi==0.136.1 starlette==1.0.0 httpx==0.28.1 pillow==12
 python -m unittest discover -s tests -p test_image_api.py -v
 python -m unittest discover -s tests -p test_dev_api.py -v
 python -m unittest discover -s tests -p test_hosted_image_client.py -v
+python -m unittest discover -s tests -p test_video_api.py -v
 python -m unittest discover -s tests -p test_validate_inference.py -k test_help_does_not_require_inference_dependencies -v
 python -m unittest discover -s tests -p test_validate_inference.py -k test_missing_vehicle_weights_fail_before_creating_outputs -v
 python -m unittest discover -s tests -p test_validate_inference.py -k test_untrusted_checkpoint_is_rejected_before_loading_inference_libraries -v
@@ -134,13 +137,13 @@ python -m unittest discover -s tests -p test_validate_inference.py -k test_exist
 python -m mypy image_service scripts/dev_api.py --ignore-missing-imports --follow-imports skip --check-untyped-defs
 ```
 
-Together these select **29 tests**: fake external compute/HTTP and four CLI safety
-checks. Despite its filename, `test_hosted_image_client.py` uses only intercepted
-HTTP/fake credentials. No model inference, video fixtures, decoding or hosting
-claim. Do **not** run unfiltered discovery, the whole diagnostic test file,
+Together these select **39 tests**: fake external compute/HTTP, real local codecs
+under the 1080p exception, and four CLI safety checks. Despite its filename,
+`test_hosted_image_client.py` uses only intercepted HTTP/fake credentials.
+No model inference or hosting claim. Do **not** run unfiltered discovery, the whole diagnostic test file,
 `/validate`, hosted image/video suites or `browser_video_workflow.js` during the hold.
 Retain separate totals for passed, failed, runner-skipped and policy-deferred tests;
-29 local passes do not replace the deferred full suite. Frontend typecheck/build
+39 local passes do not replace the deferred full suite. Frontend typecheck/build
 commands are above; artifact checks and the fixed review baseline are in
 [preparation evidence](evidence/issue-7-preparation.md).
 
@@ -256,11 +259,15 @@ afterward. No credential belongs in those files or public URLs.
 One global inference invocation, two pending slots (preview also takes a slot),
 eight retained jobs, six job-upload and twelve preview attempts per rolling ten
 minutes, all shared server-side. Do not add workers/replicas: coordination is
-in memory. Images: 10 MB/12 MP. Videos: 20 MB/10 s/720p/600 decoded frames;
+in memory. Images: 10 MB/12 MP. Videos: 20 MB/10 s/1080p/600 decoded frames;
 no truncation or subsampling. Results expire 1,800 s after success; failures and
 cancellations clean artifacts. Delete revokes access immediately, active work
 stops at a safe boundary. Refresh/restart can lose jobs; no history/recovery.
 See [API/privacy details](image-workspace.md) and [video limits](video-workspace.md).
+
+The owner approved 1080p support and local CPU-only codec/API video checks after
+the first draft. Earlier real hosted capacity runs remain 720p evidence; 1080p
+GPU inference/resource behavior is not claimed from those runs or local tests.
 
 Platform quota, cold starts and availability can fail before these limits.
 No automatic retry, credential rotation, paid compute or SLA. A reset timestamp

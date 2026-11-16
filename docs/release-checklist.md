@@ -5,11 +5,15 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 
 ## Current owner instructions
 
-- **Do not run video tests or video inference.** The owner reserves the final
-  video test until the remaining preparation is finished, to conserve HF quota.
-  This includes hosted/browser/diagnostic video checks and, conservatively, local
-  video tests. Do not run unfiltered test discovery that includes them. Earlier
-  test commands/evidence are historical, not authorization to rerun them.
+- **No model inference or hosted/browser/diagnostic video tests.** The owner
+  reserves the final hosted video test to conserve quota. For the requested
+  **1080p update**, the owner explicitly approved **local CPU-only codec/API video
+  tests** and updating the backend/draft. This narrowly lifts the earlier local
+  video-test hold, not the inference/hosted-video/production restrictions. Keep
+  unfiltered discovery and opt-in hosted/model/diagnostic suites excluded.
+- The 1080p change and local-only evidence are tracked in
+  [issue-5-1080p.md](evidence/issue-5-1080p.md); earlier 720p hosted runs are not
+  upgraded to 1080p capacity evidence.
 - Do not replace the final owner video check with an agent-run image/video job,
   consume quota just to exercise an error, or retry submissions automatically.
 - After each upcoming task, report remaining work in the conversation with its
@@ -29,7 +33,7 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
   quota-message update and Netlify draft, then separately approved pushing the
   reviewed commits to GitHub. Backend update, source push and Netlify draft are
   complete; only permitted non-inference draft checks ran. This is not approval for
-  production publication/promotion, paid resources or inference/video tests.
+   production publication/promotion, paid resources, model inference or hosted video tests.
   Never expose HF tokens in frontend variables, bundles, URLs, logs or repositories.
 
 ## Current status
@@ -37,7 +41,7 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Item | Evidence / status | Ticket |
 | --- | --- | --- |
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
-| Short-video implementation | Implemented; prior hosted 300/600-frame evidence exists. Fresh hosted active cancellation and video-specific thirty-minute retention remain unverified. Final new video check is owner-only and deferred. | #5 |
+| Short-video implementation | Owner requested 1080p and approved local-only codec/API checks plus backend/draft update. Earlier hosted 300/600-frame evidence remains 720p-only; 1080p GPU/resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. Final hosted check is owner-only. | #5 / #7 |
 | Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
 | Quota reset messages and developer adapter | Backend API update deployed at `b6c91e2`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
@@ -115,8 +119,10 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
 
 ## Safe checks during the video hold
 
-For code changes, select individual non-video tests after inspecting their scope;
-do not run the complete suite or any opt-in hosted/model/diagnostic suite. Existing
+For the 1080p change, the owner additionally approved the local
+`test_video_api.py` codec/API suite with substituted external compute. All other
+checks stay explicitly selected after inspecting scope; do not run unfiltered
+discovery or opt-in hosted/model/diagnostic suites. Existing
 image-API and developer-adapter contract tests use fake external compute/HTTP,
 not hosted inference. Type checks, frontend build, static inspection, and document
 checks do not themselves require a video job. Historical test totals must remain

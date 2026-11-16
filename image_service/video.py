@@ -30,10 +30,10 @@ def decoded(container):
         raise VideoError("Choose a clip with exactly one video stream.")
     stream = container.streams.video[0]
     # Decoder surfaces may include codec alignment padding; displayed pixels are checked separately.
-    stream.codec_context.options = {"err_detect": "explode", "max_pixels": "1048576"}
+    stream.codec_context.options = {"err_detect": "explode", "max_pixels": "2097152"}
     stream.thread_count = 1
-    if not (0 < min(stream.width, stream.height) <= 720 and max(stream.width, stream.height) <= 1280):
-        raise VideoError("Video exceeds 720p (1280 × 720, or portrait equivalent).", 413)
+    if not (0 < min(stream.width, stream.height) <= 1080 and max(stream.width, stream.height) <= 1920):
+        raise VideoError("Video exceeds 1080p (1920 × 1080, or portrait equivalent).", 413)
     for packet in container.demux(stream):
         if packet.is_corrupt:
             raise VideoError("Video contains corrupt packets. Re-export the complete clip and try again.")
@@ -83,8 +83,8 @@ def inspect_video(content, suffix):
                 if geometry is not None and geometry != current:
                     raise VideoError("Video dimensions or orientation change within the clip. Re-export it first.")
                 geometry = current
-                if (not 0 < min(frame.width, frame.height) <= 720 or max(frame.width, frame.height) > 1280):
-                    raise VideoError("Decoded video exceeds 720p.", 413)
+                if (not 0 < min(frame.width, frame.height) <= 1080 or max(frame.width, frame.height) > 1920):
+                    raise VideoError("Decoded video exceeds 1080p.", 413)
                 if frame.rotation not in [0, 90, 180, 270, -90, -180, -270]:
                     raise VideoError("Video has unsupported orientation metadata. Re-export it with upright pixels.")
                 if frame.pts is None or frame.time_base is None or frame.time_base <= 0:

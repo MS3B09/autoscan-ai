@@ -1,10 +1,10 @@
 # Short videos — issue #5
 
-> **Owner instruction, 2026-11-16:** do not run video tests or inference. The owner
-> will perform the final video check after release preparation, to conserve quota.
-> Commands below describe existing checks, not current authorization to run them.
-> Avoid unfiltered test discovery too. See [release-checklist.md](release-checklist.md)
-> for current gates and ticket-linked remaining work.
+> **Owner instruction, 2026-11-16:** the owner reserves the final hosted video check.
+> For the requested 1080p update, local CPU-only codec/API video tests are explicitly
+> approved. No model inference, hosted/browser video checks or production promotion
+> is authorized. Do not run unfiltered discovery; the diagnostic/model/hosted tests
+> remain excluded. See [release-checklist.md](release-checklist.md).
 
 The image-first `/detect` workspace also accepts MP4, MOV, AVI, ASF, M4V, and
 MPEG clips. Choosing a file only validates it and builds a silent browser preview.
@@ -15,8 +15,13 @@ fallback is added. The original Streamlit application/checkpoints are unchanged.
 ## Validation and processing
 
 - Maximum **20,000,000 upload bytes**, **ten seconds**, **600 decoded frames**,
-  and **1280 × 720** pixels (or portrait equivalent). All limits apply together;
+  and **1920 × 1080** pixels (or portrait equivalent). All limits apply together;
   exceeding one rejects the clip rather than truncating it.
+- The owner requested 1080p for a short test clip. Earlier hosted 300/600-frame
+  capacity evidence remains **720p evidence**, not proof of 1080p GPU/resource
+  behavior. Local codec/API checks do not spend HF quota or establish inference
+  performance. The larger frame has 2.25× as many pixels; free-hosted inference at
+  the new maximum remains unverified until separately approved evidence exists.
 - A decoded-container/extension check and full packet/frame decoding run before
   admission. Checkpoints, playlists, external file/network references, corrupt
   packets/frames, changing geometry, and invalid/non-increasing timestamps are
