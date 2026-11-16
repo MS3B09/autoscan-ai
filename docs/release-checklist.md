@@ -25,9 +25,12 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
   **owner-directed continuation, compliance unverified**, not a passed legal check
   or an Ultralytics exception. Preserve notices and research; do not repeatedly
   block preparation on the same already-disclosed issue.
-- Pushing source, updating the existing Space, and publishing/promoting Netlify
-  deployments still require approval. Never enable paid resources or expose HF
-  tokens in frontend variables, bundles, URLs, logs, or repositories.
+- **Limited deployment approval (2026-11-16):** the owner approved the backend
+  quota-message update and Netlify draft, then separately approved pushing the
+  reviewed commits to GitHub. Backend update and source push are complete; the
+  draft is blocked by Netlify dashboard/tooling access. This is not approval for
+  production publication/promotion, paid resources or inference/video tests.
+  Never expose HF tokens in frontend variables, bundles, URLs, logs or repositories.
 
 ## Current status
 
@@ -36,9 +39,10 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
 | Short-video implementation | Implemented; prior hosted 300/600-frame evidence exists. Fresh hosted active cancellation and video-specific thirty-minute retention remain unverified. Final new video check is owner-only and deferred. | #5 |
 | Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
-| Quota reset messages and developer adapter | Committed as `839f4b8`; local HTTP/browser checks passed. Public reset messages need the backend update. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
+| Quota reset messages and developer adapter | Backend API update deployed at `b6c91e2`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
 | Local release preparation | Runbook, Node pin, 29 safe local tests, typechecks, clean frontend build and scoped artifact/history secret checks completed; final review recorded in the linked evidence. No deployed-origin pass. | #7 |
+| Approved source push / Netlify draft | Reviewed source through `472677d` pushed to GitHub with approval. Netlify signed in but dashboard cannot connect; no site/draft created, no plan/deployed-origin pass verified. | #7 |
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
@@ -54,6 +58,10 @@ Current #7 setup/deployment/rollback instructions:
 attempts/recovery, artifact hashes, fixed review baseline and remaining gates:
 [issue-7-preparation.md](evidence/issue-7-preparation.md). Historical full-suite
 results above are not a new full-suite run.
+
+Later approved deployment/source-push results and the Netlify blocker:
+[issue-7-backend-update.md](evidence/issue-7-backend-update.md). Earlier statements
+that no deployment/push had occurred are historical, not the current status.
 
 ## Licensing disposition — #6 / #7
 
@@ -79,11 +87,12 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
    status-wording finding. Fresh deployed source/model/runtime inventory and final
    uploaded-artifact checks still belong to the approved deployment, not the local
    preparation pass.
-2. **Approved preview and backend update — #7.** After permission, update the
-   free Space's quota-message code and prepare Netlify preview configuration.
-   Check HTTPS, root/detector refresh, navigation, desktop/mobile/keyboard UI,
-   headers and image preview without inference. These checks alone cannot prove
-   authenticated/anonymous GPU execution or the full deployed job lifecycle.
+2. **Approved preview — #7.** Backend update and source push are complete. Resolve
+   Netlify access, verify free-tier controls, create/select the project without
+   automatic production publication, and prepare a draft. Add its exact backend
+   origin, then check HTTPS, root/detector refresh, navigation, desktop/mobile/
+   keyboard UI, headers and image preview without inference. These checks alone
+   cannot prove GPU execution or the full deployed job lifecycle.
 3. **Owner's final video test — #5 / #7.** After preparation, the owner tests a
    representative accepted clip against the release candidate, checking actual
    playback, MP4/JSON/CSV downloads, and deletion. Record outcome and exact build;

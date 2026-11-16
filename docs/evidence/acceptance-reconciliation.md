@@ -11,6 +11,11 @@ Those results supersede the "next preparation task" wording below, not the
 historical test accounting or any deployed-origin acceptance gate. No #7
 checkbox becomes fully accepted from local preparation alone.
 
+**Later approved deployment step:** [backend-update evidence](issue-7-backend-update.md)
+records the quota-message API update and reviewed-source GitHub push. Netlify
+dashboard access is blocked; no draft, production URL or deployed-origin pass
+exists yet. No #7 checkbox is newly accepted by those partial results.
+
 ## How to read the tracker
 
 - **Evidenced:** implemented and supported by the cited retained checks; may be

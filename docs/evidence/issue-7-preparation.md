@@ -5,6 +5,10 @@ browser submissions, source push, Space change or Netlify deployment ran.
 The owner-approved fixed review baseline is
 `cea69ae7f60c84ad8532eca803510283473fc6d2`. Unrelated untracked tooling is excluded.
 
+**Subsequent approved work:** [backend-update evidence](issue-7-backend-update.md)
+records the later Space update and GitHub push. This document's no-push/deployment
+statements describe the earlier preparation phase; Netlify draft remains pending.
+
 ## Changes and inventory
 
 - [Release runbook](../release-runbook.md): supported runtimes, separate dependency
