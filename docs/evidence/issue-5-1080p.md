@@ -53,10 +53,73 @@ other unresolved #5/#7 release gates remain separate.
 
 ## Deployment and review handoff
 
-The implementation source must be reviewed before the approved backend/draft
-refresh. Record actual source/backend/deploy IDs, artifact hashes, retained
-origins and only permitted non-video hosted checks here after deployment. Do not
-reuse the earlier 720p draft's acceptance evidence as a new 1080p runtime pass.
+### Standards
+
+Independent read-only review of source **`e719d8a`** against the existing
+owner-approved fixed baseline **`cea69ae7f60c84ad8532eca803510283473fc6d2`** found
+**0 findings and 0 actionable smells**. Both validation boundaries and the bounded
+decoder guard are preserved. No tests, inference or hosted probes ran in review.
+
+### Spec
+
+The separate read-only review found **0 actionable defects or unrequested scope**.
+The owner's instruction supersedes the old 720p ceiling only for resolution.
+Actual-file compatibility and 1080p free-hosted inference/resource capacity remain
+unverified; no such pass is inferred from local tests. Review totals: **Standards
+0, Spec 0 actionable findings; no worst finding on either axis**.
+
+### Refreshed backend and draft
+
+- Reviewed/pushed source: **`e719d8a97e7d97961b528efd5e6ea5ef19ee8d5e`**.
+- Backend: **`d160158db56c1cdf6113a575b8b01bb763f81b73`**, parent
+  `b6c91e23f1b0fcb8bfb3ab65d906d53fbcc2e9b5`. Backed up the pinned prior Space
+  revision, compared all explicit mapped files, and atomically updated **only
+  `image_service/video.py`**, guarded by the prior SHA. The published file bytes
+  match local SHA-256 `fe4ba01e1799e1c3d23391ff1d1c18868b14c6cec807f19f8625bc68d36806d5`.
+  Existing custom checkpoint hashes were rechecked before upload.
+- Final backend metadata: **RUNNING / free zero-a10g / one current/requested
+  replica**. Anonymous health: **200 / ready / 1800 s retention / 1 active /
+  2 pending / no-store**. No new full installed-package inventory is claimed.
+- Existing Netlify site: `1661ca1f-7c9b-4f69-b8ee-635ac7a49eee`, project
+  `autoscan-ai-ms3b09`, team `mosab04-ns`, **Free**. Created one new file-digest
+  deploy with explicit **`draft:true`**; all 18 uploads returned 200. Final
+  metadata: **ready / deploy-preview / published_at null / no published deploy /
+  Git unlinked**. No production, plan, billing or hardware change.
+- New deploy ID: **`6afb4f606cabececacad1489`**.
+- **Owner's current test URL:**
+  <https://6afb4f606cabececacad1489--autoscan-ai-ms3b09.netlify.app/detect>.
+- [Retained artifact hashes](issue-5-1080p-artifacts.json): 18 files including the
+  literal TOML-equivalent rule files. All **16 public files** fetched anonymously
+  matched SHA-256 and passed scoped credential/capability pattern checks. All
+  three HTTPS routes returned the exact new HTML and expected security headers.
+  No Netlify Git build ran, and no provider build-image reproducibility is claimed.
+- Appended only the new exact HTTPS draft origin to `AUTOSCAN_ORIGINS`; retained
+  both existing local origins and the earlier approved draft origin. No wildcard,
+  production origin, token, secret, paid resource or replica was added.
+- Isolated browser check: visible **1080p / 20 MB / 10 s / 600 frames**, direct
+  refresh and eleven widths **320–1920 px** passed with zero page runtime errors.
+  Inspected local desktop/mobile captures under
+  `.playwright-mcp/issue5-1080p-6afb4f60-{desktop,mobile}.png`; no design change.
+- A separate allowed **still JPEG** preview verified actual browser preflight
+  **204**, preview **200**, exact new-origin CORS and `no-store`, without owner
+  Authorization/Cookie/Referer or any job attempt. This was **not a video check**.
+  Temporary request guards/capture were removed, leaving a clean detector page.
+
+No hosted/browser video preview, video processing or model inference ran. The
+prior `6afb394cb63bcc5d8c896112` draft is historical; use the **new URL** above.
+Do not reuse its acceptance evidence as a fresh 1080p runtime pass. The owner can
+now perform the reserved final clip check; remaining #5/#7 safeguards and separate
+production approval still apply.
+
+### Deployment-record follow-up review
+
+Read-only review of documentation candidate `024bf9f` found **one Standards P3**:
+the reusable API recipe could be read as creating a new site for every refresh.
+**Resolved:** it now explicitly reuses the recorded site ID and limits site
+creation to initial provisioning. No duplicate site was created by this task.
+The separate Spec follow-up found **0 actionable findings**. Final follow-up
+totals: **Standards 1 wording finding, resolved; Spec 0**. No remaining review
+defect or new inference/deployment claim results from that documentation fix.
 
 Licensing remains the existing owner-directed exception/unverified disposition;
 all notices and private-training boundaries are preserved. #5/#6/#7 stay open.

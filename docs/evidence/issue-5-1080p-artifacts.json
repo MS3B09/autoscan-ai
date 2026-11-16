@@ -1,0 +1,31 @@
+{
+  "source_sha": "e719d8a97e7d97961b528efd5e6ea5ef19ee8d5e",
+  "backend_sha": "d160158db56c1cdf6113a575b8b01bb763f81b73",
+  "site_id": "1661ca1f-7c9b-4f69-b8ee-635ac7a49eee",
+  "deploy_id": "6afb4f606cabececacad1489",
+  "context": "deploy-preview",
+  "preview_url": "https://6afb4f606cabececacad1489--autoscan-ai-ms3b09.netlify.app",
+  "method": "file digest API with draft:true; no Git build",
+  "file_count": 18,
+  "public_file_hashes_verified": 16,
+  "files_sha256": {
+    "_headers": "4722877d3f9842fc8e0633983a03eb8bf12a6ac57585522b1ba5b4e8f250fd4a",
+    "_redirects": "b7f72b2be7bc3997a61fec31e304b2e00241e867e4a4094e1d797b6d7d5d223f",
+    "assets/index-BTFTOnud.js": "d809bddaa5c590a6f6563ab66b52bae6e3df95db73500b4c59b4ecbf3c9e9571",
+    "assets/index-CJm8rRKw.css": "2bebba316cddd2c6c4b0e4099ce413b862503cbc3348db29389874dd08837639",
+    "assets/red-hat-display-latin-600-normal-B3rzeGOx.woff": "8774ac453f5105c003b2bee67c6d406c3c599473176ee416ec7b94c91cfa559f",
+    "assets/red-hat-display-latin-600-normal-BbN_fQ7Z.woff2": "69eb3fa1ef788d887adadc9b8bf14ce517a0a879724b22a5fb8b5e3122f7e72c",
+    "assets/red-hat-display-latin-900-normal-BHcuLb2G.woff": "16200374c42b57bcc7c5fa3ea706ac8c551b06b77b0996b73bee953dea78187a",
+    "assets/red-hat-display-latin-900-normal-DPLyod-Q.woff2": "d8fc457b3cde366d0429808cbdc4cb1d26cb20a4803773b1156b656f971cb00a",
+    "assets/red-hat-text-latin-400-normal-B-8bUVwG.woff": "2e917ce86b682bffe8974a4a7983b7d2d4884f24121b4c41b31133c5440bef7e",
+    "assets/red-hat-text-latin-400-normal-CU14VBGs.woff2": "65129f71694b5b1ffcf50f1c9ab27fc5fe36b496f5e7c183a7ae7ca73876552c",
+    "assets/red-hat-text-latin-500-normal-BVSYZAnq.woff": "86cacaad5074640a3b47d9a55597ba9d7c195679b492ef6f316aa36f7928658d",
+    "assets/red-hat-text-latin-500-normal-c4wcFpAd.woff2": "1d573ccebe4e5f8a92cd21a14bb5e719b7fb7099237336e53a14f9872f8c851c",
+    "examples/attribution.txt": "1566d71c67a829faf6419a2291dc462d4ac94f8ab9d5d6ab35cca4b8920026b2",
+    "examples/lexus-detections.png": "b3a0f2c40e14cb82a006e913ab1f02c8d1bea88b07eef90d853786bd76aca04d",
+    "examples/lexus-lx570.jpg": "094eaadda95cb65a3303caf3e35039be61af977e23ad89cf840c527a15b50243",
+    "examples/lexus.csv": "bf05155f86278e97fc41fccd4394bdb76dd51af83703cd37b6840eed00e3a29f",
+    "examples/lexus.json": "0a499be9165407677cf1761c71ff5c296f57c5b5b25da473923a21da5d1be74e",
+    "index.html": "3ac4fa74bd5771aeece0e19968d56477385405c31fac99861897a5d88a0c9be2"
+  }
+}

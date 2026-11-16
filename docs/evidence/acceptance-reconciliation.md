@@ -22,6 +22,11 @@ verified routing/headers/layout/keyboard and native anonymous still-preview CORS
 No live inference, video, production or complete lifecycle criterion is newly
 accepted from those scoped checks.
 
+**Latest owner-requested change:** [1080p handoff](issue-5-1080p.md) records the
+resolution-only scope override, approved local CPU codec/API tests, new backend
+and immutable draft. Earlier hosted 720p evidence is not a 1080p capacity pass;
+the final hosted clip check remains owner-only and production remains unapproved.
+
 ## How to read the tracker
 
 - **Evidenced:** implemented and supported by the cited retained checks; may be

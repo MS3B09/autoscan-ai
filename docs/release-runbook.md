@@ -10,7 +10,7 @@ The final candidate video check belongs to the owner. Licensing remains an
 Preserve the original Streamlit app, checkpoint bytes, credits and notices.
 
 Current approved draft IDs/URLs, artifact manifest and remaining owner/release
-gates: [Netlify draft handoff](evidence/issue-7-netlify-draft.md). A draft is not
+gates: [current 1080p draft handoff](evidence/issue-5-1080p.md). A draft is not
 production approval; do not duplicate/import the project or link Git in a way
 that automatically publishes it.
 
@@ -216,7 +216,8 @@ requirements (including image/empty results, isolation, cleanup, expiry, bounds
 and failure states); leave safely unexercised ones unverified, not passed.
 
 **CLI-unavailable alternative (used for the current candidate):** with authorized
-Netlify authentication, create an empty site in the verified Free team via
+Netlify authentication, **reuse the recorded site ID for candidate refreshes**.
+Only initial provisioning creates an empty site in the verified Free team via
 `POST /api/v1/{account_slug}/sites`, without a `repo` or initial file upload.
 Stage only `web/dist` and literal `_redirects`/`_headers` equivalents of this
 repository's TOML rules. Create a file-digest deploy with

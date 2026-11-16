@@ -4,6 +4,11 @@
 Netlify connection blocker is resolved. No inference, video test, production
 publication, paid resource or billing upgrade occurred. #5/#6/#7 remain open.
 
+**Superseded candidate:** the owner's later approved 1080p change has a new
+backend/draft and a narrow local-video-test exception. Use
+[the current 1080p handoff](issue-5-1080p.md), not this earlier draft URL. Results
+below remain historical; they are not fresh 1080p inference/capacity evidence.
+
 ## Exact candidate
 
 - Showcase: <https://6afb394cb63bcc5d8c896112--autoscan-ai-ms3b09.netlify.app/>.

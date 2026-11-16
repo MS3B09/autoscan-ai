@@ -43,10 +43,10 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
 | Short-video implementation | Owner requested 1080p and approved local-only codec/API checks plus backend/draft update. Earlier hosted 300/600-frame evidence remains 720p-only; 1080p GPU/resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. Final hosted check is owner-only. | #5 / #7 |
 | Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
-| Quota reset messages and developer adapter | Backend API update deployed at `b6c91e2`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
+| Quota reset messages and developer adapter | Existing quota-message API preserved in backend `d160158`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
 | Local release preparation | Runbook, Node pin, 29 safe local tests, typechecks, clean frontend build and scoped artifact/history secret checks completed; final review recorded in the linked evidence. No deployed-origin pass. | #7 |
-| Approved source push / Netlify draft | Source through `7fb3fc1` pushed; Free-plan draft `6afb394cb63bcc5d8c896112` ready, no published deploy, Git unlinked. Routing/headers/keyboard/layout and native anonymous still-preview/preflights passed; no live inference/lifecycle acceptance. | #7 |
+| Approved source push / Netlify draft | 1080p source `e719d8a` pushed; Free-plan draft `6afb4f606cabececacad1489` ready, no published deploy, Git unlinked. Static/routing/layout and native still-preview/preflight checks passed; no hosted video/inference acceptance. | #5 / #7 |
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
@@ -69,7 +69,7 @@ that no deployment/push had occurred are historical, not the current status.
 
 The Netlify connection blocker is now resolved. Exact draft URLs, artifact hashes,
 origin wiring, non-inference browser checks and owner handoff:
-[issue-7-netlify-draft.md](evidence/issue-7-netlify-draft.md). Use that immutable
+[current 1080p handoff](evidence/issue-5-1080p.md). Use that immutable
 draft, not the unpromoted production hostname. Git integration remains unlinked
 to avoid automatic publication.
 
