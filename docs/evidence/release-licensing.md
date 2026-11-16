@@ -1,6 +1,7 @@
 # Release licensing and attribution — #6 / #7
 
-Research/access date: **2026-11-16**. **LICENSING GATE BLOCKED; research complete.**
+Research/access date: **2026-11-16**. **Owner removed the workflow hold; licensing
+compliance remains unverified.** Research complete; no legal-clearance claim.
 Evidence/owner follow-up, not legal advice or a legal-clearance opinion.
 Implementation unchanged; images work per the user's manual report, not a new test.
 
@@ -13,6 +14,34 @@ and issue comments are tracked separately. No tests, builds, inference, GPU use,
 deployments, credential access, dependency/model changes or license replacement.
 **NO VIDEO TESTING OR VIDEO INFERENCE:** the final video test belongs to the user
 after remaining work; historic evidence is not a fresh pass or authorization.
+
+## Owner-directed workflow decision — 2026-11-16
+
+After the official-source findings were explained, MS3B09 stated that the earlier
+application already uses this setup and instructed **"you can unbloack licensing
+now"**, supplying:
+- https://github.com/TeamXGroup/cars-logos-plates-detection
+- https://smart-vehicle-scanner.streamlit.app/
+
+The public GitHub page/API identifies the TeamX repository as Apache-2.0, names
+the original contributors (including MS3B09), links the same datasets, and lists
+the Streamlit URL as its homepage. A read-only fetch of the Streamlit URL hit a
+redirect limit; current application operation was not independently tested. The
+owner's report of prior successful use is recorded, not converted into inference
+or licensing evidence.
+
+**Current workflow disposition:** remove the internal licensing blocker from
+#6/#7 and continue project preparation at the owner's direction. This supersedes
+the earlier research recommendation to hold work. It does not change upstream
+terms, prove an exception, or establish independent compliance. Record the rights
+criterion as **owner-directed exception / unverified**, not checked-and-passed.
+The owner did not explicitly state a legal-risk acceptance or supply a new grant;
+do not manufacture either statement. Preserve all source/credit/license notices.
+
+Training materials remain private. No license replacement, paid agreement, model
+change, source push or deployment is authorized by this workflow decision. The
+owner-only video testing hold remains unchanged. The earlier research below is
+retained as evidence, not an instruction to reimpose the same workflow blocker.
 
 ## Focused permission search — 2026-11-16
 
@@ -29,21 +58,21 @@ and applying the GNU license to this specific work. Their terms preserve rights
 under the actual open-source license; this is not a legal finding that every
 historical notebook must be disclosed. No project-specific permission is evidenced.
 
-With the owner's privacy boundary and no-paid-license constraint unchanged,
-**keep #6/#7's public-release gate open**. A suitable explicit permission or qualified
-source-scope determination could change the assessment; neither was obtained by
-this public-page search. No request was sent and no purchase is authorized.
-Other non-inference release preparation can proceed without clearing the gate.
+The research initially recommended a release hold under the owner's privacy and
+no-paid-license constraints; the subsequent owner decision above removes that
+internal workflow hold, not the uncertainty. A suitable permission or qualified
+source-scope determination could change the compliance assessment; neither was
+obtained by the public-page search. No request was sent or purchase authorized.
 
 ## Known / unknown matrix
 
 | Layer / exact asset | Known evidence | Still unknown / release consequence |
 | --- | --- | --- |
 | Project software | Root `LICENSE` contains Apache-2.0; README names five contributors and both datasets. | This does not license third-party code, weights or images. Owner must approve an appropriate combined-work/source arrangement. |
-| `ultralytics==8.4.189` | `image_service/requirements.txt` pins it; tagged LICENSE is GNU AGPLv3 and package metadata says AGPL-3.0 [U1,U2]. | No approved compliance inventory/source offer tied to the actual release; no alternative grant evidenced. **Blocked.** |
+| `ultralytics==8.4.189` | `image_service/requirements.txt` pins it; tagged LICENSE is GNU AGPLv3 and package metadata says AGPL-3.0 [U1,U2]. | No approved compliance inventory/source offer tied to the actual release; no alternative grant evidenced. **Unverified; owner removed workflow hold.** |
 | Vehicle `models/yolov8n.pt` | Backend evidence pins official `Ultralytics/YOLOv8` revision below; that revision's model card says `license: agpl-3.0` [V1]. | Must be included in the source/license/notice arrangement; model permission does not blanket-license COCO images. |
-| Custom `models/logo.pt` | MS3B09 confirms training on the README-linked dataset from `yolov8n.pt` and permits public app/model files (2026-11-16); pinned identity below. | Owner-confirmed provenance/publication scope, not an independent audit or replacement for upstream terms. Source/licensing compatibility with private training materials remains **blocked**. |
-| Custom `models/plate.pt` | Same owner confirmation: README-linked plate dataset, `yolov8n.pt` starting weights, public app/model files permitted. | Same remaining upstream/source question; no need to establish identity through Roboflow's separately hosted model. **Blocked.** |
+| Custom `models/logo.pt` | MS3B09 confirms training on the README-linked dataset from `yolov8n.pt` and permits public app/model files (2026-11-16); pinned identity below. | Owner-confirmed provenance/publication scope, not an independent audit or replacement for upstream terms. Source/licensing compatibility **unverified; owner removed workflow hold**. |
+| Custom `models/plate.pt` | Same owner confirmation: README-linked plate dataset, `yolov8n.pt` starting weights, public app/model files permitted. | Same unverified upstream/source question; no need to establish identity through Roboflow's separately hosted model. **Owner removed workflow hold.** |
 | Logo dataset v1 | Public original version page: MS3B, CC BY 4.0, 2,782 images, generated 2024-04-19 [D1,D2]. Owner confirms using the README-linked datasets. | Export/processing history is not independently audited; uploader label is evidence, not a warranty of every image's rights. |
 | Plate dataset v1 / public hosted model | Project and version label Public Domain; project license links CC0 1.0. 1,558 images, generated 2022-06-25; hosted model `/1` is Roboflow 2.0 Object Detection (Fast) [D3–D5]. | No separate downloadable-weight grant/identity tying that model to local `plate.pt` established. CC0 affects only rights the affirmer can waive [C2]. |
 | Showcase source/annotated photograph | Commons fixed revision confirms M 93, self-photographed Lexus LX 570, 2009-06-20; attribution-only permission expressly allows redistribution, derivatives and commercial use [P1,P2]. | Photo copyright permission evidenced with credit retained; does not clear detectors/data or imply brand endorsement. No new byte/image verification here. |
@@ -143,20 +172,20 @@ notebooks/configuration, or assume permission to include them in a source offer.
 The statement does not authorize relicensing or clear third-party obligations.
 Whether this deployment can comply without those materials remains unresolved;
 do not assert either that every training notebook is automatically required by
-AGPL or that withholding it is automatically compliant. Determine the applicable
-source scope/permission with upstream or qualified advice before release.
+AGPL or that withholding it is automatically compliant. Upstream/qualified
+clarification remains an option, not a renewed owner questionnaire or an internal
+workflow prerequisite after the owner's subsequent decision above.
 
-## What remains to unblock
+## Evidence disposition after the owner decision
 
 1. **Owner questions answered.** Trainer, linked datasets, starting architecture/
    weights name, public app/model publication scope, and private-training boundary
    are confirmed by MS3B09. Retain this as the provenance record; do not present it
    as an independent audit or invent historical revisions/preprocessing details.
-2. **Upstream/source compatibility.** Clarify whether the intended public hosted
-   application and fine-tuned weights can use the no-fee license path with the
-   training materials private. This is an upstream/legal-scope question, not a
-   request for more owner provenance documents. If applicable required source
-   conflicts with that boundary, hold release unless a suitable grant is established.
+2. **Upstream/source compatibility remains unverified.** The owner removed the
+   internal workflow hold, not this research limitation. Any later permission or
+   qualified determination should be recorded; do not claim either exists or keep
+   asking for the same private training documents.
 3. **Implement only an approved arrangement.** Preserve dataset notices and all
    applicable grants, document the source/weights actually authorized for release,
    and record source access/revisions. Do not replace the root license, buy a
@@ -188,11 +217,13 @@ request or permission to contact anyone on the owner's behalf.
   gathered. A different permissively licensed stack/data/models would need a new
   user-approved scope and validation; it is not a fix performed here and conflicts
   with the current checkpoint-preservation requirement unless explicitly changed.
-- **#6: BLOCKED on its model-rights acceptance criterion** [I6]. Photo permission
-  is evidenced, but research completion/working images do not satisfy that gate.
-- **#7: BLOCKED on software/model/data licensing and source arrangement** [I7].
-  Other release checks remain separate; the user alone performs the final video
-  test after remaining work. Do not mark release cleared or close either rights gate.
+- **#6: licensing workflow hold removed by owner** [I6]. Photo permission is
+   evidenced; mark independent rights verification as an owner-directed exception,
+   not a passed legal check. Remaining acceptance reconciliation is separate.
+- **#7: no longer internally blocked on licensing at the owner's direction** [I7].
+   Preserve the unverified compliance note and required release approvals. Technical
+   release checks remain; the user alone performs the final video test. Do not
+   declare a completed production release or automatically close either ticket.
 
 ## Primary sources (all accessed 2026-11-16)
 

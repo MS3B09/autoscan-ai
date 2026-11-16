@@ -88,3 +88,8 @@ preflight is not an atomic reservation and does not guarantee capacity; keep pai
 usage disabled. Loopback restrictions do not protect against malicious local
 processes or code on the trusted frontend origin. Existing #6 model/dataset rights
 and #7 release gates remain unresolved; this change does not clear them.
+
+Subsequent workflow update (2026-11-16): the owner removed the internal licensing
+hold, without independently establishing compliance. That supersedes the prior
+licensing-block status here, not the test results or other release checks. See
+[the recorded decision](release-licensing.md#owner-directed-workflow-decision--2026-11-16).

@@ -3,13 +3,22 @@
 Research/access date: **2026-11-16**. First-party evidence, not legal advice.
 Scope: Ultralytics' own published position and grants; separate AGPL/architecture review remains necessary.
 
+**Subsequent owner decision:** MS3B09 instructed removal of the internal licensing
+workflow hold, citing the prior TeamX/Streamlit application. See
+[the recorded decision](release-licensing.md#owner-directed-workflow-decision--2026-11-16).
+The research below remains unchanged evidence, not a current instruction to block
+preparation. Compliance is **unverified**, not independently passed or waived by
+Ultralytics.
+
 ## Short answer
 
 **No published Ultralytics exception was found permitting this exact arrangement merely because it is a free, personal, noncommercial demo.**
 Ultralytics offers personal projects a free **AGPL-3.0 compliance route**, not a disclosure waiver.
 Its current licensing FAQ and version-pinned guidance expressly include training scripts and configurations in the source-publication scope [1–3].
 Consequently, public frontend/backend code plus the two fine-tuned `.pt` files alone does **not establish compliance with the vendor's stated requirements** while training materials remain private.
-**Recommendation: do not clear the public-demo licensing gate on a personal/noncommercial exception; keep it blocked under the owner's unchanged publication boundary.**
+**Research recommendation at completion:** do not claim a personal/noncommercial
+exception was found. The subsequent owner decision removes the internal workflow
+hold without changing the source findings or establishing compliance.
 This is not a finding that every historical notebook is legally mandatory, or that an Enterprise purchase is the only legally possible outcome.
 
 ## Confirmed setup and applicability
@@ -80,7 +89,7 @@ The official R&D alternative is also **not a free public-demo exception**: its g
 
 - **Free open route:** comply with the applicable AGPL scope and publish the required corresponding source, licensing/notices, fine-tuned weights and setup material; Ultralytics' guidance includes training scripts/configs. This conflicts with the stated boundary if those materials are required. Do not publish private files or silently relicense contributors' work.
 - **Paid proprietary alternative:** Enterprise is the vendor-advertised way to avoid the open-source requirements [1]. Its actual agreement §5 requires an **Annual Fee**; scope and coverage for already-trained models must be established by an actual agreement, not assumed from a quote [8]. No purchase/contact is authorized or performed.
-- **Unchanged boundary:** hold public release. An explicit applicable grant could change the result, but none is evidenced and a free exception is not promised.
+- **Research's original hold recommendation:** an explicit applicable grant could change the assessment, but none is evidenced and a free exception is not promised. The owner subsequently removed the internal workflow hold; preserve this evidence without treating it as current blocking policy.
 - **Remaining decisive issue:** whether the covered work's legally required corresponding source can be complete without the withheld training materials, or an actual applicable alternative grant covers that withholding. The vendor pages do not resolve that narrower legal/source-form question. This is not missing trainer identity, dataset provenance, or owner permission to publish app/weight files.
 
 ## Primary sources (all accessed 2026-11-16)
