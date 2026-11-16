@@ -101,3 +101,15 @@ preserve attribution and record compliance as unverified.
 - **#7:** criterion 9 covered; other combined criteria remain partial or await
   production. Approved tests/reviews are recorded, not erased or overstated.
 - **#1:** parent stays open pending child closeout.
+
+## Reconciliation checks and review
+
+- Four changed documents passed local file-link and scoped credential-pattern
+  checks; all ten criterion rows and distinct test accounting were checked.
+  `git diff --check` passed. Application, tests, models and deploy config unchanged.
+- Independent read-only review of candidate **`aedc0a6`**, full three-dot diff from
+  owner-approved baseline **`cea69ae7f60c84ad8532eca803510283473fc6d2`**:
+  **Standards 0 actionable findings; Spec 0 actionable findings**, no worst finding
+  on either axis. Both preserved the original #7 criteria and evidence boundaries.
+- No suite rerun, inference, live application check or deployment ran for these
+  documentation checks/reviews. Their scope does not establish release acceptance.
