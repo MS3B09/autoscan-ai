@@ -39,6 +39,11 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Quota reset messages and developer adapter | Committed as `839f4b8`; local HTTP/browser checks passed. Public reset messages need the backend update. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
 
+Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
+evidenced and three partial/deferred criteria; #6 has eight evidenced and one
+owner exception/unverified criterion. Both remain open; #7 is not release-accepted.
+See [the criterion-by-criterion reconciliation](evidence/acceptance-reconciliation.md).
+
 Prior evidence: [video](evidence/issue-5-verification.md),
 [showcase](evidence/issue-6-verification.md), and
 [quota/developer access](evidence/developer-quota-verification.md).
@@ -61,26 +66,22 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
 
 ## Remaining work, in order
 
-1. **Ticket/evidence reconciliation — #5 / #6 / #7, parent #1.** Reconcile
-   completed implementation against acceptance criteria and carry forward real
-   verification gaps. Record owner-reported image success without claiming an
-   independently verified quota debit. Do not close incomplete release gates.
-2. **Release candidate preparation — #7.** Finish reproducible runtime,
+1. **Release candidate preparation — #7.** Finish reproducible runtime,
    dependency, pinned-checkpoint, nonsecret configuration, and deployment/rollback
    instructions. Check frontend artifacts for credentials, keep the explicit
    backend file mapping, and record exact source/model/runtime revisions. Run only
    permitted non-video/non-inference checks and required review after changes.
-3. **Approved preview and backend update — #7.** After permission, update the
+2. **Approved preview and backend update — #7.** After permission, update the
    free Space's quota-message code and prepare Netlify preview configuration.
    Check HTTPS, root/detector refresh, navigation, desktop/mobile/keyboard UI,
    headers and image preview without inference. These checks alone cannot prove
    authenticated/anonymous GPU execution or the full deployed job lifecycle.
-4. **Owner's final video test — #5 / #7.** After preparation, the owner tests a
+3. **Owner's final video test — #5 / #7.** After preparation, the owner tests a
    representative accepted clip against the release candidate, checking actual
    playback, MP4/JSON/CSV downloads, and deletion. Record outcome and exact build;
    do not silently turn one run into a cancellation/retention/load-test suite.
    Any additional quota-consuming verification needs explicit authorization.
-5. **Production promotion and closeout — #7.** Once remaining technical checks
+4. **Production promotion and closeout — #7.** Once remaining technical checks
    are satisfied, obtain approval and promote the same candidate. Retain the
    owner's licensing decision and unverified compliance in the closeout; do not
    turn it into a legal-clearance claim. Verify deployed

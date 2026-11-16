@@ -1,5 +1,11 @@
 # Issue #5 verification
 
+Current acceptance status (2026-11-16): implementation is complete; six criteria
+are evidenced and three retain deferred verification. No new video checks may be
+run by the agent; the owner reserves the final candidate test. See
+[acceptance-reconciliation.md](acceptance-reconciliation.md) and
+[the release checklist](../release-checklist.md). Results below are historical.
+
 Date: 2026-11-14–15 (local session). Scope: short-video implementation, not public
 release approval. Review baseline: user-confirmed `07ca289a70a9af246f7cbd40652d1c36ad791925`.
 

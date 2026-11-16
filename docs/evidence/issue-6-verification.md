@@ -6,6 +6,11 @@ historical. See [the owner decision](release-licensing.md#owner-directed-workflo
 and [the current checklist](../release-checklist.md). Public deployment still
 requires separate approval and technical release checks.
 
+Acceptance reconciliation (2026-11-16): eight criteria evidenced, one mixed rights
+criterion recorded as owner exception/unverified. Formal closeout remains open;
+no new feature work was identified. See
+[acceptance-reconciliation.md](acceptance-reconciliation.md).
+
 Date: 2026-11-15. **Showcase implemented; public release is not approved.**
 Review baseline confirmed by the user:
 `a3be322662d258d08ee9e891977e1e94ae9c9e0c`.
