@@ -45,7 +45,7 @@ The owner-approved fixed review baseline is
 | Configuration/doc static checks | **Passed**: TOML parse, Node pin, unchanged rewrite/header values, mapped module existence, checkpoint example compilation |
 | Checkpoint preservation | **Passed** for both existing custom files; generic-model acquisition/loading not rerun |
 | Local source/history/artifact credential-pattern scan | **Passed within stated pattern scope**, below; not a certification of unknown credentials or deployed logs |
-| Final Standards/Spec review | Pending on the committed candidate against the fixed baseline; results will be appended separately |
+| Final Standards/Spec review | Completed on candidate `0e28355` against the fixed baseline: Standards found one P3 status-wording inconsistency, resolved by this review-recording update; Spec found zero actionable defects. See separate reports below. |
 
 The exact safe selections and commands are in
 [the runbook](../release-runbook.md#permitted-local-checks-during-the-hold).
@@ -78,7 +78,8 @@ It looked for recognizable HF/GitHub/Netlify token prefixes, AWS access-key IDs,
 private-key headers and URLs containing basic-auth credentials. No values were
 printed; no credentials were read from credential stores. Binary source/model
 files were excluded from text checks; all output artifacts were inspected.
-New evidence/checklist text must receive the same final check before committing.
+The final source scan included **92 files**, covering the new evidence/checklist
+text; it found no recognized patterns. Local Markdown-link checks also passed.
 
 The build contained only HTML, JS/CSS, local fonts and the attributed example
 image/PNG/JSON/CSV assets. No `.env`, Python, checkpoint or source-map files were
@@ -101,6 +102,27 @@ Reproduce by sorting the 16 relative POSIX paths lexically, concatenating
 `path + "\t" + sha256(file_bytes) + "\n"` as UTF-8, then SHA-256 hashing that text.
 Recheck the final approved deploy artifact: byte-identical local builds do not
 prove any Netlify candidate, deployed origin, URL or public-log safety.
+
+## Standards
+
+Independent read-only review of `git diff cea69ae7f60c84ad8532eca803510283473fc6d2...HEAD`
+at candidate `0e28355` found one **P3** documentation inconsistency: the checklist
+said "final review recorded" while this evidence still said "Pending". That
+overstated review completion under the owner's requirement to distinguish
+unverified checks. **Resolved:** this update records both completed reviews and
+removes the pending-review handoff instruction. No baseline smell findings.
+
+## Spec
+
+Independent read-only review of the same candidate against current #7/#1 found
+**zero actionable defects or scope creep**; the permitted preparation scope is
+satisfied. It confirmed that deployed workflow, origin/isolation/lifecycle,
+runtime/resource/accessibility, owner video and full-suite requirements remain
+approval-dependent release gates, not passes from this local work. No tests,
+inference, credentials or deployment were used by either reviewer.
+
+Review totals: **Standards 1 finding (P3 wording; resolved); Spec 0 actionable
+findings.** The review does not authorize or establish a completed release.
 
 ## URLs, gates and next action
 

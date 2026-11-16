@@ -75,9 +75,10 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
 
 1. **Local release candidate preparation — #7.** Instructions, permitted checks
    and local artifact inspection are recorded in the runbook/evidence above.
-   Complete the required fixed-baseline review before handoff. Fresh deployed
-   source/model/runtime inventory and final uploaded-artifact checks still belong
-   to the approved deployment, not the local preparation pass.
+   The fixed-baseline Standards/Spec review is recorded, including the corrected
+   status-wording finding. Fresh deployed source/model/runtime inventory and final
+   uploaded-artifact checks still belong to the approved deployment, not the local
+   preparation pass.
 2. **Approved preview and backend update — #7.** After permission, update the
    free Space's quota-message code and prepare Netlify preview configuration.
    Check HTTPS, root/detector refresh, navigation, desktop/mobile/keyboard UI,
