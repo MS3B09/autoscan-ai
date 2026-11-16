@@ -27,6 +27,11 @@ resolution-only scope override, approved local CPU codec/API tests, new backend
 and immutable draft. Earlier hosted 720p evidence is not a 1080p capacity pass;
 the final hosted clip check remains owner-only and production remains unapproved.
 
+**Owner report after the 1080p handoff:** the owner now reports the final video
+check **passed**. See [the recorded report](issue-5-1080p.md#owners-final-video-report--2026-11-16).
+This supersedes the owner-check-pending status, not separate lifecycle/resource/
+isolation gaps, deferred tests or production approval. No new agent checks ran.
+
 ## How to read the tracker
 
 - **Evidenced:** implemented and supported by the cited retained checks; may be

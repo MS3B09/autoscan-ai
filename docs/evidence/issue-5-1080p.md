@@ -123,3 +123,25 @@ defect or new inference/deployment claim results from that documentation fix.
 
 Licensing remains the existing owner-directed exception/unverified disposition;
 all notices and private-training boundaries are preserved. #5/#6/#7 stay open.
+
+## Owner's final video report — 2026-11-16
+
+The owner reported after the refreshed 1080p handoff:
+
+> I ran it on video now and all is good. Video check successfully passed.
+
+**Disposition: owner-reported PASS of the reserved final video check.** The
+candidate under handoff is deploy `6afb4f606cabececacad1489` (source `e719d8a`,
+backend `d160158`). The message does not include an independently captured build
+URL, job report, timing, resource measurement or downloaded artifacts. Record the
+reported workflow success without inventing per-action measurements or claiming
+independent agent verification. Earlier "owner check pending" statements above
+describe the preparation phase and are superseded by this report.
+
+No agent test, inference, video preview, media inspection or deployment ran for
+this update. No quota attribution or maximum 1080p workload claim is added. The
+report does not separately verify active cancellation, a thirty-minute expiry,
+cross-visitor isolation, resource/failure cases or deferred tests. These still
+need honest evidence reconciliation/disposition; do not require or run more
+quota-consuming checks without approval. Production promotion and ticket closure
+are not authorized by reporting a successful video test.

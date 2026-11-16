@@ -14,6 +14,10 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 - The 1080p change and local-only evidence are tracked in
   [issue-5-1080p.md](evidence/issue-5-1080p.md); earlier 720p hosted runs are not
   upgraded to 1080p capacity evidence.
+- **Owner final video check passed (reported 2026-11-16).** The owner reports
+  successful video testing after the 1080p draft handoff. This is user-reported
+  workflow evidence, not independent resource/lifecycle measurements or approval
+  for agent reruns, production promotion or automatic ticket closure.
 - Do not replace the final owner video check with an agent-run image/video job,
   consume quota just to exercise an error, or retry submissions automatically.
 - After each upcoming task, report remaining work in the conversation with its
@@ -41,12 +45,12 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Item | Evidence / status | Ticket |
 | --- | --- | --- |
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
-| Short-video implementation | Owner requested 1080p and approved local-only codec/API checks plus backend/draft update. Earlier hosted 300/600-frame evidence remains 720p-only; 1080p GPU/resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. Final hosted check is owner-only. | #5 / #7 |
+| Short-video implementation | 1080p implemented; owner's final video check reported PASS after the current draft handoff. No agent rerun. Earlier hosted capacity evidence remains 720p-only; maximum 1080p resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. | #5 / #7 |
 | Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
 | Quota reset messages and developer adapter | Existing quota-message API preserved in backend `d160158`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
 | Local release preparation | Runbook, Node pin, 29 safe local tests, typechecks, clean frontend build and scoped artifact/history secret checks completed; final review recorded in the linked evidence. No deployed-origin pass. | #7 |
-| Approved source push / Netlify draft | 1080p source `e719d8a` pushed; Free-plan draft `6afb4f606cabececacad1489` ready, no published deploy, Git unlinked. Static/routing/layout and native still-preview/preflight checks passed; no hosted video/inference acceptance. | #5 / #7 |
+| Approved source push / Netlify draft | 1080p source `e719d8a` pushed; Free-plan draft `6afb4f606cabececacad1489` ready, no published deploy, Git unlinked. Scoped agent checks passed; owner additionally reports video success. No complete release acceptance. | #5 / #7 |
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
@@ -103,11 +107,11 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
    file-digest deployment, not a Netlify Git build, full inference workflow or
    production promotion. Remaining job/lifecycle/runtime/resource evidence stays
    explicit in the linked handoff.
-3. **Owner's final video test — #5 / #7.** After preparation, the owner tests a
-   representative accepted clip against the release candidate, checking actual
-   playback, MP4/JSON/CSV downloads, and deletion. Record outcome and exact build;
-   do not silently turn one run into a cancellation/retention/load-test suite.
-   Any additional quota-consuming verification needs explicit authorization.
+3. **Owner's final video test — #5 / #7, reported PASS.** Recorded the owner's
+   successful video-check report following the 1080p candidate handoff; no agent
+   rerun or independently inspected artifacts. Reconcile remaining acceptance
+   evidence without treating this happy-path report as cancellation/retention/
+   load-test proof. Additional quota-consuming checks still need approval.
 4. **Production promotion and closeout — #7.** Once remaining technical checks
    are satisfied, obtain approval and promote the same candidate. Retain the
    owner's licensing decision and unverified compliance in the closeout; do not
