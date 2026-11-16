@@ -145,3 +145,6 @@ cross-visitor isolation, resource/failure cases or deferred tests. These still
 need honest evidence reconciliation/disposition; do not require or run more
 quota-consuming checks without approval. Production promotion and ticket closure
 are not authorized by reporting a successful video test.
+
+Current cross-ticket release gates and remaining evidence/production decisions:
+[issue-7-release-gates.md](issue-7-release-gates.md).

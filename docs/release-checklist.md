@@ -48,14 +48,20 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | Short-video implementation | 1080p implemented; owner's final video check reported PASS after the current draft handoff. No agent rerun. Earlier hosted capacity evidence remains 720p-only; maximum 1080p resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. | #5 / #7 |
 | Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
 | Quota reset messages and developer adapter | Existing quota-message API preserved in backend `d160158`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
-| Public Netlify release | Not approved or completed. Local/staged evidence is not deployed-origin evidence. | #7 |
-| Local release preparation | Runbook, Node pin, 29 safe local tests, typechecks, clean frontend build and scoped artifact/history secret checks completed; final review recorded in the linked evidence. No deployed-origin pass. | #7 |
+| Public Netlify release | Not approved or completed. Current draft-origin checks are scoped, not complete production-origin evidence. | #7 |
+| Local release preparation | Runbook/Node pin, latest approved 39-test local suite (12 policy-deferred), typechecks/build and scoped artifact/history secret checks recorded; fixed-baseline reviews completed. No fresh suite rerun for reconciliation. | #7 |
 | Approved source push / Netlify draft | 1080p source `e719d8a` pushed; Free-plan draft `6afb4f606cabececacad1489` ready, no published deploy, Git unlinked. Scoped agent checks passed; owner additionally reports video success. No complete release acceptance. | #5 / #7 |
+| Final gate reconciliation | Current matrix records criterion 9 covered, approved subset/reviews for criterion 10, and remaining workflow/lifecycle/resource/runtime evidence plus production/hostname decisions. | #7 |
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
 owner exception/unverified criterion. Both remain open; #7 is not release-accepted.
 See [the criterion-by-criterion reconciliation](evidence/acceptance-reconciliation.md).
+
+**Current post-owner-pass matrix and next decisions:**
+[issue-7-release-gates.md](evidence/issue-7-release-gates.md). Earlier snapshots
+retain historical results; setup, draft deployment and the owner video check are
+no longer pending tasks.
 
 Prior evidence: [video](evidence/issue-5-verification.md),
 [showcase](evidence/issue-6-verification.md), and
@@ -93,9 +99,9 @@ private materials, or claim an older working deployment proves legal clearance.
 See [owner decision and sources](evidence/release-licensing.md#owner-directed-workflow-decision--2026-11-16)
 and [the official-source findings](evidence/ultralytics-private-training.md).
 
-## Remaining work, in order
+## Release sequence and next decisions
 
-1. **Local release candidate preparation — #7.** Instructions, permitted checks
+1. **Local release candidate preparation — #7, completed at approved scope.** Instructions, permitted checks
    and local artifact inspection are recorded in the runbook/evidence above.
    The fixed-baseline Standards/Spec review is recorded, including the corrected
    status-wording finding. Fresh deployed source/model/runtime inventory and final
@@ -112,7 +118,12 @@ and [the official-source findings](evidence/ultralytics-private-training.md).
    rerun or independently inspected artifacts. Reconcile remaining acceptance
    evidence without treating this happy-path report as cancellation/retention/
    load-test proof. Additional quota-consuming checks still need approval.
-4. **Production promotion and closeout — #7.** Once remaining technical checks
+4. **Final evidence reconciliation — #7, report complete; decisions open.** Use
+   the current matrix to resolve/disposition partial required subchecks. Existing
+   downloaded JSON may supply runtime/model hashes without new inference; request
+   only those nonsecret fields if available. No blanket waiver, new testing or
+   renewed licensing research is authorized by this task.
+5. **Production promotion and closeout — #7.** Once remaining technical checks
    are satisfied, obtain approval and promote the same candidate. Retain the
    owner's licensing decision and unverified compliance in the closeout; do not
    turn it into a legal-clearance claim. Verify deployed

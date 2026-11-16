@@ -1,5 +1,11 @@
 # Acceptance reconciliation — #1 / #5 / #6 / #7
 
+> **Historical snapshot with later addenda.** Use
+> [issue-7-release-gates.md](issue-7-release-gates.md) for the current post-owner-pass
+> matrix and remaining decisions. Pending setup/deployment/owner-check wording
+> below describes earlier stages, not current blockers. The later local CPU-only
+> codec/API exception supersedes the earlier blanket local-video test hold.
+
 Date: **2026-11-16**. Documentation/tracker reconciliation only; no application,
 browser, model, image or video tests were run. No inference, push or deployment.
 Baseline: local implementation through `73488a5`; earlier evidence retains its
