@@ -6,6 +6,7 @@ import '@fontsource/red-hat-text/latin-400.css';
 import '@fontsource/red-hat-text/latin-500.css';
 import { APIError, developerMode, jobPath, request, type Capability, type Job, type ObjectType } from './api';
 import { Showcase } from './showcase';
+import { Icon } from './icon';
 import { SiteFooter, SiteHeader } from './site';
 import './style.css';
 
@@ -25,6 +26,7 @@ const states = {
 };
 const activeStates: Job['state'][] = ['queued', 'processing', 'cancelling'];
 const pageSize = 25;
+const idleNotice = 'Detection starts only when you select Detect.';
 
 function QuotaReset({ retryAt }: { retryAt: number }) {
   const reset = new Date(retryAt * 1000);
@@ -49,7 +51,7 @@ function Workspace() {
   const [pollFailed, setPollFailed] = useState(false);
   const [downloading, setDownloading] = useState('');
   const [page, setPage] = useState(0);
-  const [notice, setNotice] = useState(() => `Choose ${window.location.hash === '#video' ? 'a video' : 'an image'} to begin. Detection starts only when you select Detect.`);
+  const [notice, setNotice] = useState(idleNotice);
   const input = useRef<HTMLInputElement>(null);
   const settings = useRef<HTMLElement>(null);
   const focusUpload = useRef(false);
@@ -64,7 +66,7 @@ function Workspace() {
     if (locked) { window.history.replaceState(null, '', '#' + media); return; }
     setMedia(next); setFile(null); setReady(false); setPreview(''); setError('');
     if (input.current) input.current.value = '';
-    setNotice(`Choose ${next === 'video' ? 'a video' : 'an image'} to begin. Detection starts only when you select Detect.`);
+    setNotice(idleNotice);
   }
 
   useEffect(() => {
@@ -241,20 +243,25 @@ function Workspace() {
     <SiteHeader detector />
     <main id="workspace" className="shell" tabIndex={-1}>
       <div className="intro"><h1>Image &amp; video detector</h1>
-        <p>Choose your media, select what to find, and explore the results.</p>
+        <p>Find vehicles, brand logos and Moroccan plates in your own media.</p>
         {developerMode && <p>Local developer mode. Detection uses your personal Hugging Face quota.</p>}</div>
       <section ref={settings} id="settings" className="controls" aria-label="Media and detection settings">
+        <h2 className="controls-heading">Detection setup</h2>
         <div className="upload">
           <fieldset className="media-choice" disabled={locked}>
             <legend>Input file</legend>
             <div className="media-options">{(['image', 'video'] as const).map(type => <label key={type}>
-              <input type="radio" name="media-type" value={type} checked={media === type}
+              <input className="choice-input" type="radio" name="media-type" value={type} checked={media === type}
                 onChange={() => { selectMedia(type); window.location.hash = type; }} />
-              {type === 'image' ? 'Image' : 'Video'}
+              <Icon name={type} />{type === 'image' ? 'Image' : 'Video'}
             </label>)}</div>
           </fieldset>
-          <label htmlFor="image">Source {media}</label>
-          <input ref={input} id="image" type="file" accept={video ? '.mp4,.mov,.avi,.asf,.m4v,.mpeg' : '.png,.jpg,.jpeg,.bmp,.webp'} disabled={locked}
+          <label htmlFor="image" className="sr-only">Source {media}</label>
+          <div className="file-picker">
+            <span className="file-icon" aria-hidden="true"><Icon name={file ? media : 'upload'} /></span>
+            <span className="file-copy" aria-hidden="true"><strong>{file?.name ?? `Choose ${video ? 'a video' : 'an image'}`}</strong>
+              {file && <small>{locked ? 'Source selected' : 'Choose a different file'}</small>}</span>
+            <input ref={input} id="image" type="file" accept={video ? '.mp4,.mov,.avi,.asf,.m4v,.mpeg' : '.png,.jpg,.jpeg,.bmp,.webp'} disabled={locked}
             aria-describedby="image-help" onChange={event => {
               const next = event.target.files?.[0];
               setError('');
@@ -266,56 +273,59 @@ function Workspace() {
               }
               setReady(false); setFile(next);
             }} />
-          <p id="image-help">{video ? 'MP4, MOV, AVI, ASF, M4V, MPEG. Up to 20 MB, 10 seconds, 1080p and 600 frames. Silent preview and output.' :
-            'PNG, JPG, BMP, WebP. Up to 10 MB and 12 megapixels.'}</p>
+          </div>
+          <p id="image-help">{video ? 'MP4, MOV, AVI, ASF, M4V or MPEG. Up to 20 MB, 10 seconds, 1080p and 600 frames. Video output is silent.' :
+            'PNG, JPG, BMP or WebP. Up to 10 MB and 12 megapixels.'}</p>
         </div>
         <fieldset disabled={locked}>
           <legend>Object types</legend>
-          <div className="types">{objectTypes.map(type => <label key={type.value}>
-            <input type="checkbox" checked={types.includes(type.value)} onChange={event => {
+          <div className="types">{objectTypes.map(type => <label className={`type-choice ${type.value}`} key={type.value}>
+            <input className="choice-input" type="checkbox" aria-label={type.label} aria-describedby={`${type.value}-help`} checked={types.includes(type.value)} onChange={event => {
               setTypes(event.target.checked ? [...types, type.value] : types.filter(value => value !== type.value));
-            }} /><span>{type.label}<small>{type.note}</small></span>
+            }} /><Icon name={type.value} /><span>{type.label}<small id={`${type.value}-help`}>{type.note}</small></span>
+            <span className="choice-mark"><Icon name="check" /></span>
           </label>)}</div>
         </fieldset>
         <div className="confidence">
-          <label htmlFor="confidence">Confidence <output htmlFor="confidence">{confidence}%</output></label>
-          <input id="confidence" type="range" min="25" max="100" step="1" value={confidence} disabled={locked}
+          <div className="confidence-heading"><label htmlFor="confidence">Confidence</label><output htmlFor="confidence">{confidence}%</output></div>
+          <input id="confidence" type="range" min="25" max="100" step="1" value={confidence} aria-valuetext={`${confidence}%`} disabled={locked}
             onChange={event => setConfidence(Number(event.target.value))} />
-          <p>25% to 100%. Lower values include more predictions.</p>
+          <div className="range-limits" aria-hidden="true"><span>25%</span><span>100%</span></div>
+          <p>Lower the threshold to include more predictions.</p>
         </div>
         <div className="actions">
           <button className="primary" onClick={() => void detect()} disabled={!ready || !types.length || locked}>
-            {working && !capability ? 'Uploading…' : `Detect ${media}`}</button>
+            <Icon name="scan" />{working && !capability ? 'Uploading…' : `Detect ${media}`}</button>
           {active && <button onClick={() => void cancel()} disabled={working || job?.state === 'cancelling'}>Cancel</button>}
           {capability && <button onClick={() => void remove()} disabled={working}>Delete now</button>}
         </div>
+        <div className="feedback">
+          <p role="status" aria-live="polite"><Icon name={job?.state === 'success' || job?.state === 'empty' ? 'check' : 'info'} /><span>{!types.length ? 'Select at least one object type.' : notice}</span></p>
+          {job?.media_type === 'video' && job.state === 'processing' && !!job.processed_frames &&
+            <progress aria-label="Frames processed" value={job.processed_frames} max={job.frame_count} />}
+          {error && <p role="alert" className="error"><Icon name="alert" /><span>{error instanceof APIError ?
+            error.retry_at ? <QuotaReset retryAt={error.retry_at} /> : error.message : error}</span></p>}
+          {pollFailed && <button onClick={() => { setError(''); setRetry(value => value + 1); }}>Retry job status</button>}
+          {file && !ready && error && <button onClick={() => { setError(''); setFile(new File([file], file.name)); }}>Retry {media} validation</button>}
+        </div>
       </section>
-      <div className="feedback">
-        <p role="status" aria-live="polite">{!types.length ? 'Select at least one object type.' : notice}</p>
-        {job?.media_type === 'video' && job.state === 'processing' && !!job.processed_frames &&
-          <progress aria-label="Frames processed" value={job.processed_frames} max={job.frame_count} />}
-        {error && <p role="alert" className="error">{error instanceof APIError ?
-          error.retry_at ? <QuotaReset retryAt={error.retry_at} /> : error.message : error}</p>}
-        {pollFailed && <button onClick={() => { setError(''); setRetry(value => value + 1); }}>Retry job status</button>}
-        {file && !ready && error && <button onClick={() => { setError(''); setFile(new File([file], file.name)); }}>Retry {media} validation</button>}
-      </div>
       <section className="comparison" aria-label="Source and detection comparison" aria-busy={!!active}>
-        <figure><figcaption><h2>Original</h2><span>{file?.name || `Your selected ${media}`}</span></figcaption>
+        <figure><figcaption><Icon name={media} /><h2>Original</h2><span>{file?.name || 'Source preview'}</span></figcaption>
           <div className="image-stage">{preview ? video ?
             <video src={preview} controls playsInline preload="metadata" aria-label="Source video preview"
               onError={() => setError('Your browser could not play the video preview. Try another browser or re-export the clip.')} /> :
             <img src={preview} alt="Selected source, normalized for detection" /> :
-            <p>Choose your {media} above.<br />Its preview will appear here.</p>}</div></figure>
-        <figure><figcaption><h2>Detections</h2><span>{job ? `${job.width} × ${job.height} pixels` : 'Actual inference, no example boxes'}</span></figcaption>
+            <p className="stage-message"><Icon name={media} /><strong>{file ? error ? 'Preview unavailable' : 'Preparing preview' : `No ${media} selected`}</strong></p>}</div></figure>
+        <figure><figcaption><Icon name="scan" /><h2>Detections</h2><span>{job ? `${job.width} × ${job.height} pixels` : 'Annotated result'}</span></figcaption>
           <div className="image-stage">{annotated ? job?.media_type === 'video' ?
             <video src={annotated} controls playsInline preload="metadata" aria-label="Annotated silent video"
               onError={() => setError('Your browser could not play the annotated MP4. Try another browser; JSON and CSV remain available.')} /> :
             <img src={annotated} alt={`Annotated result with ${job?.detections.length ?? 0} detections`} /> :
-            <p>{job ? states[job.state] : 'Your annotated media will appear here after detection.'}</p>}</div></figure>
+            <p className="stage-message"><Icon name="scan" /><strong>{job ? 'Detection output' : 'No results yet'}</strong><span>{job ? states[job.state] : 'Run detection to see what the models find.'}</span></p>}</div></figure>
       </section>
       {job && <section className="results" aria-labelledby="result-heading">
         <div className="result-heading"><h2 id="result-heading">Detection details</h2>
-          <p>{job.detections.length} detections at {job.settings.confidence}% minimum confidence</p></div>
+          <div className="result-summary"><span><strong>{job.detections.length}</strong> detections</span><span><strong>{job.settings.confidence}%</strong> min. confidence</span></div></div>
         {job.error && <p className="error" role="alert">{job.retry_at ? <QuotaReset retryAt={job.retry_at} /> : job.error}</p>}
         {job.media_type === 'video' && <p>{job.frame_count} frames, {job.duration_seconds?.toFixed(3)} seconds.
           Frame-level observations are repeated detections, not tracked or unique objects. Frame indices start at zero; timestamps start at the first source frame.</p>}
@@ -323,22 +333,22 @@ function Workspace() {
         {(job.state === 'success' || job.state === 'empty') && <div className="downloads">
           <h3 id="download-heading">Download results</h3>
           <div className="actions" role="group" aria-labelledby="download-heading" aria-describedby="download-help" aria-busy={!!downloading}>
-            <button onClick={() => void download(job.media_type === 'video' ? 'video' : 'image')} disabled={working || !!downloading}>
+            <button onClick={() => void download(job.media_type === 'video' ? 'video' : 'image')} disabled={working || !!downloading}><Icon name="download" />
               {downloading === 'image' || downloading === 'video' ? 'Preparing media…' :
                 job.media_type === 'video' ? 'Download annotated video (MP4)' : 'Download annotated image (PNG)'}</button>
-            <button onClick={() => void download('json')} disabled={working || !!downloading}>
+            <button onClick={() => void download('json')} disabled={working || !!downloading}><Icon name="download" />
               {downloading === 'json' ? 'Preparing JSON…' : 'Download JSON'}</button>
-            <button onClick={() => void download('csv')} disabled={working || !!downloading}>
+            <button onClick={() => void download('csv')} disabled={working || !!downloading}><Icon name="download" />
               {downloading === 'csv' ? 'Preparing CSV…' : 'Download CSV'}</button>
           </div>
           <p id="download-help">Includes all {job.detections.length} selected detections, with class names rather than class IDs.
             Downloads expire with this job. Saved files stay on your device after Delete now.</p>
         </div>}
         {!activeStates.includes(job.state) &&
-          <button onClick={() => void remove(true)} disabled={working}>Change {media} or settings</button>}
-        {job.detections.length > pageSize && <div className="actions" aria-label="Detection pages">
+           <button className="change-settings" onClick={() => void remove(true)} disabled={working}><Icon name="tune" />Change {media} or settings</button>}
+        {job.detections.length > pageSize && <div className="actions pagination" aria-label="Detection pages">
           <button disabled={page === 0} onClick={() => setPage(value => value - 1)}>Previous detections</button>
-          <span>Page {page + 1} of {Math.ceil(job.detections.length / pageSize)}. Downloads include every observation.</span>
+           <span>Page {page + 1} of {Math.ceil(job.detections.length / pageSize)}</span>
           <button disabled={(page + 1) * pageSize >= job.detections.length} onClick={() => setPage(value => value + 1)}>Next detections</button>
         </div>}
         {job.detections.length > 0 && <table>
@@ -352,7 +362,7 @@ function Workspace() {
             <td data-label="Box" className="coordinates">{detection.bbox.map(value => value.toFixed(1)).join(', ')}</td>
           </tr>)}</tbody>
         </table>}
-        {job.expires_at && <p>Server results expire at <time dateTime={new Date(job.expires_at * 1000).toISOString()}>
+         {job.expires_at && <p className="result-expiry">Server results expire at <time dateTime={new Date(job.expires_at * 1000).toISOString()}>
           {new Date(job.expires_at * 1000).toLocaleTimeString()}</time>, 30 minutes after completion.</p>}
       </section>}
     </main>

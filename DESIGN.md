@@ -106,6 +106,21 @@ components:
 
 # Design System: AutoScan AI
 
+## Shared UI polish — 2026-11-17
+
+Retain Compare's layout, warm palette and supplied images. Primary and secondary
+actions now share a bordered button with a consistent outline icon; navigation
+uses a quiet current-page fill. The Home workflow is one illustrated sequence,
+not numbered paragraphs. Category icons use the existing detection colors across
+Home, the detector choices, and results.
+
+The detector groups upload, types, confidence, actions and feedback on a single
+setup sheet. Media is a segmented radio group; object choices are labeled rows
+with visible checkmarks. These and the styled upload surface still use native
+inputs, visible focus and at least 44px targets. Preview and result surfaces use
+short empty-state labels, icon-led feedback, and grouped summary/download actions.
+No changes to the backend, limits, model output or export contracts.
+
 ## Current refinement — 2026-11-17
 
 The owner's Home-page refinement preserves this visual world but supersedes the

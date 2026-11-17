@@ -28,6 +28,15 @@ async (page) => {
     if (previews) throw new Error('Wrong input type was uploaded');
     await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: source });
     await page.waitForFunction(() => !document.querySelector('button.primary').disabled);
+    const plates = page.getByRole('checkbox', { name: 'Plates', exact: true });
+    await plates.focus();
+    await page.keyboard.press('Space');
+    if (await plates.isChecked()) throw new Error('Keyboard did not deselect object type');
+    await plates.check();
+    const confidence = page.getByRole('slider', { name: 'Confidence', exact: true });
+    await confidence.focus();
+    await page.keyboard.press('ArrowRight');
+    if (await confidence.getAttribute('aria-valuetext') !== '41%' || await page.locator('output').textContent() !== '41%') throw new Error('Confidence display did not update');
     await page.getByRole('radio', { name: 'Video', exact: true }).check();
     await page.getByLabel('Source video', { exact: true }).waitFor();
     if (await page.getByLabel('Source video', { exact: true }).inputValue()) throw new Error('Mode switch kept incompatible source');
@@ -51,6 +60,6 @@ async (page) => {
       await page.evaluate(() => { window.scrollTo(0, 0); document.activeElement?.blur(); });
       await page.screenshot({ path: `C:/Users/User/AppData/Local/Temp/opencode/autoscan-detector-${width}.png`, fullPage: true });
     }
-    return { checks: ['hash defaults', 'file filters', 'wrong-type rejection', 'source reset', 'history navigation', 'radio keyboard', 'responsive layouts', 'page title'], previews, inference: 0 };
+    return { checks: ['hash defaults', 'file filters', 'wrong-type rejection', 'source reset', 'history navigation', 'radio and checkbox keyboard', 'confidence value', 'responsive layouts', 'page title'], previews, inference: 0 };
   } finally { await page.unroute('**/api/**', handler); }
 }

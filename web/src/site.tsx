@@ -1,3 +1,5 @@
+import { Icon } from './icon';
+
 export function SiteHeader({ detector = false }: { detector?: boolean }) {
   return <header className="shell topbar">
     <a className="wordmark" href="/">
@@ -7,11 +9,7 @@ export function SiteHeader({ detector = false }: { detector?: boolean }) {
     <nav aria-label="Main navigation">
       <a href="/" aria-current={!detector ? 'page' : undefined}>Project</a>
       <a href="/detect" aria-current={detector ? 'page' : undefined}>Detector</a>
-      <a href="https://github.com/MS3B09/autoscan-ai">GitHub
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <path d="M14 3h7v7m0-7L10 14M10 5H4v15h15v-6" />
-        </svg>
-      </a>
+      <a href="https://github.com/MS3B09/autoscan-ai">GitHub <Icon name="external" /></a>
     </nav>
   </header>;
 }
@@ -19,6 +17,6 @@ export function SiteHeader({ detector = false }: { detector?: boolean }) {
 export function SiteFooter() {
   return <footer className="shell">
     <span>AutoScan AI <small>Model and dataset licensing remains unverified.</small></span>
-    <a href="https://github.com/MS3B09/autoscan-ai#about-the-project-and-authors">Original contributors and datasets</a>
+    <a href="https://github.com/MS3B09/autoscan-ai#about-the-project-and-authors">Original contributors and datasets <Icon name="external" /></a>
   </footer>;
 }

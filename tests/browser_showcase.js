@@ -40,6 +40,7 @@ async (page) => {
         if (Math.abs(shell.width / width - .8) > .01) throw new Error('Desktop shell is not 80%');
       }
     }
+    await page.evaluate(() => { window.scrollTo(0, 0); document.activeElement?.blur(); });
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.screenshot({ path: 'C:/Users/User/AppData/Local/Temp/opencode/autoscan-home-desktop.png', fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
