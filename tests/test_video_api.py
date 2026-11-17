@@ -87,8 +87,13 @@ class VideoAPITests(unittest.TestCase):
                     self.assertEqual(output.streams.video[0].codec_context.name, "h264")
                     frames = list(output.decode(video=0))
                     self.assertEqual([float(f.pts * f.time_base) for f in frames], [0, .1, .4, .9])
-                self.assertEqual(client.get(endpoint + "/download/json", headers=headers).json(), result)
+                exported = client.get(endpoint + "/download/json", headers=headers).json()
+                expected = [{key: value for key, value in item.items() if key != "class_id"}
+                            for item in result["detections"]]
+                self.assertEqual(exported, {**result, "schema_version": "1.1", "detections": expected})
+                self.assertTrue(all("class_id" not in item for item in exported["detections"]))
                 rows = list(csv.DictReader(client.get(endpoint + "/download/csv", headers=headers).content.decode("utf-8-sig").splitlines()))
+                self.assertNotIn("class_id", rows[0])
                 self.assertEqual([int(row["frame_index"]) for row in rows], [0, 1, 2, 3])
                 self.assertEqual([float(row["timestamp_seconds"]) for row in rows], [0, .1, .4, .9])
                 self.assertFalse(any(Path(storage).glob("job-*/source.*")))

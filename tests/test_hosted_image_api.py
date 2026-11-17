@@ -64,8 +64,10 @@ class HostedImageTests(unittest.TestCase):
                 self.assertTrue(response.headers["Content-Type"].startswith(media_type))
                 downloads[kind] = response.read()
         data = json.loads(downloads["json"])
-        self.assertEqual(data, result)
-        self.assertEqual(data["schema_version"], "1.0")
+        expected = [{key: value for key, value in item.items() if key != "class_id"}
+                    for item in result["detections"]]
+        self.assertEqual(data, {**result, "schema_version": "1.1", "detections": expected})
+        self.assertNotIn('"class_id"', downloads["json"].decode())
         self.assertNotIn(job["token"], downloads["json"].decode())
         self.assertTrue(data["runtime"]["python"])
         for package in ["torch", "torchvision", "ultralytics", "pillow", "spaces"]:
@@ -73,7 +75,8 @@ class HostedImageTests(unittest.TestCase):
         rows = list(csv.DictReader(downloads["csv"].decode("utf-8-sig").splitlines()))
         self.assertEqual(len(rows), len(result["detections"]))
         for row, detection in zip(rows, result["detections"]):
-            for key in ["source_filename", "object_type", "class_id", "class_name", "label", "width", "height"]:
+            self.assertNotIn("class_id", row)
+            for key in ["source_filename", "object_type", "class_name", "label", "width", "height"]:
                 value = str(detection[key])
                 if value.lstrip().startswith(("=", "+", "-", "@")):
                     value = "'" + value
@@ -82,7 +85,7 @@ class HostedImageTests(unittest.TestCase):
             self.assertEqual([float(row[key]) for key in ["x1", "y1", "x2", "y2"]], detection["bbox"])
         if not rows:
             self.assertEqual(next(csv.reader(downloads["csv"].decode("utf-8-sig").splitlines())),
-                             ["source_filename", "object_type", "class_id", "class_name", "label", "confidence",
+                              ["source_filename", "object_type", "class_name", "label", "confidence",
                               "x1", "y1", "x2", "y2", "width", "height"])
         with self.call(endpoint + "/image", job=job) as response:
             self.assertEqual(downloads["image"], response.read())

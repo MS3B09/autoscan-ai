@@ -33,7 +33,7 @@ from image_service.video import VIDEO_FORMATS, MAX_VIDEO_BYTES, VideoError, prep
 FORMATS = {".png": "PNG", ".jpg": "JPEG", ".jpeg": "JPEG", ".bmp": "BMP", ".webp": "WEBP"}
 MAX_BYTES = 10_000_000
 MAX_PIXELS = 12_000_000
-CSV_COLUMNS = ["source_filename", "object_type", "class_id", "class_name", "label", "confidence",
+CSV_COLUMNS = ["source_filename", "object_type", "class_name", "label", "confidence",
                "x1", "y1", "x2", "y2", "width", "height"]
 
 
@@ -414,7 +414,11 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
                 elif format == "video":
                     content, media_type, extension = media_bytes(job, "video"), "video/mp4", "mp4"
                 elif format == "json":
-                    content = json.dumps(result(identifier, job), ensure_ascii=False, allow_nan=False).encode("utf-8")
+                    exported = result(identifier, job)
+                    exported["schema_version"] = "1.1"
+                    for detection in exported["detections"]:
+                        detection.pop("class_id", None)
+                    content = json.dumps(exported, ensure_ascii=False, allow_nan=False).encode("utf-8")
                     media_type, extension = "application/json", "json"
                 else:
                     output = StringIO(newline="")

@@ -58,10 +58,13 @@ class HostedVideoTests(unittest.TestCase):
                 for actual, expected in zip(frames, original):
                     self.assertAlmostEqual(float(actual[0]), float(expected[0] - original[0][0]), places=5)
                     self.assertEqual(actual[1:], expected[1:])
-            self.assertEqual(json.loads(downloads["json"]), result)
+            expected = [{key: value for key, value in item.items() if key != "class_id"}
+                        for item in result["detections"]]
+            self.assertEqual(json.loads(downloads["json"]), {**result, "schema_version": "1.1", "detections": expected})
             rows = list(csv.DictReader(downloads["csv"].decode("utf-8-sig").splitlines()))
             self.assertEqual(len(rows), len(result["detections"]))
             for row, detection in zip(rows, result["detections"]):
+                self.assertNotIn("class_id", row)
                 self.assertEqual(int(row["frame_index"]), detection["frame_index"])
                 self.assertEqual(float(row["timestamp_seconds"]), detection["timestamp_seconds"])
             for suffix, method in [("", "GET"), ("/video", "GET"), ("/download/video", "GET"),

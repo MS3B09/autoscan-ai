@@ -73,12 +73,13 @@ preview, status, exports, cancellation, and deletion. A wrong media endpoint
 (`/image` on a video job, for example) returns 404. Pending/failed/cancelled jobs
 never offer an apparently complete clip.
 
-Schema **1.0** retains all [documented detection fields](image-exports.md). Video
-CSV appends `frame_index,timestamp_seconds` to the twelve image columns; both also
+Export schema **1.1** retains the [documented detection fields](image-exports.md)
+without per-detection class IDs. Video
+CSV appends `frame_index,timestamp_seconds` to the eleven image columns; both also
 appear on every video JSON detection. `frame_index` is zero-based decode/presentation
 order and `timestamp_seconds` is the source timestamp relative to the first frame.
 Repeated observations are separate rows, **not unique objects**. Empty JSON has
-`detections: []`; empty CSV still contains all fourteen column names. Text-cell
+`detections: []`; empty CSV still contains all thirteen column names. Text-cell
 formula protection and UTF-8 BOM encoding are unchanged.
 
 Status adds `media_type`, `queue_position`, and, for video, `frame_count`,

@@ -331,8 +331,8 @@ function Workspace() {
             <button onClick={() => void download('csv')} disabled={working || !!downloading}>
               {downloading === 'csv' ? 'Preparing CSV…' : 'Download CSV'}</button>
           </div>
-          <p id="download-help">Includes all {job.detections.length} selected detections. JSON retains raw model identities and settings;
-            CSV is spreadsheet-safe. Downloads expire with this job. Saved files stay on your device after Delete now.</p>
+          <p id="download-help">Includes all {job.detections.length} selected detections, with class names rather than class IDs.
+            Downloads expire with this job. Saved files stay on your device after Delete now.</p>
         </div>}
         {!activeStates.includes(job.state) &&
           <button onClick={() => void remove(true)} disabled={working}>Change {media} or settings</button>}

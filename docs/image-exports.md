@@ -5,7 +5,7 @@ Completed `success` and `empty` jobs expose three downloads:
 | Request | Content |
 | --- | --- |
 | `GET /api/jobs/{id}/download/image` | Annotated PNG, byte-identical to `/image` |
-| `GET /api/jobs/{id}/download/json` | UTF-8 JSON, same document as job status |
+| `GET /api/jobs/{id}/download/json` | UTF-8 JSON, job data without per-detection class IDs |
 | `GET /api/jobs/{id}/download/csv` | UTF-8 CSV with BOM and CRLF record separators |
 
 Every request requires `Authorization: Bearer <job token>`, just like status and
@@ -23,13 +23,18 @@ remove the job's source/result artifacts. An already received or saved client
 copy cannot be remotely erased. The browser aborts pending downloads and revokes
 its object URLs when it forgets a job.
 
-## JSON schema 1.0
+## JSON export schema 1.1
+
+The 2026-11-17 simplification removes `class_id` from downloaded JSON detections
+and CSV columns for both images and videos. Status/internal model identities
+remain unchanged (status schema 1.0); exports do not mutate the retained result.
+Consumers of old exports must use class names rather than the removed column.
 
 The top-level object contains:
 
 | Field | Meaning |
 | --- | --- |
-| `schema_version` | String `"1.0"`; version of this export contract |
+| `schema_version` | String `"1.1"`; version of this export contract |
 | `id` | Random job identifier, not its access token |
 | `state` | `success` or `empty` for a downloadable result |
 | `filename` | Original source filename, unchanged metadata |
@@ -43,7 +48,7 @@ The top-level object contains:
 | `error` | `null` for completed downloadable jobs |
 
 Each detection contains `source_filename` (unchanged), `object_type` (`vehicle`,
-`logo`, `plate`), integer `class_id`, raw `class_name`, readable `label`, numeric
+`logo`, `plate`), raw `class_name`, readable `label`, numeric
 `confidence` in **0–1**, floating-point `bbox: [x1,y1,x2,y2]`, and pixel `width`
 and `height`. Numeric values are not rounded for export. Detection order and
 values are the same as the job's displayed result; UI percentages/coordinates
@@ -53,7 +58,7 @@ Boxes use pixels from the **top-left of the EXIF-oriented, white-composited RGB
 input**, not CSS/display dimensions. The PNG is not resized, reoriented, or
 re-encoded for download. `x1 < x2`, `y1 < y2`; coordinates stay inside the input.
 Vehicles retain COCO identities 2=car, 5=bus, 7=truck. Logo spellings are preserved.
-Plate raw identity `class_id: 0, class_name: "0"` has `label: "Plate"`; it is
+Plate raw class name `"0"` has `label: "Plate"`; it is
 **not plate transcription or OCR text**.
 
 ## CSV columns
@@ -61,7 +66,7 @@ Plate raw identity `class_id: 0, class_name: "0"` has `label: "Plate"`; it is
 Stable column order:
 
 ```text
-source_filename,object_type,class_id,class_name,label,confidence,x1,y1,x2,y2,width,height
+source_filename,object_type,class_name,label,confidence,x1,y1,x2,y2,width,height
 ```
 
 One row per selected detection, with the same numeric units/values as JSON. An

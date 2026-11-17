@@ -66,7 +66,7 @@ class ImageAPITests(unittest.TestCase):
         response = self.client.post("/api/jobs?filename=chunked.png", content=iter([b"x" * 5_000_001] * 2))
         self.assertEqual(response.status_code, 413)
 
-    def test_downloads_match_all_detections_and_preserve_raw_identities(self):
+    def test_downloads_preserve_all_detections_without_class_ids(self):
         detections = [
             {"object_type": "vehicle", "class_id": 2, "class_name": "car", "label": "car",
              "confidence": 0.8123456789, "bbox": [1.5, 2.25, 40.75, 30.0], "width": 48, "height": 32},
@@ -95,21 +95,25 @@ class ImageAPITests(unittest.TestCase):
                         exported = client.get(endpoint + "/download/json", headers=headers)
                         self.assertEqual(exported.status_code, 200)
                         data = exported.json()
-                        self.assertEqual(data, result)
-                        self.assertEqual(data["schema_version"], "1.0")
+                        expected = [{key: value for key, value in item.items() if key != "class_id"}
+                                    for item in result["detections"]]
+                        self.assertEqual(data, {**result, "schema_version": "1.1", "detections": expected})
+                        self.assertNotIn('"class_id"', exported.text)
+                        self.assertTrue(all("class_id" in item for item in self.wait(job).json()["detections"]))
                         self.assertEqual(data["models"], models)
                         self.assertTrue(data["runtime"]["python"])
                         self.assertIn("pillow", data["runtime"]["packages"])
                         self.assertNotIn(job["token"], exported.text)
-                        self.assertEqual(data["detections"], [dict(item, source_filename=filename) for item in detections])
+                        self.assertEqual(data["detections"], expected)
                         spreadsheet = client.get(endpoint + "/download/csv", headers=headers)
                         self.assertEqual(spreadsheet.status_code, 200)
                         rows = list(csv.DictReader(spreadsheet.content.decode("utf-8-sig").splitlines()))
                         self.assertEqual(len(rows), 3)
+                        self.assertNotIn("class_id", rows[0])
                         safe_filename = "'" + filename if filename.lstrip().startswith(('=', '+', '-', '@')) else filename
                         for row, detection in zip(rows, detections):
                             self.assertEqual(row["source_filename"], safe_filename)
-                            for key in ["object_type", "class_id", "class_name", "label", "width", "height"]:
+                            for key in ["object_type", "class_name", "label", "width", "height"]:
                                 self.assertEqual(row[key], str(detection[key]))
                             self.assertEqual(float(row["confidence"]), detection["confidence"])
                             self.assertEqual([float(row[key]) for key in ["x1", "y1", "x2", "y2"]], detection["bbox"])
@@ -160,10 +164,10 @@ class ImageAPITests(unittest.TestCase):
                     download = self.client.get(endpoint + "/download/" + kind, headers=headers)
                     self.assertEqual(download.status_code, 200)
                     if kind == "json":
-                        self.assertEqual(download.json(), result.json())
+                        self.assertEqual(download.json(), {**result.json(), "schema_version": "1.1"})
                     elif kind == "csv":
                         rows = list(csv.reader(download.content.decode("utf-8-sig").splitlines()))
-                        self.assertEqual(rows, [["source_filename", "object_type", "class_id", "class_name", "label",
+                        self.assertEqual(rows, [["source_filename", "object_type", "class_name", "label",
                                                  "confidence", "x1", "y1", "x2", "y2", "width", "height"]])
                     else:
                         self.assertEqual(download.content, image.content)
