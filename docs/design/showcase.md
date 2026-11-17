@@ -1,5 +1,22 @@
 # Option A showcase — issue #6
 
+## Current refinement — 2026-11-17
+
+The owner's follow-up brief supersedes the original story/content contract below:
+keep the warm comparison hero, use the supplied `imgs/home-image.png` and
+`imgs/home-image-detected.png`, then show a short workflow, detector classes with
+`imgs/logos.jpg`, and detector/source-code invitations. Remove sample export
+previews and the team section; preserve original credits/datasets in the footer
+link and repository README. The supplied annotations are illustrative, not a new
+inference or accuracy claim; their rights were not independently verified.
+
+Desktop content is centered at 80% width, capped at 1440px, with narrower-screen
+gutters. Icon buttons inside the images open a native modal with Escape, close,
+and focus restoration. Image/video entry links target `/detect#image` and
+`/detect#video`. No new imagery, dependencies, or model changes are needed.
+
+The original approval and release evidence below remains historical.
+
 Mode: Experience at `/`; Operate at `/detect`. Portfolio visitors inspect the
 actual detector, then enter its existing image/video workflow. The approved
 reference is `.impeccable/mocks/option-a-compare.png` (also attached to #6).

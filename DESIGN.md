@@ -106,6 +106,18 @@ components:
 
 # Design System: AutoScan AI
 
+## Current refinement — 2026-11-17
+
+The owner's Home-page refinement preserves this visual world but supersedes the
+earlier content inventory: a supplied Nissan comparison, short workflow, three
+detector descriptions with the supplied brand image, and detector/GitHub actions.
+The centered shared shell is now `min(80%, 1440px)`, with 24px gutters at 1000px
+and below and 16px gutters at 640px and below. Full-size links are now 44px
+in-image SVG buttons opening a native dialog; close and Escape restore focus.
+Credits/datasets remain linked in the footer; the licensing notice remains visible.
+Historical sample JSON/CSV assets remain available for regression fixtures, not
+promoted on the landing page. See `docs/design/showcase.md` for the updated brief.
+
 ## Overview
 
 **Creative North Star: "Compare"**

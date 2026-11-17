@@ -1,12 +1,28 @@
-import example from '../public/examples/lexus.json';
-import csv from '../public/examples/lexus.csv?raw';
+import { useEffect, useRef, useState } from 'react';
+import original from '../../imgs/home-image.png';
+import detected from '../../imgs/home-image-detected.png';
+import logos from '../../imgs/logos.jpg';
 import { SiteFooter, SiteHeader } from './site';
 import './showcase.css';
 
-const jsonPreview = JSON.stringify({ filename: example.filename, width: example.width, height: example.height,
-  settings: example.settings, detections: example.detections }, null, 2);
+const images = [
+  { title: 'Original', src: original, alt: 'White Nissan SUV on a rocky desert road' },
+  { title: 'Detections', src: detected, alt: 'Nissan SUV with bounding boxes for car at 87%, Nissan logo at 91%, and plate at 63%' },
+];
+const detections = [
+  { type: 'vehicle', label: 'car', confidence: '87%' },
+  { type: 'logo', label: 'nissan', confidence: '91%' },
+  { type: 'plate', label: 'Plate', confidence: '63%' },
+];
 
 export function Showcase() {
+  const [expanded, setExpanded] = useState<typeof images[number] | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (expanded) dialog.current?.showModal();
+  }, [expanded]);
+
   return <>
     <a className="skip" href="#project">Skip to project</a>
     <SiteHeader />
@@ -16,85 +32,69 @@ export function Showcase() {
         <p>Detect vehicles, logos and Moroccan plates in images and short videos.</p>
         <div className="showcase-actions">
           <a className="entry" href="/detect#image">Open image detector</a>
-          <a className="video-entry" href="/detect#image">Try a video</a>
+          <a className="video-entry" href="/detect#video">Try a video</a>
         </div>
       </section>
-      <section className="showcase-comparison" aria-label="Real inference example">
-        <figure>
-          <figcaption><h2>Original</h2><a href="/examples/lexus-lx570.jpg" aria-label="View original full size">Full size</a></figcaption>
-          <img src="/examples/lexus-lx570.jpg" width="1280" height="915" fetchPriority="high"
-            alt="Black Lexus LX 570 photographed from the rear, with no license plate fitted" />
-        </figure>
-        <figure>
-          <figcaption><h2>Detections</h2><a href="/examples/lexus-detections.png" aria-label="View detections full size">Full size</a></figcaption>
-          <img src="/examples/lexus-detections.png" width="1280" height="915"
-            alt="Actual output: the Lexus is classified as truck, a background car and Lexus logo are detected, and a side step is incorrectly marked Plate" />
-        </figure>
+      <section className="showcase-comparison" aria-label="Detection example">
+        {images.map(image => <figure key={image.title}>
+          <figcaption><h2>{image.title}</h2></figcaption>
+          <div className="sample-image">
+            <img src={image.src} width="648" height="432" fetchPriority="high" alt={image.alt} />
+            <button className="expand-image" aria-label={`View ${image.title.toLowerCase()} full size`}
+              aria-haspopup="dialog" onClick={() => setExpanded(image)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6M3 3l6 6m12-6-6 6M3 21l6-6m12 6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </figure>)}
         <aside className="example-legend" aria-labelledby="legend-heading">
           <h2 id="legend-heading">Legend</h2>
-          <ul>{example.detections.map((detection, index) => <li key={index}>
-            <span className={'legend-label ' + detection.object_type}>{detection.label}</span>
-            <span>{(detection.confidence * 100).toFixed(1)}%</span>
+          <ul>{detections.map(detection => <li key={detection.type}>
+            <span className={'legend-label ' + detection.type}>{detection.label}</span>
+            <span>{detection.confidence}</span>
           </li>)}</ul>
-          <p>Real model output at 40% minimum confidence. Not an accuracy benchmark.</p>
+          <p>Example detections. Confidence is not a measure of accuracy.</p>
         </aside>
       </section>
-      <section className="data-section" aria-labelledby="data-heading">
-        <div><h2 id="data-heading">From detections to data</h2>
-          <p>Inspect this image’s real JSON and CSV. A published sample, not a live job.</p></div>
-        <div className="data-preview"><h3>JSON (detection excerpt)</h3>
-          <pre role="region" aria-label="JSON sample preview" tabIndex={0}><code>{jsonPreview}</code></pre></div>
-        <div className="data-preview"><h3>CSV (complete sample)</h3>
-          <pre role="region" aria-label="CSV sample preview" tabIndex={0}><code>{csv.trimStart()}</code></pre></div>
-        <div className="data-downloads">
-          <a className="entry" href="/examples/lexus.json" download="autoscan-example.json">Download sample JSON</a>
-          <a className="entry" href="/examples/lexus.csv" download="autoscan-example.csv">Download sample CSV</a>
-        </div>
-      </section>
-      <section className="example-context" aria-labelledby="example-heading">
-        <h2 id="example-heading">Predictions, imperfections included.</h2>
-        <div><p>The model labels this Lexus SUV as “truck” and mistakes a side step for a plate.
-          This German photograph contains no Moroccan plate. Confidence is not a measure of accuracy.</p>
-          <p className="photo-credit" data-credits="photography">Photograph: <a href="https://commons.wikimedia.org/wiki/File:Lexus_LX_570_20090620_rear.JPG">Lexus LX 570</a> by <a href="https://commons.wikimedia.org/wiki/User:M_93">M 93</a>.
-            {' '}<a href="https://commons.wikimedia.org/wiki/Template:Attribution">Attribution-only permission</a> via Wikimedia Commons.
-            Resized; detector annotations added. <a href="/examples/attribution.txt">Provenance and usage notes</a>.</p></div>
+      <section className="workflow-section" aria-labelledby="workflow-heading">
+        <h2 id="workflow-heading">From detections to data</h2>
+        <ol className="workflow">
+          <li><h3>Choose your media</h3><p>Upload an image or a short video.</p></li>
+          <li><h3>Make your selection</h3><p>Pick object types and set your confidence.</p></li>
+          <li><h3>Detect and explore</h3><p>Review the results and download what you need.</p></li>
+        </ol>
       </section>
       <section className="project-facts" aria-labelledby="capabilities-heading">
-        <h2 id="capabilities-heading">Three detectors. Your selection.</h2>
-        <div><dl>
-          <div><dt>Vehicles</dt><dd>Bounding boxes for cars, trucks and buses.</dd></div>
-          <div><dt>Brand logos</dt><dd>24 logo classes from the original checkpoint.</dd></div>
-          <div><dt>Moroccan plates</dt><dd>Locates plates, without reading their text. No OCR.</dd></div>
-        </dl>
-          <details><summary>View all 24 supported logo brands</summary>
-            <ul className="brand-list">{Object.values(example.models.logo.classes).map(brand => <li key={brand}>{brand}</li>)}</ul>
-          </details>
+        <div><h2 id="capabilities-heading">Three detectors. Your selection.</h2>
+          <p>Run one detector, or combine all three.</p>
+          <dl>
+            <div><dt>Vehicles</dt><dd>Cars, trucks and buses.</dd></div>
+            <div><dt>Brand logos</dt><dd>24 vehicle brands.</dd></div>
+            <div><dt>Moroccan plates</dt><dd>Locate plates, without reading the text.</dd></div>
+          </dl>
         </div>
+        <img className="brand-image" src={logos} width="1920" height="1080" loading="lazy"
+          alt="24 supported vehicle brands: Audi, BMW, Chevrolet, Citroën, Dacia, Fiat, Ford, Honda, Hyundai, Kia, Lexus, Mazda, Mercedes-Benz, Mitsubishi, Nissan, Opel, Peugeot, Renault, Seat, Škoda, Suzuki, Toyota, Volkswagen and Volvo" />
       </section>
-      <section className="project-facts" aria-labelledby="try-heading">
-        <h2 id="try-heading">Try your own media.</h2>
-        <div><p>Choose your file inside the detector. Nothing runs until you select Detect.
-          Adjust confidence from 25% to 100%, then download annotated media, JSON or CSV.</p>
-          <p>Live results expire after 30 minutes; Delete now removes them earlier.
-            Refresh or restart can lose a job. Free GPU quotas, queues and cold starts can interrupt processing.</p>
-          <a className="text-action" href="/detect">Open the detector</a></div>
-      </section>
-      <section className="project-facts contributors" aria-labelledby="credits-heading">
-        <h2 id="credits-heading">The original project team.</h2>
-        <div><ul className="contributor-list">
-          <li><a href="https://github.com/zayd8890">El-Ouaragli Zayd</a></li>
-          <li><a href="https://github.com/ou4abs">El-Abbass Ossama</a></li>
-          <li><a href="https://github.com/MS3B09">Nassiri Mosab</a></li>
-          <li><a href="https://github.com/HaFares">Hassan Fares</a></li>
-          <li><a href="https://github.com/Guinga6">Aly Guinga</a></li>
-        </ul>
-          <p>Datasets: <a href="https://universe.roboflow.com/ms3b/logos-teamx/dataset/1">Logos</a>,
-            {' '}<a href="https://universe.roboflow.com/plate-detection/plate_detection-tp5h9">Moroccan plates</a>.
-            {' '}Detection uses <a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLO</a>.</p>
-          <p>Model and dataset licensing is not yet cleared for public release.
-            {' '}<a href="https://github.com/MS3B09/autoscan-ai">Inspect the project source</a>.</p></div>
+      <section className="project-invite" aria-labelledby="try-heading">
+        <div><h2 id="try-heading">See it on your own media.</h2>
+          <p>Try the detector, or explore how it works on GitHub.</p></div>
+        <div className="invite-actions">
+          <a className="entry" href="/detect#image">Open the detector</a>
+          <a className="text-action" href="https://github.com/MS3B09/autoscan-ai">Explore the source code</a>
+        </div>
       </section>
     </main>
     <SiteFooter />
+    <dialog ref={dialog} className="image-dialog" aria-labelledby="expanded-title"
+      onClose={() => setExpanded(null)} onClick={event => { if (event.target === event.currentTarget) dialog.current?.close(); }}>
+      <div className="image-dialog-heading"><h2 id="expanded-title">{expanded?.title}</h2>
+        <button aria-label="Close full-size image" onClick={() => dialog.current?.close()} autoFocus>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" /></svg>
+        </button>
+      </div>
+      {expanded && <img src={expanded.src} alt={expanded.alt} width="648" height="432" />}
+    </dialog>
   </>;
 }
