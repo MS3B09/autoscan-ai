@@ -20,7 +20,7 @@ button.primary:hover:enabled { background: var(--color-accent-hover); }
 input[type=file] { width: 100%; font-size: .875rem; }
 input[type=file]::file-selector-button { margin-right: var(--space-sm); }
 input[type=range] { width: 100%; min-height: 44px; margin: 0; }
-input[type=checkbox] { width: 20px; height: 20px; flex-shrink: 0; margin: 0; }
+input[type=checkbox], input[type=radio] { width: 20px; height: 20px; flex-shrink: 0; margin: 0; }
 .shell { width: min(80%, 1440px); margin-inline: auto; }
 .skip { position: fixed; transform: translateY(-150%); background: var(--color-sheet); padding: var(--space-md); z-index: 5; }
 .skip:focus { transform: translateY(0); }
@@ -37,10 +37,17 @@ p { max-width: 72ch; margin-block: var(--space-sm); }
 .controls { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.45fr) minmax(0, .6fr); gap: var(--space-lg); border-block: 1px solid var(--color-rule); padding-block: var(--space-lg); }
 .controls label, legend { font-weight: 500; font-size: .9375rem; }
 .upload > label { display: block; margin-bottom: var(--space-sm); }
+.controls { scroll-margin-top: var(--space-lg); }
+.media-choice { margin-bottom: var(--space-md); }
+.media-options { display: flex; gap: var(--space-sm); }
+.media-options label { display: flex; align-items: center; gap: var(--space-sm); min-height: 44px; padding: var(--space-sm) var(--space-md); border: 1px solid var(--color-rule); border-radius: var(--radius-control); cursor: pointer; }
+.media-options label:has(:checked) { background: var(--color-sheet); border-color: var(--color-ink); }
+.media-options label:hover { background: var(--color-paper-3); }
+.media-choice:disabled label { cursor: not-allowed; }
 .controls p, small { color: var(--color-muted); font-size: .8125rem; }
 fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
 legend { padding: 0; margin-bottom: var(--space-sm); }
-.types { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-lg); }
+.types { display: grid; gap: var(--space-xs); }
 .types label { display: flex; align-items: center; gap: var(--space-sm); min-height: 48px; cursor: pointer; }
 small { display: block; font-weight: 400; }
 .confidence label { display: flex; justify-content: space-between; gap: var(--space-sm); }
@@ -70,9 +77,6 @@ td { font-variant-numeric: tabular-nums; }
 .type-label { border-bottom: 2px solid var(--color-vehicle); }
 .type-label.logo { border-color: var(--color-logo); }
 .type-label.plate { border-color: var(--color-plate); }
-.privacy { display: grid; grid-template-columns: minmax(0, .6fr) minmax(0, 1fr); column-gap: var(--space-xl); border-top: 1px solid var(--color-ink); padding-top: var(--space-lg); margin-top: var(--space-xl); }
-.privacy h2 { grid-row: span 2; }
-.privacy p { font-size: .875rem; color: var(--color-muted); }
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-md); padding-block: var(--space-xl) var(--space-lg); font-size: .875rem; }
 @media (max-width: 1000px) { .controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .confidence { grid-column: 1; } .actions { grid-column: 2; align-items: center; } }
 @media (max-width: 640px) {
@@ -80,11 +84,10 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: va
   .topbar { gap: var(--space-md); padding-block: var(--space-sm); }
   .wordmark { font-size: 1.25rem; } nav { gap: var(--space-md); font-size: .875rem; }
   h1 { font-size: 2rem; } .intro { padding-block: var(--space-lg); }
-  .controls, .comparison, .privacy { grid-template-columns: minmax(0, 1fr); }
+  .controls, .comparison { grid-template-columns: minmax(0, 1fr); }
   .confidence, .actions { grid-column: 1; }
   .comparison { padding: var(--space-md); }
   .image-stage { min-height: 180px; }
-  .privacy h2 { grid-row: auto; margin-bottom: var(--space-md); }
   thead { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: clip; }
   table, caption, tbody, tr { display: block; }
   tr { padding-block: var(--space-sm); border-bottom: 1px solid var(--color-rule); }

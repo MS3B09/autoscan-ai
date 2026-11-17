@@ -9,7 +9,8 @@ async (page) => {
     if (request.url().includes('/download/json')) resultRequest = request;
   });
   if (!await page.getByLabel('Annotated silent video', { exact: true }).count()) {
-  await page.getByLabel('Source image or short video', { exact: true }).setInputFiles(directory + '/issue5-traffic.mp4');
+   await page.getByRole('radio', { name: 'Video', exact: true }).check();
+   await page.getByLabel('Source video', { exact: true }).setInputFiles(directory + '/issue5-traffic.mp4');
   const detect = page.getByRole('button', { name: 'Detect video', exact: true });
   await detect.waitFor({ state: 'visible' });
   await page.waitForFunction(() => ![...document.querySelectorAll('button')].find(b => b.textContent === 'Detect video').disabled,
@@ -73,7 +74,7 @@ async (page) => {
     { submissions: submissions.length, reusedCompletedJob: !submissions.length, playback, downloads, isolation });
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Delete now', exact: true }).click();
-  await page.getByRole('button', { name: 'Detect video', exact: true }).waitFor({ state: 'hidden' });
+   await page.waitForFunction(() => document.querySelector('button.primary')?.disabled);
   if (await annotated.count()) throw new Error('Deleted video remains visible');
   const revoked = await page.evaluate(async ({ endpoint, authorization }) => {
     const codes = [];

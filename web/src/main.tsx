@@ -34,6 +34,7 @@ function QuotaReset({ retryAt }: { retryAt: number }) {
 }
 
 function Workspace() {
+  const [media, setMedia] = useState<'image' | 'video'>(() => window.location.hash === '#video' ? 'video' : 'image');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
   const [ready, setReady] = useState(false);
@@ -48,15 +49,33 @@ function Workspace() {
   const [pollFailed, setPollFailed] = useState(false);
   const [downloading, setDownloading] = useState('');
   const [page, setPage] = useState(0);
-  const [notice, setNotice] = useState('Choose an image to begin. Nothing runs until you select Detect image.');
+  const [notice, setNotice] = useState(() => `Choose ${window.location.hash === '#video' ? 'a video' : 'an image'} to begin. Detection starts only when you select Detect.`);
   const input = useRef<HTMLInputElement>(null);
+  const settings = useRef<HTMLElement>(null);
   const focusUpload = useRef(false);
   const downloadController = useRef<AbortController | null>(null);
   const downloadURL = useRef('');
   const locked = !!capability || working;
   const active = capability && (!job || activeStates.includes(job.state));
-  const video = !!file && /\.(mp4|mov|avi|asf|m4v|mpeg)$/i.test(file.name);
-  const media = video ? 'video' : 'image';
+  const video = media === 'video';
+
+  function selectMedia(next: 'image' | 'video') {
+    if (next === media) return;
+    if (locked) { window.history.replaceState(null, '', '#' + media); return; }
+    setMedia(next); setFile(null); setReady(false); setPreview(''); setError('');
+    if (input.current) input.current.value = '';
+    setNotice(`Choose ${next === 'video' ? 'a video' : 'an image'} to begin. Detection starts only when you select Detect.`);
+  }
+
+  useEffect(() => {
+    function syncMedia() {
+      const hash = window.location.hash;
+      if (hash !== '#image' && hash !== '#video' && hash !== '') return;
+      selectMedia(hash === '#video' ? 'video' : 'image');
+    }
+    window.addEventListener('hashchange', syncMedia);
+    return () => window.removeEventListener('hashchange', syncMedia);
+  }, [media, locked]);
 
   useEffect(() => {
     setDownloading('');
@@ -69,7 +88,8 @@ function Workspace() {
 
   useEffect(() => {
     if (!locked && focusUpload.current) {
-      input.current?.focus();
+      input.current?.focus({ preventScroll: true });
+      settings.current?.scrollIntoView({ block: 'start' });
       focusUpload.current = false;
     }
   }, [locked]);
@@ -220,25 +240,34 @@ function Workspace() {
     <a className="skip" href="#workspace">Skip to detector</a>
     <SiteHeader detector />
     <main id="workspace" className="shell" tabIndex={-1}>
-      <div className="intro"><h1>See what your image holds.</h1>
-        <p>Detect vehicles, brand logos, and plates in images and short videos. Inspect the real model results.</p>
+      <div className="intro"><h1>Image &amp; video detector</h1>
+        <p>Choose your media, select what to find, and explore the results.</p>
         {developerMode && <p>Local developer mode. Detection uses your personal Hugging Face quota.</p>}</div>
-      <section className="controls" aria-label="Media and detection settings">
+      <section ref={settings} id="settings" className="controls" aria-label="Media and detection settings">
         <div className="upload">
-          <label htmlFor="image">Source image or short video</label>
-          <input ref={input} id="image" type="file" accept=".png,.jpg,.jpeg,.bmp,.webp,.mp4,.mov,.avi,.asf,.m4v,.mpeg" disabled={locked}
+          <fieldset className="media-choice" disabled={locked}>
+            <legend>Input file</legend>
+            <div className="media-options">{(['image', 'video'] as const).map(type => <label key={type}>
+              <input type="radio" name="media-type" value={type} checked={media === type}
+                onChange={() => { selectMedia(type); window.location.hash = type; }} />
+              {type === 'image' ? 'Image' : 'Video'}
+            </label>)}</div>
+          </fieldset>
+          <label htmlFor="image">Source {media}</label>
+          <input ref={input} id="image" type="file" accept={video ? '.mp4,.mov,.avi,.asf,.m4v,.mpeg' : '.png,.jpg,.jpeg,.bmp,.webp'} disabled={locked}
             aria-describedby="image-help" onChange={event => {
               const next = event.target.files?.[0];
               setError('');
               if (!next) return;
-              const isVideo = /\.(mp4|mov|avi|asf|m4v|mpeg)$/i.test(next.name);
-              if (next.size > (isVideo ? 20_000_000 : 10_000_000) || !/\.(png|jpe?g|bmp|webp|mp4|mov|avi|asf|m4v|mpeg)$/i.test(next.name)) {
-                setFile(null); setError('Choose a supported image up to 10 MB or video up to 20 MB.'); return;
+              if (next.size > (video ? 20_000_000 : 10_000_000) ||
+                !(video ? /\.(mp4|mov|avi|asf|m4v|mpeg)$/i : /\.(png|jpe?g|bmp|webp)$/i).test(next.name)) {
+                setFile(null); setReady(false); event.target.value = '';
+                setError(`Choose a supported ${media} up to ${video ? 20 : 10} MB.`); return;
               }
-              setFile(next);
+              setReady(false); setFile(next);
             }} />
-          <p id="image-help">PNG, JPG, BMP, WebP. Up to 10 MB and 12 megapixels.</p>
-          <p>MP4, MOV, AVI, ASF, M4V, MPEG. Up to 20 MB, 10 seconds, 1080p, and 600 frames. Video previews and results are silent.</p>
+          <p id="image-help">{video ? 'MP4, MOV, AVI, ASF, M4V, MPEG. Up to 20 MB, 10 seconds, 1080p and 600 frames. Silent preview and output.' :
+            'PNG, JPG, BMP, WebP. Up to 10 MB and 12 megapixels.'}</p>
         </div>
         <fieldset disabled={locked}>
           <legend>Object types</legend>
@@ -252,7 +281,7 @@ function Workspace() {
           <label htmlFor="confidence">Confidence <output htmlFor="confidence">{confidence}%</output></label>
           <input id="confidence" type="range" min="25" max="100" step="1" value={confidence} disabled={locked}
             onChange={event => setConfidence(Number(event.target.value))} />
-          <p>25% to 100%</p>
+          <p>25% to 100%. Lower values include more predictions.</p>
         </div>
         <div className="actions">
           <button className="primary" onClick={() => void detect()} disabled={!ready || !types.length || locked}>
@@ -271,12 +300,12 @@ function Workspace() {
         {file && !ready && error && <button onClick={() => { setError(''); setFile(new File([file], file.name)); }}>Retry {media} validation</button>}
       </div>
       <section className="comparison" aria-label="Source and detection comparison" aria-busy={!!active}>
-        <figure><figcaption><h2>Original</h2><span>{file?.name || 'Your selected image'}</span></figcaption>
+        <figure><figcaption><h2>Original</h2><span>{file?.name || `Your selected ${media}`}</span></figcaption>
           <div className="image-stage">{preview ? video ?
             <video src={preview} controls playsInline preload="metadata" aria-label="Source video preview"
               onError={() => setError('Your browser could not play the video preview. Try another browser or re-export the clip.')} /> :
             <img src={preview} alt="Selected source, normalized for detection" /> :
-            <p>Choose your image above.<br />Its preview will appear here.</p>}</div></figure>
+            <p>Choose your {media} above.<br />Its preview will appear here.</p>}</div></figure>
         <figure><figcaption><h2>Detections</h2><span>{job ? `${job.width} × ${job.height} pixels` : 'Actual inference, no example boxes'}</span></figcaption>
           <div className="image-stage">{annotated ? job?.media_type === 'video' ?
             <video src={annotated} controls playsInline preload="metadata" aria-label="Annotated silent video"
@@ -317,7 +346,7 @@ function Workspace() {
           <thead><tr><th>Object</th><th>Model class</th><th>Confidence</th>{job.media_type === 'video' && <th>Frame / time</th>}<th>Box (x1, y1, x2, y2)</th></tr></thead>
           <tbody>{job.detections.slice(page * pageSize, (page + 1) * pageSize).map((detection, index) => <tr key={index}>
             <td data-label="Object"><span className={'type-label ' + detection.object_type}>{detection.label}</span></td>
-            <td data-label="Model class">{detection.class_name} (ID {detection.class_id})</td>
+            <td data-label="Model class">{detection.object_type === 'plate' ? detection.label : detection.class_name}</td>
             <td data-label="Confidence">{(detection.confidence * 100).toFixed(1)}%</td>
             {job.media_type === 'video' && <td data-label="Frame / time">{detection.frame_index} / {detection.timestamp_seconds?.toFixed(3)} s</td>}
             <td data-label="Box" className="coordinates">{detection.bbox.map(value => value.toFixed(1)).join(', ')}</td>
@@ -326,18 +355,11 @@ function Workspace() {
         {job.expires_at && <p>Server results expire at <time dateTime={new Date(job.expires_at * 1000).toISOString()}>
           {new Date(job.expires_at * 1000).toLocaleTimeString()}</time>, 30 minutes after completion.</p>}
       </section>}
-      <section className="privacy" aria-labelledby="privacy-heading"><h2 id="privacy-heading">Temporary by design.</h2>
-        <p>Your media is sent to the Python service for validation; inference starts only on your command.
-          Sources are removed when no longer needed. Results expire automatically after 30 minutes.
-          Delete now revokes access immediately and removes remaining files at a safe boundary.
-          Refreshing this page loses your job key; a server restart also loses jobs.</p>
-        <p>Shared free GPU capacity can mean queues, cold starts, or quota errors. Plate detection does not read plate text.</p>
-      </section>
     </main>
     <SiteFooter />
   </>;
 }
 
 const detector = window.location.pathname.replace(/\/$/, '') === '/detect';
-document.title = detector ? 'Image and video detector | AutoScan AI' : 'AutoScan AI | See what the models detect';
+document.title = 'AutoScan AI | Image & Video Detector';
 createRoot(document.getElementById('root')!).render(detector ? <Workspace /> : <Showcase />);

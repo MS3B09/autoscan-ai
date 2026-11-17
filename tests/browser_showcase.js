@@ -1,5 +1,6 @@
 // Run with browser_run_code_unsafe(filename) against the Vite dev/preview server. No inference.
 async (page) => {
+  await page.bringToFront();
   const origin = new URL(page.url()).origin;
   const errors = [];
   const onError = error => errors.push(error.message);
@@ -51,6 +52,7 @@ async (page) => {
       await page.goto(origin + '/');
       await page.getByRole('link', { name: label, exact: true }).click();
       if (new URL(page.url()).hash !== hash) throw new Error('Wrong detector entry: ' + label);
+      if (!await page.getByRole('radio', { name: hash === '#video' ? 'Video' : 'Image', exact: true }).isChecked()) throw new Error('Entry did not select input type');
     }
     if (errors.length) throw new Error(errors.join('\n'));
     return { sections: 4, images: 'supplied assets loaded', modal: 'keyboard, close, Escape, focus restoration', responsiveWidths: widths, detectorLinks: ['#image', '#video'] };

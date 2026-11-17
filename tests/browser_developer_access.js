@@ -12,7 +12,7 @@ async (page) => {
   page.on('request', observe);
   try {
     const source = await (await page.request.get(origin + '/examples/lexus-lx570.jpg')).body();
-    await page.getByLabel('Source image or short video', { exact: true })
+    await page.getByLabel('Source image', { exact: true })
       .setInputFiles({ name: 'lexus-lx570.jpg', mimeType: 'image/jpeg', buffer: source });
     await page.waitForFunction(() => ![...document.querySelectorAll('button')].find(button => button.textContent === 'Detect image').disabled);
     if (requests.some(request => new URL(request.url()).pathname === '/api/jobs')) throw new Error('Preview submitted inference');

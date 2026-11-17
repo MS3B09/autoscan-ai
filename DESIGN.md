@@ -118,6 +118,16 @@ Credits/datasets remain linked in the footer; the licensing notice remains visib
 Historical sample JSON/CSV assets remain available for regression fixtures, not
 promoted on the landing page. See `docs/design/showcase.md` for the updated brief.
 
+The detector now begins with native Image/Video radios linked to URL fragments,
+then upload, object types, and confidence. A type switch clears incompatible
+source media; active jobs lock the choice. The results settings action retains
+deletion confirmation, then scrolls to and focuses editable configuration while
+keeping the local source. Model classes show names, not numeric IDs (plates use
+the human-readable label). The long privacy section is removed; result expiry,
+Delete now, quota/error feedback, and the documented lifecycle remain unchanged.
+The tab title is `AutoScan AI | Image & Video Detector`, with a matching SVG car
+favicon. Native controls, 44px targets, and visible keyboard focus remain in use.
+
 ## Overview
 
 **Creative North Star: "Compare"**

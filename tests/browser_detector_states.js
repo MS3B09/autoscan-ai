@@ -51,19 +51,29 @@ async (page) => {
     const prepare = async () => {
       await page.goto(origin + '/detect');
       const before = submissions;
-      await page.getByLabel('Source image or short video', { exact: true }).setInputFiles({ name: 'lexus-lx570.jpg', mimeType: 'image/jpeg', buffer: source });
+      await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'lexus-lx570.jpg', mimeType: 'image/jpeg', buffer: source });
       await page.waitForFunction(() => ![...document.querySelectorAll('button')].find(button => button.textContent === 'Detect image').disabled);
       if (submissions !== before) throw new Error('Selecting a file started inference');
       await page.getByRole('button', { name: 'Detect image', exact: true }).click();
     };
     await prepare();
     await page.getByRole('status').filter({ hasText: 'Queued.' }).waitFor();
-    if (!await page.getByLabel('Source image or short video', { exact: true }).isDisabled()) throw new Error('Queued source is editable');
+    if (!await page.getByLabel('Source image', { exact: true }).isDisabled()) throw new Error('Queued source is editable');
     state = 'processing';
     await page.getByRole('status').filter({ hasText: 'Processing.' }).waitFor();
     state = 'success';
     await page.getByRole('button', { name: 'Download JSON', exact: true }).waitFor();
     await page.getByRole('img', { name: 'Annotated result with 4 detections', exact: true }).waitFor();
+    if ((await page.locator('tbody').textContent()).includes('(ID ')) throw new Error('Model class IDs are still visible');
+    if (!await page.getByRole('radio', { name: 'Video', exact: true }).isDisabled()) throw new Error('Input type can change during a job');
+    await page.evaluate(() => { window.confirm = () => true; });
+    await page.getByRole('button', { name: 'Change image or settings', exact: true }).click();
+    await page.waitForFunction(() => document.activeElement?.id === 'image');
+    if (await page.locator('#settings').evaluate(element => Math.abs(element.getBoundingClientRect().top - 24) > 2)) throw new Error('Settings shortcut did not scroll to configuration');
+    if (await page.getByLabel('Source image', { exact: true }).isDisabled()) throw new Error('Settings remain locked');
+    if (!await page.getByRole('button', { name: 'Detect image', exact: true }).isEnabled()) throw new Error('Settings shortcut discarded the source');
+    await page.getByRole('button', { name: 'Detect image', exact: true }).click();
+    await page.getByRole('button', { name: 'Download JSON', exact: true }).waitFor();
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });
       if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)) throw new Error('Detector overflow: ' + width);

@@ -2,7 +2,6 @@ export type Capability = { id: string; token: string };
 export type ObjectType = 'vehicle' | 'logo' | 'plate';
 export type Detection = {
   object_type: ObjectType;
-  class_id: number;
   class_name: string;
   label: string;
   confidence: number;
