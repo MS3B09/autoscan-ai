@@ -1,11 +1,13 @@
 # Release runbook — #7
 
-**Current 2026-11-17 release attempt:** [latest evidence](evidence/issue-7-final-release.md).
-The owner requests final free publication; the existing site is now `autoscan-ai`
-(same site ID). Candidate: https://6afb4f606cabececacad1489--autoscan-ai.netlify.app/detect.
-Production origin is configured, but promotion awaits the remaining required
-hosted-check permission/evidence. Earlier approval-hold wording below retains its
-preparation context; never infer a test pass or paid-resource permission from it.
+**Published 2026-11-17:** https://autoscan-ai.netlify.app/ and `/detect`.
+Existing site `1661ca1f-7c9b-4f69-b8ee-635ac7a49eee` (`autoscan-ai`), same reviewed
+deploy `6afb4f606cabececacad1489`, Free/Git unlinked; exact production origin is
+configured. [Publication evidence](evidence/issue-7-final-release.md) records the
+owner's no-more-tests decision and accepted unverified portions, not new passes.
+Earlier preparation/approval-hold wording below is historical for this release;
+future deployment changes still require approval. Do not rerun tests or infer
+paid-resource permission from this completed release.
 
 This is preparation, **not deployment approval**. Follow the owner's current
 [release checklist](release-checklist.md): no agent-run inference or video tests,

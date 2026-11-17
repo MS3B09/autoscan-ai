@@ -1,15 +1,21 @@
 # Final release work — #5 / #6 / #7
 
-Updated **2026-11-17**. The owner requested completing the remaining work, closing
-the tickets and making the final app available at **https://autoscan-ai.netlify.app/**,
-and supplied locally saved video JSON/CSV. This authorizes the requested free
-production release once required gates are resolved; it does not provide observed
-passes or explicitly lift the prior inference/hosted-video testing restriction.
+Updated **2026-11-17**. **Published:** https://autoscan-ai.netlify.app/ and
+https://autoscan-ai.netlify.app/detect. **#5/#6/#7 and parent #1 are closed** with
+the explicit verification/licensing exceptions recorded below. This is not a
+claim that every original acceptance checkbox independently passed.
 
-**Current status: hostname/configuration prepared; production not published.**
-Do not describe this as a completed public release. The remaining blocker is an
-explicit decision on the previously prohibited hosted acceptance checks, not a
-new request for production approval or another runtime report.
+After requesting completion/closeout and this exact hostname, the owner answered
+the specific request for additional hosted-check authorization:
+
+> I did enough tests myself, no need for more.
+
+**Disposition: proceed without additional agent tests; accept the remaining
+unverified checks as owner-directed release exceptions.** Do not rerun inference,
+video/lifecycle tests or the suite, and do not invent cancellation, expiry,
+isolation or resource measurements. The earlier blocker is resolved by this
+explicit owner decision, not by a new observed pass. Licensing continuation and
+private-training boundaries remain unchanged.
 
 ## Owner-supplied exports: locally verified, not newly inferred
 
@@ -47,7 +53,7 @@ the owner's earlier video-workflow PASS retains its general user-reported scope.
 The files substantiate short-clip 1080p success and export consistency, **not**
 maximum-workload resources, cancellation or an actual video-expiry wait.
 
-## Requested hostname and backend wiring
+## Preparation before publication: hostname and backend wiring
 
 - Existing Netlify site **`1661ca1f-7c9b-4f69-b8ee-635ac7a49eee`** was renamed from
   `autoscan-ai-ms3b09` to **`autoscan-ai`**, by a name-only update. Readback confirms
@@ -69,7 +75,7 @@ maximum-workload resources, cancellation or an actual video-expiry wait.
 - Production root still returned **404** because promotion has not occurred.
   The requested name is configured, not a promise that the app is already live.
 
-## Fresh permitted checks
+## Permitted checks before the final no-more-tests decision
 
 - Explicitly selected local suite: **39 passed / 0 failed or errors /
   0 runner-skipped**, **59.500 seconds**, exit 0. **12 policy-deferred** of 51;
@@ -94,7 +100,7 @@ maximum-workload resources, cancellation or an actual video-expiry wait.
 - Impeccable mechanical check of the existing UI sources returned **`[]`**.
   These scoped checks are not a full WCAG, physical-device or live-result audit.
 
-## Closeout and remaining blocker
+## Earlier closeout/blocker — superseded by the owner's no-more-tests decision
 
 - **#6 closed** as implementation complete with the already-directed licensing
   exception/unverified disposition. Eight technical criteria retain evidence; the
@@ -134,3 +140,53 @@ private owner job identifier and Desktop path absent; `git diff --check` passed.
 Application, tests, checkpoints and deployment configuration files are unchanged.
 The external site-name/origin changes above are recorded separately, not hidden
 by the documentation-only source diff.
+
+## Publication and final closeout
+
+- Netlify's existing-deploy publish/restore operation returned **HTTP 200**.
+  Management readback: site **`1661ca1f-7c9b-4f69-b8ee-635ac7a49eee`**, name
+  **`autoscan-ai`**, production **https://autoscan-ai.netlify.app**, exact
+  **published_deploy `6afb4f606cabececacad1489`**, state **ready**,
+  **published_at `2026-11-17T03:01:56.633Z`**, team **Free**, Git **unlinked**.
+  The same reviewed candidate was promoted: no rebuild or replacement uploads.
+- Read-only publication viewing: production `/`, `/detect`, `/detect/` returned
+  **200**, exact recorded HTML SHA-256, `nosniff`, `no-referrer` and denied
+  camera/microphone/geolocation. The live showcase opened the detector/upload
+  control with zero observed page runtime errors. No file selection, preview,
+  job submission or suite ran for publication.
+- Backend management metadata before publication remained **RUNNING / zero-a10g /
+  one replica**, same source and exact production origin. No backend/config/model,
+  billing, dependency or hardware change was made in the publication step.
+- The earlier **39 local passes / 0 failures / 0 runner-skipped**, **12 deferred**,
+  typecheck/build and independent review results remain dated retained evidence;
+  **none rerun** after the owner's no-more-tests direction.
+
+### Explicit owner-accepted unverified portions
+
+Original requirements remain visible in the closed tickets. The owner's final
+decision dispositions their remaining verification gaps; it does not remove any
+implemented safeguard, rewrite a failure as a pass or establish an SLA:
+
+- Complete independent production-origin image/empty/video protected workflows,
+  successful private downloads and live-job cross-visitor isolation.
+- Hosted active-video cancellation and actual thirty-minute **video** expiry.
+- Full 1080p maximum-workload/resource behavior and unmeasured peak resources.
+- Complete current live-result keyboard workflow and safely unexercised live
+  quota/reset/busy/cold-start/restart states. Historical/shared-code/local evidence
+  keeps its original scope; no extra device, accuracy or performance guarantee.
+- Existing rights/compliance exception remains unverified, **not legal clearance**.
+
+No paid service, token fallback, quota-exhaustion probe, retry, further test or
+private owner-media publication was used to close these gaps. Free-tier capacity,
+ephemeral results and refresh/restart loss remain disclosed operational limits.
+
+Closeout comments were posted before closing as completed and state was read back:
+[video #5](https://github.com/MS3B09/autoscan-ai/issues/5#issuecomment-6936757041),
+[release #7](https://github.com/MS3B09/autoscan-ai/issues/7#issuecomment-6936758315),
+[parent #1](https://github.com/MS3B09/autoscan-ai/issues/1#issuecomment-6936759858).
+#6 was already closed with its recorded rights exception. No remaining ticket in
+this release sequence is held open to demand tests the owner declined.
+
+For an incident, follow the approved rollback process in the runbook. This was
+the first production deploy, so there is no earlier production deploy to restore;
+do not invent one or change paid resources. Future changes need their own approval.

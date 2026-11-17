@@ -1,32 +1,30 @@
 # Release checklist — issues #5, #6, and #7
 
-Updated 2026-11-17. The owner now requests the final **free production release** at
-**https://autoscan-ai.netlify.app/** and ticket closeout, subject to unresolved
-required checks. Production is **not published**. This checklist separates
-implementation, prior evidence, the owner's checks, and remaining release gates.
+Updated 2026-11-17. **Live:** https://autoscan-ai.netlify.app/ and
+https://autoscan-ai.netlify.app/detect. **#5/#6/#7 and parent #1 are closed.**
+Release accepted with explicit owner-directed unverified portions, **not a claim
+that every original acceptance checkbox independently passed**.
 
-**Latest work and blocker:** [final-release evidence](evidence/issue-7-final-release.md).
-Saved owner exports validate 1080p/runtime/hashes and matching CSV; hostname is
-assigned, exact origins configured. Explicit permission to lift the prior
-inference/hosted-video hold is needed to complete the remaining hosted checks;
-neither that permission nor a waiver is inferred from the general release request.
+**Publication and accepted exceptions:** [final-release evidence](evidence/issue-7-final-release.md).
+The owner declined further checks: **"I did enough tests myself, no need for more."**
+That final decision resolves the earlier release hold without additional agent
+tests. Saved exports validate 1080p/runtime/hashes and matching CSV; the same
+reviewed deploy is published on Free hosting with the exact production origin.
 
 ## Current owner instructions
 
-- **No model inference or hosted/browser/diagnostic video tests** until the owner
-  explicitly lifts that prior hold for the remaining hosted acceptance checks.
-  The reserved owner clip check has passed. For the requested
-  **1080p update**, the owner explicitly approved **local CPU-only codec/API video
-  tests** and updating the backend/draft. This narrowly lifts the earlier local
-  video-test hold, not the inference/hosted-video/production restrictions. Keep
-  unfiltered discovery and opt-in hosted/model/diagnostic suites excluded.
+- **No further tests.** The owner declined the specifically proposed hosted
+  acceptance run and directed release/closeout based on their own testing.
+  Remaining lifecycle/resource/complete-production-workflow gaps stay explicitly
+  **owner-accepted / unverified**; do not convert them into passes or demand reruns.
+  The earlier approved local CPU codec/API checks remain retained evidence only.
 - The 1080p change and local-only evidence are tracked in
   [issue-5-1080p.md](evidence/issue-5-1080p.md); earlier 720p hosted runs are not
   upgraded to 1080p capacity evidence.
 - **Owner final video check passed (reported 2026-11-16).** The owner reports
   successful video testing after the 1080p draft handoff. This is user-reported
-  workflow evidence, not independent resource/lifecycle measurements or approval
-  for agent reruns, production promotion or automatic ticket closure.
+  workflow evidence, not independent resource/lifecycle measurements. Separate
+  later owner instructions authorize publication/closeout, not agent reruns.
 - Do not replace the final owner video check with an agent-run image/video job,
   consume quota just to exercise an error, or retry submissions automatically.
 - After each upcoming task, report remaining work in the conversation with its
@@ -56,22 +54,22 @@ neither that permission nor a waiver is inferred from the general release reques
 | Item | Evidence / status | Ticket |
 | --- | --- | --- |
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
-| Short-video implementation | 1080p implemented; owner's final video check reported PASS after the current draft handoff. No agent rerun. Earlier hosted capacity evidence remains 720p-only; maximum 1080p resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. | #5 / #7 |
+| Short-video implementation | Closed with owner final video PASS, saved 87-frame 1080p export validation and accepted unverified lifecycle/resource portions. No extra inference/testing for publication. | #5 (closed) / #7 |
 | Compare showcase | Closed as implementation complete under the owner's closeout request, with existing licensing exception/unverified. Eight technical criteria evidenced; rights criterion remains unchecked/not independently passed. | #6 (closed) |
 | Quota reset messages and developer adapter | Existing quota-message API preserved in backend `d160158`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
-| Public Netlify release | Owner requests final free release. Existing site renamed `autoscan-ai`, production origin wired, same candidate hashes verified; still unpublished while required hosted-check permission/evidence is unresolved. | #7 |
+| Public Netlify release | Published `6afb4f606cabececacad1489` at the requested hostname, 2026-11-17T03:01:56.633Z. Free/Git unlinked; production routes 200/exact reviewed HTML/security headers; detector opens. Accepted exceptions remain explicit. | #7 (closed) |
 | Local release preparation | Runbook/Node pin, latest approved 39-test local suite (12 policy-deferred), typechecks/build and scoped artifact/history secret checks recorded; fixed-baseline reviews completed. No fresh suite rerun for reconciliation. | #7 |
-| Approved source push / Netlify draft | 1080p source `e719d8a` pushed; Free-plan draft `6afb4f606cabececacad1489` ready, no published deploy, Git unlinked. Scoped agent checks passed; owner additionally reports video success. No complete release acceptance. | #5 / #7 |
-| Final gate reconciliation | Current matrix records criterion 9 covered, approved subset/reviews for criterion 10, and remaining workflow/lifecycle/resource/runtime evidence plus production/hostname decisions. | #7 |
+| Source / deployed bytes | Reviewed source `e719d8a`; same immutable deploy promoted, no rebuild or replacement assets. Later repository commits record documentation/evidence only. | #5 / #7 |
+| Final gate reconciliation | Covered evidence, owner-reported results, deferred tests and accepted unverified subchecks remain distinct. No all-checks-passed or legal-clearance claim. Parent and children closed under explicit owner direction. | #1 / #5 / #6 / #7 (closed) |
 
-Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
-evidenced and three partial/deferred criteria; #6 has eight evidenced and one
-owner exception/unverified criterion. #6 is now closed under the owner's final
-closeout request with that exception retained; #5 remains open and #7 is not
-release-accepted.
+Final disposition: #5 retains six evidenced criteria and three mixed criteria
+with accepted unverified portions; #6 retains eight evidenced and one rights
+exception/unverified criterion. #7 is published/closed with its explicit
+verification exceptions; #1 is closed. No unchecked criterion is silently relabeled
+as an independent pass.
 See [the criterion-by-criterion reconciliation](evidence/acceptance-reconciliation.md).
 
-**Current post-owner-pass matrix and next decisions:**
+**Historical post-owner-pass matrix:**
 [issue-7-release-gates.md](evidence/issue-7-release-gates.md). Earlier snapshots
 retain historical results; setup, draft deployment and the owner video check are
 no longer pending tasks.
@@ -92,9 +90,10 @@ that no deployment/push had occurred are historical, not the current status.
 
 The Netlify connection blocker is now resolved. Exact draft URLs, artifact hashes,
 origin wiring, non-inference browser checks and owner handoff:
-[current 1080p handoff](evidence/issue-5-1080p.md). Use that immutable
-draft, not the unpromoted production hostname. Git integration remains unlinked
-to avoid automatic publication.
+[1080p handoff](evidence/issue-5-1080p.md). That preparation evidence precedes the
+site rename and production promotion; the current user URL is
+**https://autoscan-ai.netlify.app/**. Git remains unlinked to avoid automatic
+publication of future pushes.
 
 ## Licensing disposition — #6 / #7
 
@@ -112,43 +111,22 @@ private materials, or claim an older working deployment proves legal clearance.
 See [owner decision and sources](evidence/release-licensing.md#owner-directed-workflow-decision--2026-11-16)
 and [the official-source findings](evidence/ultralytics-private-training.md).
 
-## Release sequence and next decisions
+## Final sequence — completed
 
-The preparation/owner-check sequence below is historical. Current action is the
-explicit hosted-check authorization described in the latest evidence, followed by
-the already-requested production promotion if those checks pass. The hostname
-decision and runtime-export request are no longer outstanding.
-
-1. **Local release candidate preparation — #7, completed at approved scope.** Instructions, permitted checks
-   and local artifact inspection are recorded in the runbook/evidence above.
-   The fixed-baseline Standards/Spec review is recorded, including the corrected
-   status-wording finding. Fresh deployed source/model/runtime inventory and final
-   uploaded-artifact checks still belong to the approved deployment, not the local
-   preparation pass.
-2. **Approved preview — #7, completed at permitted scope.** Free-plan draft ready;
-   exact origin added, HTTPS/refresh/headers/keyboard/desktop/mobile and native
-   still-preview/preflight checks passed without inference. This was a local-build
-   file-digest deployment, not a Netlify Git build, full inference workflow or
-   production promotion. Remaining job/lifecycle/runtime/resource evidence stays
-   explicit in the linked handoff.
-3. **Owner's final video test — #5 / #7, reported PASS.** Recorded the owner's
-   successful video-check report following the 1080p candidate handoff; no agent
-   rerun or independently inspected artifacts. Reconcile remaining acceptance
-   evidence without treating this happy-path report as cancellation/retention/
-   load-test proof. Additional quota-consuming checks still need approval.
-4. **Final evidence reconciliation — #7, report complete; decisions open.** Use
-   the current matrix to resolve/disposition partial required subchecks. Existing
-   downloaded JSON may supply runtime/model hashes without new inference; request
-   only those nonsecret fields if available. No blanket waiver, new testing or
-   renewed licensing research is authorized by this task.
-5. **Production promotion and closeout — #7.** Once remaining technical checks
-   are satisfied, obtain approval and promote the same candidate. Retain the
-   owner's licensing decision and unverified compliance in the closeout; do not
-   turn it into a legal-clearance claim. Verify deployed
-   routing/UI/headers without new inference. Record actual URLs, passed/skipped/
-   deferred checks, isolation/lifecycle/resource evidence, and any remaining
-   limitations. A pre-release local or preview run is not automatically proof of
-   all production-origin safeguards; unresolved required criteria keep #7 open.
+1. **#7 preparation/draft:** runbook, selected local checks, source/artifact review,
+   Free candidate and exact-origin wiring recorded.
+2. **#5 owner video:** reported PASS; saved JSON/CSV supplied and validated locally,
+   with runtime inventory and all trusted hashes matching. No private data published.
+3. **#5/#7 disposition:** owner explicitly declined the proposed extra tests.
+   Remaining independent production workflows/isolation, video cancellation/expiry,
+   1080p maximum resources and complete live-result keyboard verification stay
+   accepted/unverified. Safely unexercised quota/busy/cold-start states remain so.
+4. **#7 publication:** same deploy promoted at the exact requested HTTPS hostname;
+   publication metadata/routes/HTML/headers and navigation read back, no uploads,
+   previews, inference, suite rerun or additional test jobs.
+5. **#5/#6/#7/#1 closeout:** comments explain evidence versus owner exceptions;
+   closed states read back. There is no pending task to demand further owner tests,
+   source media, runtime exports or private training materials for this release.
 
 ## Safe checks during the video hold
 

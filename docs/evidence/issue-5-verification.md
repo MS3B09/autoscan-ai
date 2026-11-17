@@ -1,5 +1,11 @@
 # Issue #5 verification
 
+**2026-11-17 closeout:** #5 is closed under the owner's final release request and
+explicit no-more-tests decision. Retained technical evidence and owner 1080p PASS
+remain scoped; hosted active cancellation/video-expiry/resource gaps are accepted
+unverified exceptions, not new passes. See [publication evidence](issue-7-final-release.md).
+The pending owner-check/closeout statements below are historical.
+
 Current acceptance status (2026-11-16): implementation is complete; six criteria
 are evidenced and three retain deferred verification. No new video checks may be
 run by the agent; the owner reserves the final candidate test. See

@@ -2,14 +2,18 @@
   <h1 id="top" align="center"> 🚘 Vehicle Logo & License Plate Detection</h1></div>
   <img src="imgs/image.JPG" width="100%", alt="Classes"></a>
 
-## Separate frontend/backend demo (release preparation)
+## Live frontend/backend demo
 
-The React showcase and detector are implemented; public release is not yet approved.
+**[Open AutoScan AI](https://autoscan-ai.netlify.app/)** ·
+**[Open the detector](https://autoscan-ai.netlify.app/detect)**
+
+The image/video demo runs on free hosting, subject to shared quota and availability.
+It supports vehicle, logo and plate detection—not OCR, tracking or webcam capture.
 See [local setup and deployment/rollback instructions](docs/release-runbook.md),
-[current release gates](docs/release-checklist.md), and
-[local preparation evidence](docs/evidence/issue-7-preparation.md).
-[The current 1080p draft handoff](docs/evidence/issue-5-1080p.md) records
-the preview URL and remaining release gates; it is not a production release.
+[release status](docs/release-checklist.md), and
+[publication evidence and owner-accepted verification exceptions](docs/evidence/issue-7-final-release.md).
+No new inference tests were run for publication. Licensing compliance remains
+unverified under the owner's recorded continuation decision; notices are preserved.
 The original Streamlit application and its requirements remain below/alongside this demo.
 
 <h2 id="about-the-project-and-authors"> 👋 About This Project and Authors</h2>

@@ -1,5 +1,11 @@
 # Owner-requested 1080p support — #5 / #7
 
+> **Published 2026-11-17:** https://autoscan-ai.netlify.app/detect. Same reviewed
+> deploy `6afb4f606cabececacad1489`; site renamed before promotion. #5/#7 are closed
+> under the owner's explicit no-more-tests decision, with unverified exceptions
+> retained. See [final publication](issue-7-final-release.md). Preparation URLs and
+> pending-check statements below retain their historical scope.
+
 Date: 2026-11-16. The owner requested accepting a clip whose screenshot reports
 **1920×1080**, about **two seconds**, **30.14 fps**, then explicitly approved
 **local CPU-only codec/API video tests and a backend/draft update**. This does not

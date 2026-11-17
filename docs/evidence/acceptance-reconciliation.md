@@ -1,8 +1,10 @@
 # Acceptance reconciliation — #1 / #5 / #6 / #7
 
 > **Historical snapshot with later addenda.** Use
-> [issue-7-release-gates.md](issue-7-release-gates.md) for the current post-owner-pass
-> matrix and remaining decisions. Pending setup/deployment/owner-check wording
+> [final publication](issue-7-final-release.md) for the live URL, closed tickets and
+> owner's no-more-tests/accepted-unverified disposition. The earlier
+> [release-gate matrix](issue-7-release-gates.md) records the pre-publication
+> post-owner-pass decisions. Pending setup/deployment/owner-check wording
 > below describes earlier stages, not current blockers. The later local CPU-only
 > codec/API exception supersedes the earlier blanket local-video test hold.
 
