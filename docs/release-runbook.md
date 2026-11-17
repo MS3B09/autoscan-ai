@@ -1,5 +1,12 @@
 # Release runbook — #7
 
+**Latest UI/export update (2026-11-17):** the owner's follow-up request authorized
+three incremental pushes and live updates. See
+[Home/Detector deployment evidence](evidence/home-detector-refresh.md) for current
+source/deploy revisions, focused checks, and rollback points. The original release
+record and approval-hold history below are unchanged; hosted inference remains
+unexercised by this refinement.
+
 **Published 2026-11-17:** https://autoscan-ai.netlify.app/ and `/detect`.
 Existing site `1661ca1f-7c9b-4f69-b8ee-635ac7a49eee` (`autoscan-ai`), same reviewed
 deploy `6afb4f606cabececacad1489`, Free/Git unlinked; exact production origin is
