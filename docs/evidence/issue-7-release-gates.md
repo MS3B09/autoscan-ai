@@ -1,5 +1,11 @@
 # #7 release gates after the owner's video pass
 
+> **Later 2026-11-17 work:** [final-release evidence](issue-7-final-release.md)
+> records the owner's release/closeout request, verified saved exports, assigned
+> `autoscan-ai.netlify.app` hostname, origin wiring and fresh permitted checks.
+> The production/hostname approval and runtime-request statements below describe
+> the earlier handoff; remaining hosted-test authorization is now the blocker.
+
 Date: **2026-11-16**. Implementation source **`e719d8a`**, backend
 **`d160158db56c1cdf6113a575b8b01bb763f81b73`**. The final video check is
 **PASS, owner-reported**, recorded in `872a854`; not an independent agent trace.

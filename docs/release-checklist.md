@@ -1,12 +1,21 @@
 # Release checklist — issues #5, #6, and #7
 
-Updated 2026-11-16. Public release is **not approved**. This checklist separates
+Updated 2026-11-17. The owner now requests the final **free production release** at
+**https://autoscan-ai.netlify.app/** and ticket closeout, subject to unresolved
+required checks. Production is **not published**. This checklist separates
 implementation, prior evidence, the owner's checks, and remaining release gates.
+
+**Latest work and blocker:** [final-release evidence](evidence/issue-7-final-release.md).
+Saved owner exports validate 1080p/runtime/hashes and matching CSV; hostname is
+assigned, exact origins configured. Explicit permission to lift the prior
+inference/hosted-video hold is needed to complete the remaining hosted checks;
+neither that permission nor a waiver is inferred from the general release request.
 
 ## Current owner instructions
 
-- **No model inference or hosted/browser/diagnostic video tests.** The owner
-  reserves the final hosted video test to conserve quota. For the requested
+- **No model inference or hosted/browser/diagnostic video tests** until the owner
+  explicitly lifts that prior hold for the remaining hosted acceptance checks.
+  The reserved owner clip check has passed. For the requested
   **1080p update**, the owner explicitly approved **local CPU-only codec/API video
   tests** and updating the backend/draft. This narrowly lifts the earlier local
   video-test hold, not the inference/hosted-video/production restrictions. Keep
@@ -33,11 +42,13 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
   **owner-directed continuation, compliance unverified**, not a passed legal check
   or an Ultralytics exception. Preserve notices and research; do not repeatedly
   block preparation on the same already-disclosed issue.
-- **Limited deployment approval (2026-11-16):** the owner approved the backend
+- **Earlier limited deployment approval (2026-11-16):** the owner approved the backend
   quota-message update and Netlify draft, then separately approved pushing the
   reviewed commits to GitHub. Backend update, source push and Netlify draft are
-  complete; only permitted non-inference draft checks ran. This is not approval for
-   production publication/promotion, paid resources, model inference or hosted video tests.
+   complete; only permitted non-inference draft checks ran. That earlier approval
+   did not include production. The 2026-11-17 request now covers final free
+   publication once gates are resolved, not a paid change or an implicit lifting
+   of the prior inference/hosted-video hold.
   Never expose HF tokens in frontend variables, bundles, URLs, logs or repositories.
 
 ## Current status
@@ -46,9 +57,9 @@ implementation, prior evidence, the owner's checks, and remaining release gates.
 | --- | --- | --- |
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
 | Short-video implementation | 1080p implemented; owner's final video check reported PASS after the current draft handoff. No agent rerun. Earlier hosted capacity evidence remains 720p-only; maximum 1080p resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. | #5 / #7 |
-| Compare showcase | Implemented/reviewed; photo permission/attribution documented. Owner removed the licensing workflow hold; compliance remains unverified, not a passed check. | #6 |
+| Compare showcase | Implementation complete; owner now requests formal closeout with the existing licensing exception/unverified. Eight technical criteria evidenced; rights criterion is not independently passed. | #6 |
 | Quota reset messages and developer adapter | Existing quota-message API preserved in backend `d160158`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
-| Public Netlify release | Not approved or completed. Current draft-origin checks are scoped, not complete production-origin evidence. | #7 |
+| Public Netlify release | Owner requests final free release. Existing site renamed `autoscan-ai`, production origin wired, same candidate hashes verified; still unpublished while required hosted-check permission/evidence is unresolved. | #7 |
 | Local release preparation | Runbook/Node pin, latest approved 39-test local suite (12 policy-deferred), typechecks/build and scoped artifact/history secret checks recorded; fixed-baseline reviews completed. No fresh suite rerun for reconciliation. | #7 |
 | Approved source push / Netlify draft | 1080p source `e719d8a` pushed; Free-plan draft `6afb4f606cabececacad1489` ready, no published deploy, Git unlinked. Scoped agent checks passed; owner additionally reports video success. No complete release acceptance. | #5 / #7 |
 | Final gate reconciliation | Current matrix records criterion 9 covered, approved subset/reviews for criterion 10, and remaining workflow/lifecycle/resource/runtime evidence plus production/hostname decisions. | #7 |
@@ -100,6 +111,11 @@ See [owner decision and sources](evidence/release-licensing.md#owner-directed-wo
 and [the official-source findings](evidence/ultralytics-private-training.md).
 
 ## Release sequence and next decisions
+
+The preparation/owner-check sequence below is historical. Current action is the
+explicit hosted-check authorization described in the latest evidence, followed by
+the already-requested production promotion if those checks pass. The hostname
+decision and runtime-export request are no longer outstanding.
 
 1. **Local release candidate preparation — #7, completed at approved scope.** Instructions, permitted checks
    and local artifact inspection are recorded in the runbook/evidence above.

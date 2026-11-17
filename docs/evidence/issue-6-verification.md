@@ -1,5 +1,12 @@
 # Issue #6 — Option A showcase
 
+**2026-11-17 closeout:** the owner requested completing/closing the remaining
+tickets. Showcase implementation is complete with the existing owner-directed
+rights exception/compliance-unverified; eight technical criteria are evidenced.
+Formal implementation closeout does not independently pass the mixed rights
+criterion or #7 release gates. See [latest release work](issue-7-final-release.md).
+Prior "formal closeout remains open" statements below are historical.
+
 Current workflow update (2026-11-16): the owner removed the internal licensing
 hold; compliance is unverified, not a legal pass. Earlier gate findings below are
 historical. See [the owner decision](release-licensing.md#owner-directed-workflow-decision--2026-11-16)
