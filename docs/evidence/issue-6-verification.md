@@ -1,7 +1,7 @@
 # Issue #6 — Option A showcase
 
 **2026-11-17 closeout:** the owner requested completing/closing the remaining
-tickets. Showcase implementation is complete with the existing owner-directed
+tickets. **#6 is now closed** as showcase implementation complete with the existing owner-directed
 rights exception/compliance-unverified; eight technical criteria are evidenced.
 Formal implementation closeout does not independently pass the mixed rights
 criterion or #7 release gates. See [latest release work](issue-7-final-release.md).

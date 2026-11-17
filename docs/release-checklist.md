@@ -57,7 +57,7 @@ neither that permission nor a waiver is inferred from the general release reques
 | --- | --- | --- |
 | Images and exports | Previously implemented/verified; owner reports the new local developer image workflow works. This is user-reported, not a fresh agent-run test or independent quota-accounting measurement. | #3 / #4 (closed), #7 integration |
 | Short-video implementation | 1080p implemented; owner's final video check reported PASS after the current draft handoff. No agent rerun. Earlier hosted capacity evidence remains 720p-only; maximum 1080p resource behavior, hosted active cancellation and video-specific thirty-minute retention remain unverified. | #5 / #7 |
-| Compare showcase | Implementation complete; owner now requests formal closeout with the existing licensing exception/unverified. Eight technical criteria evidenced; rights criterion is not independently passed. | #6 |
+| Compare showcase | Closed as implementation complete under the owner's closeout request, with existing licensing exception/unverified. Eight technical criteria evidenced; rights criterion remains unchecked/not independently passed. | #6 (closed) |
 | Quota reset messages and developer adapter | Existing quota-message API preserved in backend `d160158`; health/still-image preview passed without inference. Live quota reset response unexercised. No automatic fallback to cached WRITE credentials. | #6 follow-up / #7 |
 | Public Netlify release | Owner requests final free release. Existing site renamed `autoscan-ai`, production origin wired, same candidate hashes verified; still unpublished while required hosted-check permission/evidence is unresolved. | #7 |
 | Local release preparation | Runbook/Node pin, latest approved 39-test local suite (12 policy-deferred), typechecks/build and scoped artifact/history secret checks recorded; fixed-baseline reviews completed. No fresh suite rerun for reconciliation. | #7 |
@@ -66,7 +66,9 @@ neither that permission nor a waiver is inferred from the general release reques
 
 Acceptance/checklist reconciliation is complete as of 2026-11-16: #5 has six
 evidenced and three partial/deferred criteria; #6 has eight evidenced and one
-owner exception/unverified criterion. Both remain open; #7 is not release-accepted.
+owner exception/unverified criterion. #6 is now closed under the owner's final
+closeout request with that exception retained; #5 remains open and #7 is not
+release-accepted.
 See [the criterion-by-criterion reconciliation](evidence/acceptance-reconciliation.md).
 
 **Current post-owner-pass matrix and next decisions:**

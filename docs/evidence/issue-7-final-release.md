@@ -96,10 +96,12 @@ maximum-workload resources, cancellation or an actual video-expiry wait.
 
 ## Closeout and remaining blocker
 
-- **#6** can close as implementation complete with the already-directed licensing
+- **#6 closed** as implementation complete with the already-directed licensing
   exception/unverified disposition. Eight technical criteria retain evidence; the
   mixed rights criterion is **not an independent legal pass**. The owner now
   explicitly requested ticket closeout. Preserve notices/private-training boundary.
+  [Closeout comment](https://github.com/MS3B09/autoscan-ai/issues/6#issuecomment-6936255997)
+  was posted before closing as completed; the rights checkbox remains unchecked.
 - **#5 / #7:** saved exports resolve the requested runtime/hash evidence and add
   real owner-export 1080p/CSV consistency. Historical 720p capacity, image retention,
   shared lifecycle and prior isolation evidence remain valid at their own scope.
@@ -119,3 +121,16 @@ maximum-workload resources, cancellation or an actual video-expiry wait.
   verify actual production routes/headers/native origin/UI, then close #5/#7 and
   parent #1 with distinct passes/limitations. Do not seek production approval again
   unless the scope, cost or candidate changes.
+
+## Review and document checks
+
+Independent read-only review of **`21e75b5`**, complete three-dot diff from the
+owner-approved **`cea69ae7f60c84ad8532eca803510283473fc6d2`** baseline:
+**Standards 0 actionable findings / Spec 0 actionable findings**; no worst finding
+on either axis. No private-export reads or live application tests ran in review.
+
+Five changed documents passed local link/credential-pattern checks, with the
+private owner job identifier and Desktop path absent; `git diff --check` passed.
+Application, tests, checkpoints and deployment configuration files are unchanged.
+The external site-name/origin changes above are recorded separately, not hidden
+by the documentation-only source diff.
