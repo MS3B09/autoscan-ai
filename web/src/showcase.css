@@ -3,7 +3,9 @@
 .showcase-intro p { max-width: 65ch; font-size: clamp(1rem, 1.6vw, 1.45rem); line-height: 1.4; margin: var(--space-label) auto var(--space-lg); color: var(--color-muted); }
 .showcase-actions, .invite-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-sm); }
 .showcase-actions { justify-content: center; }
-.showcase-actions .button, .invite-actions .button { min-height: 50px; padding-inline: var(--space-label); }
+.showcase-actions .button { min-height: 58px; min-width: min(100%, 190px); padding-inline: var(--space-lg); font-size: 1.125rem; }
+.showcase-actions .primary { min-width: min(100%, 280px); }
+.invite-actions .button { min-height: 50px; padding-inline: var(--space-label); }
 .showcase-comparison { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(170px, .38fr); gap: var(--space-columns); padding: var(--space-md) var(--space-lg); border: 1px solid var(--color-ink); border-radius: var(--radius-panel); background: var(--color-sheet); }
 .showcase h2 { font-weight: 900; text-wrap: balance; }
 .showcase-comparison h2 { font-size: 1.375rem; line-height: 1.1; }
@@ -65,4 +67,7 @@ body:has(.image-dialog[open]) { overflow: hidden; }
   .project-invite { padding: var(--space-md); }
   .invite-actions { width: 100%; }
   .invite-actions .button { flex: 1 1 175px; }
+}
+@media (max-width: 520px) {
+  .showcase-actions .button { width: min(100%, 320px); }
 }

@@ -18,7 +18,7 @@ const detections = [
 const workflow = [
   { icon: 'upload', title: 'Choose your media', text: 'Add an image or short video.' },
   { icon: 'tune', title: 'Set what to find', text: 'Pick object types and a confidence threshold.' },
-  { icon: 'scan', title: 'Review detections', text: 'See what was found and save the results.' },
+  { icon: 'scan', title: 'Review detections', text: 'See what was found and save the results (Annotated Image, CSV & JSON Data)' },
 ] as const;
 const classes = [
   { icon: 'vehicle', title: 'Vehicles', text: 'Cars, trucks and buses' },

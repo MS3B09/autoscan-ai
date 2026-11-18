@@ -16,7 +16,7 @@ export function SiteHeader({ detector = false }: { detector?: boolean }) {
 
 export function SiteFooter() {
   return <footer className="shell">
-    <span>AutoScan AI <small>Model and dataset licensing remains unverified.</small></span>
+    <span>AutoScan AI</span>
     <a href="https://github.com/MS3B09/autoscan-ai#about-the-project-and-authors">Original contributors and datasets <Icon name="external" /></a>
   </footer>;
 }
