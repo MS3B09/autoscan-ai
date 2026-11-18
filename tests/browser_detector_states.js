@@ -15,6 +15,7 @@ async (page) => {
   let submissionQuota = false;
   let submissionRetryAt = 1893456000;
   let submissions = 0;
+  let deletions = 0;
   let expiresAt = Date.now() / 1000 + 1800;
   const handler = async route => {
     const request = route.request();
@@ -32,7 +33,7 @@ async (page) => {
     }
     if (request.headers().authorization !== 'Bearer test-only-capability') throw new Error('Workspace dropped job capability');
     if (expired) return route.fulfill({ status: 404, contentType: 'application/json', body: '{"detail":"Job unavailable, deleted, or expired."}' });
-    if (request.method() === 'DELETE') return json({ deleted: true });
+    if (request.method() === 'DELETE') { deletions++; return json({ deleted: true }); }
     if (url.pathname.endsWith('/cancel')) { state = 'cancelled'; return json({ state }); }
     if (url.pathname.includes('/download/')) {
       if (downloadFailure) return route.fulfill({ status: 503, contentType: 'application/json', body: '{"detail":"Temporary download failure."}' });
@@ -68,8 +69,18 @@ async (page) => {
     if (JSON.stringify(rows) !== JSON.stringify([['Vehicle', 'Truck'], ['Vehicle', 'Car'], ['Brand', 'Lexus'], ['Plate', 'Plate']])) throw new Error('Object categories and model classes are incorrect: ' + JSON.stringify(rows));
     if (await page.locator('#download-help').textContent() !== 'Includes all 4 selected detections. Saved files stay on your device after Delete now.') throw new Error('Incorrect download help');
     if (!await page.getByRole('radio', { name: 'Video', exact: true }).isDisabled()) throw new Error('Input type can change during a job');
-    await page.evaluate(() => { window.confirm = () => true; });
+    const deleteNow = page.getByRole('button', { name: 'Delete now', exact: true });
+    const deleteDialog = page.getByRole('dialog', { name: 'Delete this job?' });
+    for (const dismiss of [() => page.keyboard.press('Escape'), () => deleteDialog.getByRole('button', { name: 'Cancel' }).click()]) {
+      await deleteNow.click();
+      await deleteDialog.waitFor();
+      if (!await deleteDialog.getByRole('button', { name: 'Cancel' }).evaluate(button => document.activeElement === button)) throw new Error('Cancel does not receive initial focus');
+      await dismiss();
+      await deleteDialog.waitFor({ state: 'hidden' });
+      if (deletions || !await deleteNow.evaluate(button => document.activeElement === button)) throw new Error('Dismissing Delete now removed the job or lost focus');
+    }
     await page.getByRole('button', { name: 'Change image or settings', exact: true }).click();
+    await deleteDialog.getByRole('button', { name: 'Delete job' }).click();
     await page.waitForFunction(() => document.activeElement?.id === 'image');
     if (await page.locator('#settings').evaluate(element => Math.abs(element.getBoundingClientRect().top - 24) > 2)) throw new Error('Settings shortcut did not scroll to configuration');
     if (await page.getByLabel('Source image', { exact: true }).isDisabled()) throw new Error('Settings remain locked');
@@ -96,10 +107,10 @@ async (page) => {
       await page.keyboard.press('Enter');
       if ((await event).suggestedFilename() !== `Lexus.photo é_${suffix}`) throw new Error('Wrong download name for ' + label);
     }
-    // Accept native confirmation in this simulated-state run; production keeps window.confirm.
-    await page.evaluate(() => { window.confirm = () => true; });
-    await page.getByRole('button', { name: 'Delete now', exact: true }).click();
+    await deleteNow.click();
+    await deleteDialog.getByRole('button', { name: 'Delete job' }).click();
     await page.waitForFunction(() => document.activeElement?.id === 'image');
+    if (deletions !== 2) throw new Error('Confirmed deletion did not reach the API');
     if (await page.getByRole('button', { name: 'Download JSON', exact: true }).count()) throw new Error('Deleted results remain');
     state = 'empty';
     await prepare();

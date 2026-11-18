@@ -74,8 +74,8 @@ async (page) => {
   if (isolation.some(code => code !== 404)) throw new Error('Cross-visitor isolation failed');
   await page.evaluate(summary => { window.__autoscanVideoCheck = summary; },
     { submissions: submissions.length, reusedCompletedJob: !submissions.length, playback, downloads, isolation });
-  page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Delete now', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Delete this job?' }).getByRole('button', { name: 'Delete job' }).click();
    await page.waitForFunction(() => document.querySelector('button.primary')?.disabled);
   if (await annotated.count()) throw new Error('Deleted video remains visible');
   const revoked = await page.evaluate(async ({ endpoint, authorization }) => {

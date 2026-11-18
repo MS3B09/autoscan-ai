@@ -53,6 +53,8 @@ function Workspace() {
   const [downloading, setDownloading] = useState('');
   const [page, setPage] = useState(0);
   const [notice, setNotice] = useState(idleNotice);
+  const [keepSourceOnDelete, setKeepSourceOnDelete] = useState(false);
+  const deleteDialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const settings = useRef<HTMLElement>(null);
   const focusUpload = useRef(false);
@@ -98,6 +100,7 @@ function Workspace() {
   }, [locked]);
 
   function forgetJob(message: string) {
+    deleteDialog.current?.close();
     downloadController.current?.abort();
     setCapability(null); setJob(null); setAnnotated(''); setPage(0); setPollFailed(false); setNotice(message);
   }
@@ -224,8 +227,13 @@ function Workspace() {
     }
   }
 
-  async function remove(keepSource = false) {
-    if (!capability || !window.confirm('Delete this job and its remaining server-side results? This cannot be undone.')) return;
+  function confirmDelete(keepSource = false) {
+    setKeepSourceOnDelete(keepSource);
+    deleteDialog.current?.showModal();
+  }
+
+  async function remove(keepSource: boolean) {
+    if (!capability || working) return;
     setWorking(true); setError('');
     try {
       try { await request(jobPath(capability), { method: 'DELETE' }, capability); }
@@ -300,7 +308,7 @@ function Workspace() {
           <button className="primary" onClick={() => void detect()} disabled={!ready || !types.length || locked}>
             <Icon name="scan" />{working && !capability ? 'Uploading…' : `Detect ${media}`}</button>
           {active && <button onClick={() => void cancel()} disabled={working || job?.state === 'cancelling'}>Cancel</button>}
-          {capability && <button onClick={() => void remove()} disabled={working}>Delete now</button>}
+          {capability && <button onClick={() => confirmDelete()} aria-haspopup="dialog" disabled={working}>Delete now</button>}
         </div>
         <div className="feedback">
           <p role="status" aria-live="polite"><Icon name={job?.state === 'success' || job?.state === 'empty' ? 'check' : 'info'} /><span>{!types.length ? 'Select at least one object type.' : notice}</span></p>
@@ -347,7 +355,7 @@ function Workspace() {
           <p id="download-help">Includes all {job.detections.length} selected {job.detections.length === 1 ? 'detection' : 'detections'}. Saved files stay on your device after Delete now.</p>
         </div>}
         {!activeStates.includes(job.state) &&
-           <button className="change-settings" onClick={() => void remove(true)} disabled={working}><Icon name="tune" />Change {media} or settings</button>}
+           <button className="change-settings" onClick={() => confirmDelete(true)} aria-haspopup="dialog" disabled={working}><Icon name="tune" />Change {media} or settings</button>}
         {job.detections.length > pageSize && <div className="actions pagination" aria-label="Detection pages">
           <button disabled={page === 0} onClick={() => setPage(value => value - 1)}>Previous detections</button>
            <span>Page {page + 1} of {Math.ceil(job.detections.length / pageSize)}</span>
@@ -370,6 +378,18 @@ function Workspace() {
       </section>}
     </main>
     <SiteFooter />
+    {capability && <dialog ref={deleteDialog} className="delete-dialog" aria-labelledby="delete-heading" aria-describedby="delete-description">
+      <h2 id="delete-heading">Delete this job?</h2>
+      <p id="delete-description">This permanently removes the job and its results from the server. Downloaded files stay on your device.
+        {keepSourceOnDelete && ' Your selected file stays in the app so you can change settings and run detection again.'}</p>
+      <div className="actions">
+        <button type="button" onClick={() => deleteDialog.current?.close()}>Cancel</button>
+        <button type="button" className="delete-confirm" onClick={() => {
+          deleteDialog.current?.close();
+          void remove(keepSourceOnDelete);
+        }}>Delete job</button>
+      </div>
+    </dialog>}
   </>;
 }
 

@@ -70,6 +70,13 @@ legend { padding: 0; margin-bottom: var(--space-sm); }
 output { font-weight: 500; font-variant-numeric: tabular-nums; background: var(--color-paper-3); border-radius: var(--radius-control); padding: var(--space-xs) var(--space-sm); }
 input[type=range] { display: block; width: 100%; min-height: 44px; margin: 0; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); }
+.delete-dialog { width: min(28rem, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: var(--space-lg); color: var(--color-ink); background: var(--color-sheet); border: 1px solid var(--color-ink); border-radius: var(--radius-panel); }
+.delete-dialog::backdrop { background: rgb(25 27 23 / .65); }
+body:has(.delete-dialog[open]) { overflow: hidden; }
+.delete-dialog p { color: var(--color-muted); }
+.delete-dialog .actions { justify-content: flex-end; margin-top: var(--space-lg); }
+.delete-confirm, .delete-confirm:hover:enabled { color: var(--color-sheet); background: var(--color-error); border-color: var(--color-error); }
+.delete-confirm:hover:enabled { text-decoration: underline; }
 .controls > .actions { grid-column: 1 / -1; }
 .feedback { grid-column: 1 / -1; display: grid; justify-items: start; gap: var(--space-sm); border-top: 1px solid var(--color-rule); padding-top: var(--space-md); }
 .feedback p { display: flex; align-items: flex-start; gap: var(--space-sm); margin: 0; font-size: .875rem; }

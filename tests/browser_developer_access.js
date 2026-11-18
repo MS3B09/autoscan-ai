@@ -29,9 +29,8 @@ async (page) => {
       if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)) throw new Error('Developer UI overflows');
       await page.screenshot({ path: `E:/autoscan-ai/.impeccable/review/developer-${width}.png`, fullPage: true });
     }
-    // Accept native confirmation only for this browser regression.
-    await page.evaluate(() => { window.confirm = () => true; });
     await page.getByRole('button', { name: 'Delete now', exact: true }).click();
+    await page.getByRole('dialog', { name: 'Delete this job?' }).getByRole('button', { name: 'Delete job' }).click();
     await page.waitForFunction(() => document.activeElement?.id === 'image');
     for (const request of requests) {
       const authorization = request.headers().authorization;
