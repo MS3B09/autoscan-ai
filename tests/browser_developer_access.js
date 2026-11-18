@@ -23,7 +23,7 @@ async (page) => {
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download JSON', exact: true }).focus();
     await page.keyboard.press('Enter');
-    if ((await download).suggestedFilename() !== `autoscan-${capability.id}.json`) throw new Error('Developer download failed');
+    if ((await download).suggestedFilename() !== 'lexus-lx570_detections.json') throw new Error('Developer download failed');
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)) throw new Error('Developer UI overflows');

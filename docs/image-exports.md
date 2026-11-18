@@ -12,6 +12,9 @@ Every request requires `Authorization: Bearer <job token>`, just like status and
 preview retrieval. Tokens never enter URLs or exports. Responses use
 `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, and attachment names
 `autoscan-{id}.{png|json|csv}`; visitor filenames never become paths or headers.
+In the web app, PNG, JSON, and CSV downloads use the uploaded file's base name
+with `_annotated.png`, `_detections.json`, or `_detections.csv` appended. The
+browser replaces filename characters that are invalid on common filesystems.
 Unknown formats and missing/wrong/deleted/expired capabilities return 404.
 Unfinished, failed, and cancelled jobs return 409. Storage/serialization failures
 return sanitized 503 errors, without attachments or partial result bodies.

@@ -15,6 +15,7 @@ const objectTypes: { value: ObjectType; label: string; note: string }[] = [
   { value: 'logo', label: 'Logos', note: '24 vehicle brands' },
   { value: 'plate', label: 'Plates', note: 'Detection, not transcription' },
 ];
+const resultTypes: Record<ObjectType, string> = { vehicle: 'Vehicle', logo: 'Brand', plate: 'Plate' };
 const states = {
   queued: 'Queued. Your media is waiting for the single inference slot.',
   processing: 'Processing. The free GPU may need to start or wait for capacity.',
@@ -190,7 +191,7 @@ function Workspace() {
   }
 
   async function download(format: 'image' | 'video' | 'json' | 'csv') {
-    if (!capability || downloading) return;
+    if (!capability || !file || downloading) return;
     const controller = new AbortController();
     downloadController.current = controller;
     const label = format === 'image' || format === 'video' ? `Annotated ${format}` : format.toUpperCase();
@@ -204,7 +205,9 @@ function Workspace() {
       downloadURL.current = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadURL.current;
-      link.download = `autoscan-${capability.id}.${format === 'image' ? 'png' : format === 'video' ? 'mp4' : format}`;
+      const sourceName = file.name.replace(/\.[^.]+$/, '').replace(/[<>:"/\\|?*\p{Cc}]/gu, '_').trim() || 'autoscan';
+      link.download = format === 'video' ? `autoscan-${capability.id}.mp4` :
+        `${sourceName}_${format === 'image' ? 'annotated.png' : `detections.${format}`}`;
       document.body.append(link);
       link.click();
       link.remove();
@@ -341,8 +344,7 @@ function Workspace() {
             <button onClick={() => void download('csv')} disabled={working || !!downloading}><Icon name="download" />
               {downloading === 'csv' ? 'Preparing CSV…' : 'Download CSV'}</button>
           </div>
-          <p id="download-help">Includes all {job.detections.length} selected detections, with class names rather than class IDs.
-            Downloads expire with this job. Saved files stay on your device after Delete now.</p>
+          <p id="download-help">Includes all {job.detections.length} selected {job.detections.length === 1 ? 'detection' : 'detections'}. Saved files stay on your device after Delete now.</p>
         </div>}
         {!activeStates.includes(job.state) &&
            <button className="change-settings" onClick={() => void remove(true)} disabled={working}><Icon name="tune" />Change {media} or settings</button>}
@@ -355,8 +357,9 @@ function Workspace() {
           <caption>Pixel coordinates refer to the {job.width} × {job.height} oriented input, measured from its top-left corner.</caption>
           <thead><tr><th>Object</th><th>Model class</th><th>Confidence</th>{job.media_type === 'video' && <th>Frame / time</th>}<th>Box (x1, y1, x2, y2)</th></tr></thead>
           <tbody>{job.detections.slice(page * pageSize, (page + 1) * pageSize).map((detection, index) => <tr key={index}>
-            <td data-label="Object"><span className={'type-label ' + detection.object_type}>{detection.label}</span></td>
-            <td data-label="Model class">{detection.object_type === 'plate' ? detection.label : detection.class_name}</td>
+            <td data-label="Object"><span className={'type-label ' + detection.object_type}>{resultTypes[detection.object_type]}</span></td>
+            <td data-label="Model class" className="model-class">{detection.object_type === 'plate' ? 'Plate' :
+              detection.class_name === 'bmw' || detection.class_name === 'kia' ? detection.class_name.toUpperCase() : detection.class_name}</td>
             <td data-label="Confidence">{(detection.confidence * 100).toFixed(1)}%</td>
             {job.media_type === 'video' && <td data-label="Frame / time">{detection.frame_index} / {detection.timestamp_seconds?.toFixed(3)} s</td>}
             <td data-label="Box" className="coordinates">{detection.bbox.map(value => value.toFixed(1)).join(', ')}</td>

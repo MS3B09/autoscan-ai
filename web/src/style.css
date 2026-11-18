@@ -102,6 +102,7 @@ th, td { padding: var(--space-label) var(--space-sm); border-bottom: 1px solid v
 th { font-weight: 500; background: var(--color-paper-3); }
 td { font-variant-numeric: tabular-nums; }
 .coordinates { overflow-wrap: anywhere; }
+.model-class { text-transform: capitalize; }
 .type-label { display: inline-flex; gap: var(--space-sm); align-items: center; }
 .type-label::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--object-color); flex: none; }
 

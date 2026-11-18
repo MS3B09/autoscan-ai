@@ -36,13 +36,15 @@ async (page) => {
   await annotated.evaluate(video => video.play());
   await page.waitForFunction(() => document.querySelectorAll('video')[1].ended);
   const downloads = [];
+  const sourceStem = (await page.locator('.file-copy strong').textContent()).replace(/\.[^.]+$/, '');
   for (const [label, extension] of [['Download annotated video (MP4)', 'mp4'], ['Download JSON', 'json'], ['Download CSV', 'csv']]) {
     const event = page.waitForEvent('download');
     await page.getByRole('button', { name: label, exact: true }).focus();
     await page.keyboard.press('Enter');
     const download = await event;
     const filename = download.suggestedFilename();
-    if (!new RegExp(`^autoscan-[a-f0-9]{32}\\.${extension}$`).test(filename)) throw new Error('Unsafe download filename');
+     const valid = extension === 'mp4' ? /^autoscan-[a-f0-9]{32}\.mp4$/.test(filename) : filename === `${sourceStem}_detections.${extension}`;
+     if (!valid) throw new Error('Wrong download filename');
     await download.saveAs(`${directory}/issue5-browser.${extension}`);
     downloads.push({ filename, extension });
   }

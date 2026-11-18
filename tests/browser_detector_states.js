@@ -51,7 +51,7 @@ async (page) => {
     const prepare = async () => {
       await page.goto(origin + '/detect');
       const before = submissions;
-      await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'lexus-lx570.jpg', mimeType: 'image/jpeg', buffer: source });
+      await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'Lexus.photo é.JPG', mimeType: 'image/jpeg', buffer: source });
       await page.waitForFunction(() => ![...document.querySelectorAll('button')].find(button => button.textContent === 'Detect image').disabled);
       if (submissions !== before) throw new Error('Selecting a file started inference');
       await page.getByRole('button', { name: 'Detect image', exact: true }).click();
@@ -64,7 +64,9 @@ async (page) => {
     state = 'success';
     await page.getByRole('button', { name: 'Download JSON', exact: true }).waitFor();
     await page.getByRole('img', { name: 'Annotated result with 4 detections', exact: true }).waitFor();
-    if ((await page.locator('tbody').textContent()).includes('(ID ')) throw new Error('Model class IDs are still visible');
+    const rows = await page.locator('tbody tr').evaluateAll(rows => rows.map(row => Array.from(row.cells).slice(0, 2).map(cell => cell.innerText.trim())));
+    if (JSON.stringify(rows) !== JSON.stringify([['Vehicle', 'Truck'], ['Vehicle', 'Car'], ['Brand', 'Lexus'], ['Plate', 'Plate']])) throw new Error('Object categories and model classes are incorrect: ' + JSON.stringify(rows));
+    if (await page.locator('#download-help').textContent() !== 'Includes all 4 selected detections. Saved files stay on your device after Delete now.') throw new Error('Incorrect download help');
     if (!await page.getByRole('radio', { name: 'Video', exact: true }).isDisabled()) throw new Error('Input type can change during a job');
     await page.evaluate(() => { window.confirm = () => true; });
     await page.getByRole('button', { name: 'Change image or settings', exact: true }).click();
@@ -86,10 +88,14 @@ async (page) => {
     await page.getByRole('button', { name: 'Download CSV', exact: true }).click();
     await page.getByRole('alert').filter({ hasText: 'CSV download failed' }).waitFor();
     downloadFailure = false;
-    const event = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Download CSV', exact: true }).focus();
-    await page.keyboard.press('Enter');
-    if ((await event).suggestedFilename() !== 'autoscan-browser-regression.csv') throw new Error('Workspace CSV download changed');
+    for (const [label, suffix] of [['Download CSV', 'detections.csv'], ['Download JSON', 'detections.json'], ['Download annotated image (PNG)', 'annotated.png']]) {
+      const event = page.waitForEvent('download');
+      const button = page.getByRole('button', { name: label, exact: true });
+      await page.waitForFunction(label => [...document.querySelectorAll('button')].some(b => b.textContent === label && !b.disabled), label);
+      await button.focus();
+      await page.keyboard.press('Enter');
+      if ((await event).suggestedFilename() !== `Lexus.photo é_${suffix}`) throw new Error('Wrong download name for ' + label);
+    }
     // Accept native confirmation in this simulated-state run; production keeps window.confirm.
     await page.evaluate(() => { window.confirm = () => true; });
     await page.getByRole('button', { name: 'Delete now', exact: true }).click();
