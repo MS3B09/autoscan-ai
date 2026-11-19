@@ -53,15 +53,15 @@ def quota_retry_at(message):
 def normalize(content, filename):
     expected = FORMATS.get(Path(filename).suffix.lower())
     if not expected:
-        raise HTTPException(415, "Choose a PNG, JPG, BMP, or WebP image; checkpoints are never accepted.")
+        raise HTTPException(415, "Unsupported image format. Choose a PNG, JPG, BMP, or WebP file.")
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("error", Image.DecompressionBombWarning)
             with Image.open(BytesIO(content)) as source:
                 if source.format != expected:
-                    raise HTTPException(415, "The decoded image format does not match its filename.")
+                    raise HTTPException(415, "The image format does not match the filename extension. Re-export it in a supported format.")
                 if source.width * source.height > MAX_PIXELS:
-                    raise HTTPException(413, "Image exceeds 12 megapixels.")
+                    raise HTTPException(413, "The image exceeds the 12-megapixel limit. Resize it and try again.")
                 if getattr(source, "n_frames", 1) != 1:
                     raise HTTPException(415, "Choose a still image, not an animation.")
                 source.verify()
@@ -72,9 +72,10 @@ def normalize(content, filename):
                 output = BytesIO()
                 image.save(output, format="PNG")
                 return output.getvalue(), image.size
-    except (UnidentifiedImageError, OSError, ValueError, SyntaxError,
-            Image.DecompressionBombError, Image.DecompressionBombWarning):
-        raise HTTPException(422, "Image is corrupt, unsupported, or cannot be decoded safely.") from None
+    except (Image.DecompressionBombError, Image.DecompressionBombWarning):
+        raise HTTPException(413, "The image exceeds the 12-megapixel limit. Resize it and try again.") from None
+    except (UnidentifiedImageError, OSError, ValueError, SyntaxError):
+        raise HTTPException(422, "The image could not be read. It may be damaged or incomplete. Re-export it and try again.") from None
 
 
 @dataclass
@@ -259,8 +260,8 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
 
     @asynccontextmanager
     async def upload(request, filename, kind):
-        if len(filename) > 255 or any(ord(char) < 32 for char in filename):
-            raise HTTPException(422, "Invalid source filename.")
+        if not filename or len(filename) > 255 or any(ord(char) < 32 for char in filename):
+            raise HTTPException(422, "The source filename is empty, too long, or contains invalid characters. Rename the file and try again.")
         with jobs.lock:
             recent = attempts[kind]
             now = time.monotonic()
@@ -281,22 +282,25 @@ def create_app(runner, *, submission_limit=6, retention=1800, storage_root=None,
         try:
             is_video = Path(filename).suffix.lower() in VIDEO_FORMATS
             maximum = MAX_VIDEO_BYTES if is_video else MAX_BYTES
-            too_large = "Video exceeds 20 MB." if is_video else "Image exceeds 10 MB."
+            too_large = f"The {'video' if is_video else 'image'} exceeds the {maximum // 1_000_000} MB upload limit. Choose a smaller file."
+            upload_seconds = 60 if is_video else 30
             length = request.headers.get("content-length")
             if length is not None:
                 if len(length) > 12 or not length.isascii() or not length.isdecimal():
-                    raise HTTPException(400, "Invalid upload length.")
+                    raise HTTPException(400, "The upload reported an invalid file size. Select the file again and retry.")
                 if int(length) > maximum:
                     raise HTTPException(413, too_large)
             content = bytearray()
             try:
-                with fail_after(30):
+                with fail_after(upload_seconds):
                     async for chunk in request.stream():
                         if len(content) + len(chunk) > maximum:
                             raise HTTPException(413, too_large)
                         content.extend(chunk)
             except TimeoutError:
-                raise HTTPException(408, "Upload timed out; try a smaller file.") from None
+                raise HTTPException(408, f"Upload timed out: the server did not receive the full file within {upload_seconds} seconds. Check your connection and retry.") from None
+            if not content:
+                raise HTTPException(422, "The upload is empty. Choose a file with content.")
             if is_video:
                 try:
                     normalized, info = await run_in_threadpool(prepare_video, content, Path(filename).suffix.lower(), root, kind == "preview")

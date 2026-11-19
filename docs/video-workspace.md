@@ -91,8 +91,9 @@ Details are paginated; downloads always include every selected observation.
 Video shares the image service's one active job, two pending/admission slots,
 six job attempts/twelve previews per rolling ten minutes, and eight retained
 results. These are shared bounds, not separate allowances for each media type.
-Preview decoding/encoding occupies its admission slot until complete. Upload
-streaming remains bounded to thirty seconds, including chunked bodies.
+Preview decoding/encoding occupies its admission slot until complete. The server
+allows 60 seconds to receive a video, including chunked uploads. The browser
+allows 120 seconds for upload and validation together.
 
 Queued cancellation removes source work immediately. Active cancellation and
 Delete now stop at the next detector/frame boundary; encoder/decoder contexts close

@@ -28,12 +28,12 @@ class VideoError(ValueError):
 
 def decoded(container):
     if len(container.streams.video) != 1:
-        raise VideoError("Choose a clip with exactly one video stream.")
+        raise VideoError("The file must contain exactly one video stream. Re-export it as a single video.")
     stream = container.streams.video[0]
     stream.codec_context.options = {"err_detect": "explode"}
     stream.thread_count = 1
     if min(stream.width, stream.height) <= 0:
-        raise VideoError("Video has invalid frame dimensions.")
+        raise VideoError("The video reports an invalid frame width or height. Re-export the clip.")
     for packet in container.demux(stream):
         if packet.is_corrupt:
             raise VideoError("Video contains corrupt packets. Re-export the complete clip and try again.")
@@ -53,7 +53,7 @@ def inspect_video(content, suffix):
     try:
         with open_source(BytesIO(content)) as container:
             if VIDEO_FORMATS[suffix] not in container.format.name.split(","):
-                raise VideoError("The decoded video container does not match its filename.", 415)
+                raise VideoError("The video format does not match the filename extension. Re-export it in a supported format.", 415)
             if container.format.name == "avi":
                 # AVI frame headers can count empty time slots; RIFF bounds independently catch truncation.
                 containers = [(0, len(content))]
@@ -78,13 +78,13 @@ def inspect_video(content, suffix):
             first = None
             for frame in decoded(container):
                 if len(timestamps) >= 600:
-                    raise VideoError("Video exceeds 600 decoded frames.", 413)
+                    raise VideoError("The video exceeds the 600-frame limit. Shorten it or export it at a lower frame rate.", 413)
                 current = (frame.width, frame.height, frame.rotation)
                 if geometry is not None and geometry != current:
                     raise VideoError("Video dimensions or orientation change within the clip. Re-export it first.")
                 geometry = current
                 if min(frame.width, frame.height) <= 0:
-                    raise VideoError("Video has invalid frame dimensions.")
+                    raise VideoError("A video frame has an invalid width or height. Re-export the clip.")
                 if frame.rotation not in [0, 90, 180, 270, -90, -180, -270]:
                     raise VideoError("Video has unsupported orientation metadata. Re-export it with upright pixels.")
                 if frame.pts is None or frame.time_base is None or frame.time_base <= 0:
@@ -95,7 +95,7 @@ def inspect_video(content, suffix):
                 if relative < 0 or (timestamps and relative <= timestamps[-1]):
                     raise VideoError("Video timestamps are not strictly increasing. Re-export the clip.")
                 if relative >= MAX_VIDEO_SECONDS:
-                    raise VideoError(f"Video exceeds {MAX_VIDEO_SECONDS} seconds.", 413)
+                    raise VideoError(f"The video exceeds the {MAX_VIDEO_SECONDS}-second limit. Trim it and try again.", 413)
                 timestamps.append(relative)
                 durations.append(frame.duration * frame.time_base)
             if not timestamps or not stream or first is None:
@@ -110,7 +110,7 @@ def inspect_video(content, suffix):
                 raise VideoError("Video has no valid final-frame duration. Re-export with valid timing.")
             duration = timestamps[-1] + last_duration
             if duration > MAX_VIDEO_SECONDS + Fraction(1, 1000000):
-                raise VideoError(f"Video exceeds {MAX_VIDEO_SECONDS} seconds.", 413)
+                raise VideoError(f"The video exceeds the {MAX_VIDEO_SECONDS}-second limit. Trim it and try again.", 413)
             assert geometry is not None
             width, height, rotation = geometry
             if rotation % 180:
@@ -125,8 +125,12 @@ def inspect_video(content, suffix):
                     "width": width, "height": height, "rotation": rotation, "sample_aspect_ratio": str(sar)}
     except VideoError:
         raise
+    except (av.error.DecoderNotFoundError, av.error.DemuxerNotFoundError, av.error.PatchWelcomeError):
+        raise VideoError("The video's codec or container is not supported. Re-export it as H.264 MP4.", 415) from None
+    except av.error.InvalidDataError:
+        raise VideoError("The video contains invalid or incomplete data. Re-export the complete clip as H.264 MP4.") from None
     except (av.FFmpegError, ValueError, OverflowError, OSError):
-        raise VideoError("Video is corrupt, unsupported, or cannot be decoded safely. Re-export the complete clip.") from None
+        raise VideoError("The server could not decode the video. Re-export the complete clip as H.264 MP4.") from None
 
 
 def render_video(source, output, info, cancelled, annotate=None, progress=None):
@@ -244,9 +248,12 @@ def prepare_video(content, suffix, root, preview):
                 raise VideoError(info["error"], info["status"])
             return (path / "preview.mp4").read_bytes() if preview else bytes(content), info
     except subprocess.TimeoutExpired:
-        raise VideoError("Video validation/preview timed out. Try a shorter clip or re-export as H.264 MP4.", 503) from None
-    except (subprocess.CalledProcessError, OSError, json.JSONDecodeError):
-        raise VideoError("Video validation/encoding or temporary storage is unavailable. Re-export the clip or try again later.", 503) from None
+        step = "prepare a preview" if preview else "validate it"
+        raise VideoError(f"Upload completed, but the server took more than 50 seconds to {step}. Try a shorter clip or re-export it as H.264 MP4.", 503) from None
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        raise VideoError("Upload completed, but the video checker stopped without a result. Try again or re-export as H.264 MP4.", 503) from None
+    except OSError:
+        raise VideoError("The server could not access temporary files or start the video checker. Try again later.", 503) from None
 
 
 if __name__ == "__main__":
@@ -258,5 +265,6 @@ if __name__ == "__main__":
     except VideoError as error:
         metadata = {"error": str(error), "status": error.status}
     except Exception:
-        metadata = {"error": "Video preview encoding failed. Re-export the complete clip as H.264 MP4.", "status": 422}
+        step = "encode the preview" if sys.argv[3] == "preview" else "validate the video"
+        metadata = {"error": f"Upload completed, but the server could not {step}. Re-export the complete clip as H.264 MP4.", "status": 422}
     (directory / "metadata.json").write_text(json.dumps(metadata))

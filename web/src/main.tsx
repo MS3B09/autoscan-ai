@@ -111,9 +111,9 @@ function Workspace() {
     const urls: string[] = [];
     setPreview('');
     setReady(false);
-    setNotice('Validating the file and preparing its preview. No inference has started.');
+    setNotice('Uploading the file for validation and preview. No inference has started.');
     request('/preview?' + new URLSearchParams({ filename: file.name }),
-      { method: 'POST', body: file, signal: controller.signal })
+      { method: 'POST', body: file, signal: controller.signal, upload: media })
       .then(response => response.blob())
       .then(blob => {
         if (controller.signal.aborted) return;
@@ -123,9 +123,13 @@ function Workspace() {
         setReady(true);
         setNotice(`${video ? 'Video' : 'Image'} ready. Choose object types and confidence, then Detect ${media}.`);
       })
-      .catch((reason: Error) => { if (!controller.signal.aborted) setError(reason.message); });
+      .catch((reason: Error) => {
+        if (controller.signal.aborted) return;
+        setNotice('The preview is not ready. No inference has started.');
+        setError(reason.name === 'TimeoutError' ? 'The browser timed out receiving the preview. Check your connection and try again.' : reason.message);
+      });
     return () => { controller.abort(); urls.forEach(url => URL.revokeObjectURL(url)); };
-  }, [file]);
+  }, [file, media]);
 
   useEffect(() => {
     if (!capability) return;
@@ -177,9 +181,13 @@ function Workspace() {
     try {
       const response = await request('/jobs?' + new URLSearchParams({
         filename: file.name, types: types.join(','), confidence: String(confidence),
-      }), { method: 'POST', body: file });
+      }), { method: 'POST', body: file, upload: media });
       setCapability(await response.json());
-    } catch (reason) { setError(reason instanceof APIError ? reason : (reason as Error).message); }
+    } catch (reason) {
+      setNotice('The server did not confirm a detection job.');
+      setError(reason instanceof APIError ? reason : (reason as Error).name === 'TimeoutError'
+        ? 'The browser timed out receiving the submission response.' : (reason as Error).message);
+    }
     finally { setWorking(false); }
   }
 
@@ -277,10 +285,13 @@ function Workspace() {
               const next = event.target.files?.[0];
               setError('');
               if (!next) return;
-              if (next.size > (video ? 20_000_000 : 10_000_000) ||
-                !(video ? /\.(mp4|mov|avi|asf|m4v|mpeg)$/i : /\.(png|jpe?g|bmp|webp)$/i).test(next.name)) {
+              const problem = !(video ? /\.(mp4|mov|avi|asf|m4v|mpeg)$/i : /\.(png|jpe?g|bmp|webp)$/i).test(next.name)
+                ? video ? 'Unsupported video format. Choose an MP4, MOV, AVI, ASF, M4V, or MPEG file.' : 'Choose a supported image format: PNG, JPG, BMP, or WebP.'
+                : !next.size ? 'The file is empty. Choose a file with content.'
+                : next.size > (video ? 20_000_000 : 10_000_000) ? `The ${media} exceeds the ${video ? 20 : 10} MB upload limit. Choose a smaller file.` : '';
+              if (problem) {
                 setFile(null); setReady(false); event.target.value = '';
-                setError(`Choose a supported ${media} up to ${video ? 20 : 10} MB.`); return;
+                setNotice(idleNotice); setError(problem); return;
               }
               setReady(false); setFile(next);
             }} />

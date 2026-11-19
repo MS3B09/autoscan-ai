@@ -51,13 +51,16 @@ class ImageAPITests(unittest.TestCase):
         self.fail("Job did not reach a terminal state")
 
     def test_decoded_upload_is_validated_before_a_job_is_accepted(self):
-        for data, filename, status in [(b"not an image", "photo.png", 422),
-                                       (image_bytes(), "weights.pt", 415),
-                                       (image_bytes("JPEG"), "photo.png", 415),
-                                       (b"x" * 10_000_001, "photo.png", 413),
-                                       (image_bytes(size=(4001, 3000)), "photo.png", 413)]:
+        for data, filename, status, detail in [(b"", "photo.png", 422, "upload is empty"),
+                                              (b"not an image", "photo.png", 422, "image could not be read"),
+                                              (image_bytes(), "weights.pt", 415, "Unsupported image format"),
+                                              (image_bytes("JPEG"), "photo.png", 415, "does not match the filename extension"),
+                                              (b"x" * 10_000_001, "photo.png", 413, "10 MB upload limit"),
+                                              (image_bytes(size=(4001, 3000)), "photo.png", 413, "12-megapixel limit")]:
             with self.subTest(filename=filename, status=status):
-                self.assertEqual(self.submit(data, filename).status_code, status)
+                response = self.submit(data, filename)
+                self.assertEqual(response.status_code, status)
+                self.assertIn(detail, response.json()["detail"])
         for types, confidence in [("", "40"), ("vehicle,unknown", "40"), ("logo", "24"),
                                   ("plate", "101"), ("vehicle", "nan"), ("logo", "40.5")]:
             with self.subTest(types=types, confidence=confidence):
@@ -65,6 +68,13 @@ class ImageAPITests(unittest.TestCase):
         # A chunked body cannot bypass the ceiling by omitting Content-Length.
         response = self.client.post("/api/jobs?filename=chunked.png", content=iter([b"x" * 5_000_001] * 2))
         self.assertEqual(response.status_code, 413)
+
+    def test_image_upload_timeout_explains_incomplete_transfer(self):
+        with patch("image_service.api.fail_after", side_effect=TimeoutError) as deadline:
+            response = self.client.post("/api/preview?filename=photo.png", content=image_bytes())
+        deadline.assert_called_once_with(30)
+        self.assertEqual(response.status_code, 408)
+        self.assertIn("did not receive the full file within 30 seconds", response.json()["detail"])
 
     def test_downloads_preserve_all_detections_without_class_ids(self):
         detections = [

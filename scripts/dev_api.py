@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import math
+from pathlib import Path
 import re
 
 from anyio import fail_after
@@ -10,6 +11,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse, Response
 import httpx
+
+from image_service.video import VIDEO_FORMATS
 
 
 UPSTREAM = "https://ms3b09-autoscan-ai-images.hf.space"
@@ -77,15 +80,18 @@ def create_app(token):
             raise HTTPException(400, "Invalid upload length.")
         if length is not None and int(length) > 20_000_000:
             raise HTTPException(413, "Developer uploads are limited to 20 MB.")
+        is_video_upload = (request.method == "POST" and path in ["preview", "jobs"]
+                           and Path(request.query_params.get("filename", "")).suffix.lower() in VIDEO_FORMATS)
+        upload_seconds = 60 if is_video_upload else 30
         body = bytearray()
         try:
-            with fail_after(30):
+            with fail_after(upload_seconds):
                 async for chunk in request.stream():
                     if len(body) + len(chunk) > 20_000_000:
                         raise HTTPException(413, "Developer uploads are limited to 20 MB.")
                     body.extend(chunk)
         except TimeoutError:
-            raise HTTPException(408, "Upload timed out. Try a smaller file.") from None
+            raise HTTPException(408, f"The local server did not receive the full file within {upload_seconds} seconds. Retry the upload.") from None
         headers = {"Cookie": ""}
         if request.method == "POST" and path == "jobs":
             try:
@@ -113,8 +119,11 @@ def create_app(token):
             headers["Authorization"] = request.headers["authorization"]
         try:
             response = await app.state.upstream.request(request.method, UPSTREAM + "/api/" + path,
-                                                        params=request.query_params.multi_items(),
-                                                        headers=headers, content=bytes(body))
+                                                         params=request.query_params.multi_items(),
+                                                         headers=headers, content=bytes(body),
+                                                         timeout=115 if is_video_upload else 60)
+        except httpx.TimeoutException:
+            raise HTTPException(504, "The hosted server did not respond in time. No automatic retry was made.") from None
         except httpx.HTTPError:
             raise HTTPException(503, "Cannot reach the hosted backend. No automatic submission retry was made.") from None
         forwarded = {name: response.headers[name] for name in ["content-type", "content-disposition", "retry-after"]

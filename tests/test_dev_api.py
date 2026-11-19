@@ -155,7 +155,9 @@ class DeveloperAPITests(unittest.TestCase):
                 with self.subTest(failure=self.failure):
                     before = len([request for request in self.requests if request.url.host.endswith("hf.space")])
                     response = client.post("/api/jobs?filename=photo.png", content=b"source")
-                    self.assertEqual(response.status_code, 503)
+                    self.assertEqual(response.status_code, 504 if self.failure == "timeout" else 503)
+                    if self.failure == "timeout":
+                        self.assertIn("did not respond in time", response.json()["detail"])
                     self.assertNotIn("hf_readonlytest", response.text)
                     self.assertNotIn("sensitive", response.text)
                     self.assertNotIn("location", response.headers)
