@@ -2,11 +2,11 @@
 
 Detect cars, trucks, buses, vehicle brand logos, and Moroccan license plates in images and short videos.
 
+![A Nissan SUV shown before and after vehicle, logo, and plate detection](imgs/detector-preview.png)
+
 ## 🚀 Live Demo
 
-**[Detect objects in an image](https://autoscan-ai.netlify.app/detect#image)** · **[Detect objects in a video](https://autoscan-ai.netlify.app/detect#video)** · [See how it works](https://autoscan-ai.netlify.app/)
-
-![A Nissan SUV shown before and after vehicle, logo, and plate detection](imgs/detector-preview.png)
+<https://autoscan-ai.netlify.app/>
 
 <a name="about-the-project-and-authors"></a>
 
