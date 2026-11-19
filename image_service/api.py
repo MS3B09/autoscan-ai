@@ -38,7 +38,7 @@ CSV_COLUMNS = ["source_filename", "object_type", "class_name", "label", "confide
 
 
 def quota_retry_at(message):
-    # spaces==0.51.3 includes a Python timedelta in timed quota rejections, not every rejection.
+    # ZeroGPU includes a Python timedelta in timed quota rejections, not every rejection.
     match = re.search(r"\btry again in (?:(\d{1,2}) days?, )?(\d{1,2}):([0-5]\d):"
                       r"([0-5]\d(?:\.\d{1,6})?)(?=\.?(?:\s|$))", message.lower())
     if not match:

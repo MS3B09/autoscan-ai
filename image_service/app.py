@@ -6,8 +6,8 @@ os.environ["YOLO_VERBOSE"] = "False"
 
 import gradio as gr
 import spaces
-from gradio.context import LocalContext
 from huggingface_hub import hf_hub_download
+from spaces.zero.context import ZeroGPUContext, set_context_var
 from starlette.middleware import Middleware
 from starlette.responses import Response
 from starlette.routing import Mount
@@ -35,12 +35,9 @@ def gpu_image(source, settings, cancelled):
 
 
 def run_image(source, settings, cancelled, context):
-    # Pinned SDK uses this context for the platform's anonymous quota attribution.
-    token = LocalContext.request.set(gr.Request(**context))
-    try:
+    # Queued jobs run outside Gradio's request context but still need quota attribution.
+    with set_context_var(ZeroGPUContext(headers=context["headers"], log_emitter=lambda _: None)):
         return gpu_image(source, settings, cancelled)
-    finally:
-        LocalContext.request.reset(token)
 
 
 class FrameworkRouteGuard:
@@ -67,7 +64,7 @@ if __name__ == "__main__":
                                      for kind, model in MODELS.items()})
     with gr.Blocks(analytics_enabled=False) as demo:
         gr.Markdown("AutoScan AI media service. Use the /detect workspace.")
-    # Ordinary launch is required by spaces==0.51.3's GPU initialization hook.
+    # Ordinary Gradio launch initializes ZeroGPU before serving the API.
     # The first mount intercepts ALL public routes: Gradio uploads/files/events are unreachable.
     logging.getLogger("uvicorn.access").disabled = True
     with api.state.job_lifecycle():
