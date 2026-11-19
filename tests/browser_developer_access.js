@@ -2,6 +2,11 @@
 // Live execution spends account quota; use the test-only external-HTTP replay for contract checks.
 async (page) => {
   const origin = new URL(page.url()).origin;
+  await page.goto(origin);
+  const src = await page.getByRole('img', { name: 'White Nissan SUV on a rocky desert road', exact: true }).getAttribute('src');
+  const sample = await page.request.get(new URL(src, origin).href);
+  if (!sample.ok()) throw new Error('Could not load the test image');
+  const source = await sample.body();
   await page.goto(origin + '/detect');
   await page.getByText('Local developer mode. Detection uses your personal Hugging Face quota.', { exact: true })
     .waitFor({ timeout: 5000 });
@@ -11,9 +16,8 @@ async (page) => {
   };
   page.on('request', observe);
   try {
-    const source = await (await page.request.get(origin + '/examples/lexus-lx570.jpg')).body();
     await page.getByLabel('Source image', { exact: true })
-      .setInputFiles({ name: 'lexus-lx570.jpg', mimeType: 'image/jpeg', buffer: source });
+      .setInputFiles({ name: 'nissan.png', mimeType: 'image/png', buffer: source });
     await page.waitForFunction(() => ![...document.querySelectorAll('button')].find(button => button.textContent === 'Detect image').disabled);
     if (requests.some(request => new URL(request.url()).pathname === '/api/jobs')) throw new Error('Preview submitted inference');
     const response = page.waitForResponse(response => new URL(response.url()).pathname === '/api/jobs' && response.request().method() === 'POST');
@@ -23,7 +27,7 @@ async (page) => {
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download JSON', exact: true }).focus();
     await page.keyboard.press('Enter');
-    if ((await download).suggestedFilename() !== 'lexus-lx570_detections.json') throw new Error('Developer download failed');
+    if ((await download).suggestedFilename() !== 'nissan_detections.json') throw new Error('Developer download failed');
     for (const width of [390, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)) throw new Error('Developer UI overflows');

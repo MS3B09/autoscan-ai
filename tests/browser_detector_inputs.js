@@ -2,12 +2,16 @@
 async (page) => {
   await page.bringToFront();
   const origin = new URL(page.url()).origin;
-  const source = await (await page.request.get(origin + '/examples/lexus-lx570.jpg')).body();
+  await page.goto(origin);
+  const src = await page.getByRole('img', { name: 'White Nissan SUV on a rocky desert road', exact: true }).getAttribute('src');
+  const response = await page.request.get(new URL(src, origin).href);
+  if (!response.ok()) throw new Error('Could not load the test image');
+  const source = await response.body();
   let previews = 0;
   const handler = async route => {
     if (!route.request().url().includes('/api/preview?')) throw new Error('Unexpected inference request');
     previews++;
-    await route.fulfill({ status: 200, contentType: 'image/jpeg', body: source });
+    await route.fulfill({ status: 200, contentType: 'image/png', body: source });
   };
   await page.route('**/api/**', handler);
   try {
@@ -26,7 +30,7 @@ async (page) => {
     await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'wrong.mp4', mimeType: 'video/mp4', buffer: source });
     await page.getByRole('alert').filter({ hasText: 'supported image' }).waitFor();
     if (previews) throw new Error('Wrong input type was uploaded');
-    await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: source });
+    await page.getByLabel('Source image', { exact: true }).setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: source });
     await page.waitForFunction(() => !document.querySelector('button.primary').disabled);
     const plates = page.getByRole('checkbox', { name: 'Plates', exact: true });
     await plates.focus();

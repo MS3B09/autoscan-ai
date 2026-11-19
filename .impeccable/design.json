@@ -100,7 +100,7 @@
       "kind": "card",
       "refersTo": "data-preview",
       "description": "Body-font heading and focusable, internally scrolling code pane for published sample data.",
-      "html": "<div class=\"ds-data\"><h3>JSON (detection excerpt)</h3><pre role=\"region\" aria-label=\"JSON sample preview\" tabindex=\"0\"><code>{\n  &quot;filename&quot;: &quot;lexus-lx570.jpg&quot;\n}</code></pre></div>",
+      "html": "<div class=\"ds-data\"><h3>JSON (detection excerpt)</h3><pre role=\"region\" aria-label=\"JSON sample preview\" tabindex=\"0\"><code>{\n  &quot;filename&quot;: &quot;vehicle.png&quot;\n}</code></pre></div>",
       "css": ".ds-data { min-width:0; border:1px solid var(--color-rule); border-radius:var(--radius-panel); background:var(--color-sheet); color:var(--color-ink); overflow:clip; } .ds-data h3 { margin:0; padding:var(--space-sm) var(--space-md); border-bottom:1px solid var(--color-rule); font:500 1rem/1.4 var(--font-body); } .ds-data pre { height:128px; overflow:auto; margin:0; padding:var(--space-sm) var(--space-md); font:400 .8125rem/1.5 var(--font-code); } .ds-data code { font:inherit; } .ds-data pre:focus-visible { outline:3px solid var(--color-focus); outline-offset:-3px; }"
     },
     {

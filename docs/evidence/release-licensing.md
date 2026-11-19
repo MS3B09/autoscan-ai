@@ -8,7 +8,9 @@ Implementation unchanged; images work per the user's manual report, not a new te
 ## Scope and baseline
 
 Read `AGENTS.md`, `docs/agents/domain.md`, `GLOSSARY.md`, `README.md`, `LICENSE`,
-`docs/evidence/issue-6-verification.md`, backend provenance, service pins and `web/public/examples/attribution.txt`; no ADR directory present.
+`docs/evidence/issue-6-verification.md`, backend provenance, service pins and the [archived example attribution notice][sample-notice]; no ADR directory present.
+
+[sample-notice]: https://github.com/MS3B09/autoscan-ai/blob/ebe0de5c67cbcc98bf631cbdd2c1ab50ca597aa6/web/public/examples/attribution.txt
 The research pass added this document; related checklist/policy/attribution updates
 and issue comments are tracked separately. No tests, builds, inference, GPU use,
 deployments, credential access, dependency/model changes or license replacement.
@@ -135,7 +137,7 @@ separate grant for AutoScan's custom weights [D3,D5]. No inference controls used
 
 CC BY 4.0 permits sharing/adaptation subject to its terms: retain supplied credit,
 notices and source link, link the license, indicate modifications, and avoid implied
-endorsement [C1]. `web/public/examples/attribution.txt` now records the dataset-page
+endorsement [C1]. The [archived example attribution notice][sample-notice] records the dataset-page
 declarations, named uploaders and license links, without claiming checkpoint
 permission. Actual training/preprocessing changes still need confirmation before
 release notices can describe them. CC0 waives the
@@ -143,9 +145,9 @@ affirmer's rights, not others' rights; neither tool supplies trademark/privacy
 clearance or guarantees the uploader owns every constituent image [C1,C2]. Do not
 invent dataset-to-weight licensing consequences or publish training data blindly.
 
-Commons revision `1254744190` (2026-07-31) matches the photograph, author, date and attribution-only permission in `attribution.txt` [P1].
-That notice identifies the 1280px thumbnail and annotation changes; keep it and the
-visible author/source credit with shipped originals/derivatives/downloads. The
+Commons revision `1254744190` (2026-07-31) matches the photograph, author, date and attribution-only permission in the [archived example attribution notice][sample-notice] [P1].
+That notice identifies the 1280px thumbnail and annotation changes. The Lexus
+example is no longer shipped; retain the credit if the archived images are reused. The
 Commons site-wide text license is not the photograph's license. This supports the
 photo copyright-permission subcheck, **not** an overall #6 or #7 rights pass.
 
