@@ -20,7 +20,7 @@ This fork of the [TeamX project](https://github.com/TeamXGroup/cars-logos-plates
 
 ## 🔍 Features
 
-- Upload an image or a video up to 10 seconds long.
+- Upload an image or a video. Videos can be up to 20 MB, 20 seconds, and 600 frames, with no fixed resolution limit.
 - Choose which categories to detect and adjust the confidence threshold.
 - Detect cars, trucks, buses, 24 vehicle brands, and Moroccan license plates. Plates are located, not transcribed.
 - Review labeled results and download an annotated PNG or MP4, or export detections as CSV or JSON.

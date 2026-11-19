@@ -125,7 +125,7 @@ class VideoAPITests(unittest.TestCase):
                         self.assertEqual(response.status_code, status)
                 self.assertEqual(list(Path(storage).iterdir()), [])
 
-    def test_1080p_preview_and_job_preserve_landscape_and_portrait_dimensions(self):
+    def test_preview_and_job_preserve_landscape_and_portrait_dimensions_above_1080p(self):
         def codec_only(source, settings, cancelled, context):
             info = json.loads((source.parent / "video.json").read_text())
             output = source.parent / "result.mp4"
@@ -134,7 +134,7 @@ class VideoAPITests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as storage:
             with TestClient(create_app(codec_only, storage_root=storage)) as client:
-                for size in [(1920, 1080), (1080, 1920)]:
+                for size in [(2048, 1152), (1152, 2048)]:
                     with self.subTest(size=size):
                         content = clip(frames=3, size=size)
                         preview = client.post("/api/preview?filename=full-hd.mp4", content=content)
@@ -159,7 +159,7 @@ class VideoAPITests(unittest.TestCase):
                                 self.assertEqual([(frame.width, frame.height) for frame in frames], [size] * 3)
                         self.assertEqual(client.delete(endpoint, headers=headers).status_code, 204)
 
-    def test_all_containers_and_decoded_duration_dimension_frame_and_byte_ceilings(self):
+    def test_all_containers_and_decoded_duration_frame_and_byte_ceilings(self):
         with tempfile.TemporaryDirectory() as storage:
             with TestClient(create_app(lambda *args: None, storage_root=storage, submission_limit=100)) as client:
                 for format, codec, extension in [("mp4", "libx264", "mp4"), ("mov", "libx264", "mov"),
@@ -169,16 +169,14 @@ class VideoAPITests(unittest.TestCase):
                         data = clip(format=format, codec=codec, rate=25)
                         response = client.post("/api/preview?filename=source." + extension, content=data)
                         self.assertEqual(response.status_code, 200, response.text[:200])
-                for data, expected in [(clip(frames=600, rate=60), 200),
-                                       (clip(frames=601, rate=61), 413),
-                                       (clip(frames=40, rate=4), 200),
-                                       (clip(frames=41, rate=4), 413),
+                for data, expected in [(clip(frames=600, rate=30), 200),
+                                       (clip(frames=601, rate=31), 413),
+                                       (clip(frames=80, rate=4), 200),
+                                       (clip(frames=81, rate=4), 413),
                                        (clip(size=(1280, 720)), 200),
                                        (clip(size=(720, 1280)), 200),
                                        (clip(size=(1282, 720)), 200),
                                        (clip(size=(1280, 722)), 200),
-                                       (clip(size=(1922, 1080)), 413),
-                                       (clip(size=(1920, 1082)), 413),
                                        (clip()[:200], 422)]:
                     with self.subTest(bytes=len(data), expected=expected):
                         response = client.post("/api/preview?filename=boundary.mp4", content=data)

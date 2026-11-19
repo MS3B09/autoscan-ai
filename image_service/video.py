@@ -17,6 +17,7 @@ av.logging.set_level(-8)  # Native codec diagnostics must not echo untrusted med
 VIDEO_FORMATS = {".mp4": "mov", ".mov": "mov", ".m4v": "mov", ".avi": "avi",
                  ".asf": "asf", ".mpeg": "mpeg"}
 MAX_VIDEO_BYTES = 20_000_000
+MAX_VIDEO_SECONDS = 20
 
 
 class VideoError(ValueError):
@@ -29,11 +30,10 @@ def decoded(container):
     if len(container.streams.video) != 1:
         raise VideoError("Choose a clip with exactly one video stream.")
     stream = container.streams.video[0]
-    # Decoder surfaces may include codec alignment padding; displayed pixels are checked separately.
-    stream.codec_context.options = {"err_detect": "explode", "max_pixels": "2097152"}
+    stream.codec_context.options = {"err_detect": "explode"}
     stream.thread_count = 1
-    if not (0 < min(stream.width, stream.height) <= 1080 and max(stream.width, stream.height) <= 1920):
-        raise VideoError("Video exceeds 1080p (1920 × 1080, or portrait equivalent).", 413)
+    if min(stream.width, stream.height) <= 0:
+        raise VideoError("Video has invalid frame dimensions.")
     for packet in container.demux(stream):
         if packet.is_corrupt:
             raise VideoError("Video contains corrupt packets. Re-export the complete clip and try again.")
@@ -83,8 +83,8 @@ def inspect_video(content, suffix):
                 if geometry is not None and geometry != current:
                     raise VideoError("Video dimensions or orientation change within the clip. Re-export it first.")
                 geometry = current
-                if (not 0 < min(frame.width, frame.height) <= 1080 or max(frame.width, frame.height) > 1920):
-                    raise VideoError("Decoded video exceeds 1080p.", 413)
+                if min(frame.width, frame.height) <= 0:
+                    raise VideoError("Video has invalid frame dimensions.")
                 if frame.rotation not in [0, 90, 180, 270, -90, -180, -270]:
                     raise VideoError("Video has unsupported orientation metadata. Re-export it with upright pixels.")
                 if frame.pts is None or frame.time_base is None or frame.time_base <= 0:
@@ -94,8 +94,8 @@ def inspect_video(content, suffix):
                 relative = timestamp - first
                 if relative < 0 or (timestamps and relative <= timestamps[-1]):
                     raise VideoError("Video timestamps are not strictly increasing. Re-export the clip.")
-                if relative >= 10:
-                    raise VideoError("Video exceeds ten seconds.", 413)
+                if relative >= MAX_VIDEO_SECONDS:
+                    raise VideoError(f"Video exceeds {MAX_VIDEO_SECONDS} seconds.", 413)
                 timestamps.append(relative)
                 durations.append(frame.duration * frame.time_base)
             if not timestamps or not stream or first is None:
@@ -109,8 +109,8 @@ def inspect_video(content, suffix):
             if last_duration <= 0:
                 raise VideoError("Video has no valid final-frame duration. Re-export with valid timing.")
             duration = timestamps[-1] + last_duration
-            if duration > 10 + Fraction(1, 1000000):
-                raise VideoError("Video exceeds ten seconds.", 413)
+            if duration > MAX_VIDEO_SECONDS + Fraction(1, 1000000):
+                raise VideoError(f"Video exceeds {MAX_VIDEO_SECONDS} seconds.", 413)
             assert geometry is not None
             width, height, rotation = geometry
             if rotation % 180:

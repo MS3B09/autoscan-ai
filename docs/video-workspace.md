@@ -14,14 +14,10 @@ fallback is provided.
 
 ## Validation and processing
 
-- Maximum **20,000,000 upload bytes**, **ten seconds**, **600 decoded frames**,
-  and **1920 × 1080** pixels (or portrait equivalent). All limits apply together;
-  exceeding one rejects the clip rather than truncating it.
-- The owner requested 1080p for a short test clip. Earlier hosted 300/600-frame
-  capacity evidence remains **720p evidence**, not proof of 1080p GPU/resource
-  behavior. Local codec/API checks do not spend HF quota or establish inference
-  performance. The larger frame has 2.25× as many pixels; free-hosted inference at
-  the new maximum remains unverified until separately approved evidence exists.
+- Maximum **20,000,000 upload bytes**, **20 seconds**, and **600 decoded frames**.
+  All limits apply together; exceeding one rejects the clip rather than truncating it.
+  There is no fixed width or height limit, but frames must be decodable and encodable
+  within the codec and hosting resource limits.
 - A decoded-container/extension check and full packet/frame decoding run before
   admission. Checkpoints, playlists, external file/network references, corrupt
   packets/frames, changing geometry, and invalid/non-increasing timestamps are

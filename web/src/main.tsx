@@ -285,7 +285,7 @@ function Workspace() {
               setReady(false); setFile(next);
             }} />
           </div>
-          <p id="image-help">{video ? 'MP4, MOV, AVI, ASF, M4V or MPEG. Up to 20 MB, 10 seconds, 1080p and 600 frames. Video output is silent.' :
+          <p id="image-help">{video ? 'MP4, MOV, AVI, ASF, M4V or MPEG. Up to 20 MB, 20 seconds and 600 frames. No fixed resolution limit. Video output is silent.' :
             'PNG, JPG, BMP or WebP. Up to 10 MB and 12 megapixels.'}</p>
         </div>
         <fieldset disabled={locked}>
