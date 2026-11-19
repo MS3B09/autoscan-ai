@@ -33,20 +33,54 @@ export class APIError extends Error {
   constructor(readonly status: number, message: string, readonly retry_at?: number) { super(message); }
 }
 
-export async function request(path: string, { upload, ...init }: RequestInit & { upload?: 'image' | 'video' } = {}, capability?: Capability) {
+export type UploadProgress = number | 'uploading' | 'checking';
+
+function sendWithProgress(url: string, file: File, signal: AbortSignal, onProgress: (progress: UploadProgress) => void) {
+  return new Promise<Response>((resolve, reject) => {
+    signal.throwIfAborted();
+    const xhr = new XMLHttpRequest();
+    const abort = () => xhr.abort();
+    xhr.open('POST', url);
+    xhr.responseType = 'blob';
+    xhr.upload.onprogress = event => {
+      if (event.lengthComputable && event.total > 0 && event.loaded < event.total) {
+        onProgress(Math.floor(100 * event.loaded / event.total));
+      }
+    };
+    xhr.upload.onload = () => onProgress('checking');
+    xhr.onload = () => resolve(new Response([204, 205, 304].includes(xhr.status) ? null : xhr.response, {
+      status: xhr.status,
+      headers: { 'Content-Type': xhr.getResponseHeader('Content-Type') ?? 'application/octet-stream' },
+    }));
+    xhr.onerror = () => reject(new Error('Upload connection failed.'));
+    xhr.onabort = () => reject(signal.reason);
+    xhr.onloadend = () => signal.removeEventListener('abort', abort);
+    signal.addEventListener('abort', abort, { once: true });
+    try { xhr.send(file); }
+    catch (error) { signal.removeEventListener('abort', abort); reject(error); }
+  });
+}
+
+export async function request(path: string, { upload, onUploadProgress, ...init }: RequestInit & {
+  upload?: 'image' | 'video'; onUploadProgress?: (progress: UploadProgress) => void;
+} = {}, capability?: Capability) {
   if (!base) throw new Error('The detection backend is not configured. Set VITE_AUTOSCAN_API before building.');
   const timeout = AbortSignal.timeout(upload === 'video' ? 120_000 : 65_000);
+  const signal = init.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
   const uploadFailure = upload && (path.startsWith('/preview?') ? `Could not validate the ${upload}.` : `Could not confirm the ${upload} submission.`);
   let response: Response;
   try {
-    response = await fetch(base + '/api' + path, {
-      ...init,
-      credentials: 'omit',
-      cache: 'no-store',
-      referrerPolicy: 'no-referrer',
-      signal: init.signal ? AbortSignal.any([init.signal, timeout]) : timeout,
-      headers: { ...init.headers, ...(capability ? { Authorization: 'Bearer ' + capability.token } : {}) },
-    });
+    const url = base + '/api' + path;
+    response = upload === 'video' && onUploadProgress && init.body instanceof File
+      ? await sendWithProgress(url, init.body, signal, onUploadProgress)
+      : await fetch(url, {
+        ...init,
+        credentials: 'omit',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer',
+        signal,
+        headers: { ...init.headers, ...(capability ? { Authorization: 'Bearer ' + capability.token } : {}) },
+      });
   } catch (error) {
     if (init.signal?.aborted) throw error;
     if (timeout.aborted) throw new Error(uploadFailure
