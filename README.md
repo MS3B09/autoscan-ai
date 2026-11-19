@@ -2,11 +2,11 @@
 
 Detect cars, trucks, buses, vehicle brand logos, and Moroccan license plates in images and short videos.
 
-![A Nissan SUV shown before and after vehicle, logo, and plate detection](imgs/detector-preview.png)
-
 ## 🚀 Live Demo
 
 <https://autoscan-ai.netlify.app/>
+
+![A Nissan SUV shown before and after vehicle, logo, and plate detection](imgs/detector-preview.png)
 
 <a name="about-the-project-and-authors"></a>
 
@@ -68,4 +68,4 @@ Open [http://127.0.0.1:5173/detect](http://127.0.0.1:5173/detect). The interface
 - **Logos:** [LOGOS TEAMX, version 1](https://universe.roboflow.com/ms3b/logos-teamx/dataset/1) covers the 24 brand classes shown above.
 - **Plates:** The [plate detection dataset](https://universe.roboflow.com/plate-detection/plate_detection-tp5h9) is used to locate Moroccan license plates.
 
-[Repository license](LICENSE) · [Dataset attribution and terms](web/public/examples/attribution.txt)
+[Repository license](LICENSE)
