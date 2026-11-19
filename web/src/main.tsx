@@ -36,11 +36,26 @@ function QuotaReset({ retryAt }: { retryAt: number }) {
     {' '}GPU availability is not guaranteed.</>;
 }
 
+function VideoUploadProgress({ startedAt }: { startedAt: number }) {
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setSeconds(Math.floor((performance.now() - startedAt) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [startedAt]);
+  const elapsed = [Math.floor(seconds / 60), seconds % 60].map(value => String(value).padStart(2, '0')).join(':');
+  return <div className="upload-progress">
+    <p><span id="upload-progress-label">Uploading and checking video…</span>
+      <time dateTime={`PT${seconds}S`} aria-label={`${seconds} seconds elapsed`}>{elapsed}</time></p>
+    <div className="upload-progress-track" role="progressbar" aria-labelledby="upload-progress-label" />
+  </div>;
+}
+
 function Workspace() {
   const [media, setMedia] = useState<'image' | 'video'>(() => window.location.hash === '#video' ? 'video' : 'image');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
   const [ready, setReady] = useState(false);
+  const [videoUploadStarted, setVideoUploadStarted] = useState<number | null>(null);
   const [types, setTypes] = useState<ObjectType[]>(['vehicle', 'logo', 'plate']);
   const [confidence, setConfidence] = useState(40);
   const [capability, setCapability] = useState<Capability | null>(null);
@@ -106,11 +121,12 @@ function Workspace() {
   }
 
   useEffect(() => {
-    if (!file) { setPreview(''); setReady(false); return; }
+    if (!file) { setPreview(''); setReady(false); setVideoUploadStarted(null); return; }
     const controller = new AbortController();
     const urls: string[] = [];
     setPreview('');
     setReady(false);
+    setVideoUploadStarted(media === 'video' ? performance.now() : null);
     setNotice('Uploading the file for validation and preview. No inference has started.');
     request('/preview?' + new URLSearchParams({ filename: file.name }),
       { method: 'POST', body: file, signal: controller.signal, upload: media })
@@ -127,7 +143,8 @@ function Workspace() {
         if (controller.signal.aborted) return;
         setNotice('The preview is not ready. No inference has started.');
         setError(reason.name === 'TimeoutError' ? 'The browser timed out receiving the preview. Check your connection and try again.' : reason.message);
-      });
+      })
+      .finally(() => { if (!controller.signal.aborted) setVideoUploadStarted(null); });
     return () => { controller.abort(); urls.forEach(url => URL.revokeObjectURL(url)); };
   }, [file, media]);
 
@@ -178,17 +195,19 @@ function Workspace() {
   async function detect() {
     if (!file || !ready || !types.length || locked) return;
     setWorking(true); setError(''); setNotice('Uploading for detection. A cold start can take a while.');
+    if (video) setVideoUploadStarted(performance.now());
     try {
       const response = await request('/jobs?' + new URLSearchParams({
         filename: file.name, types: types.join(','), confidence: String(confidence),
       }), { method: 'POST', body: file, upload: media });
       setCapability(await response.json());
+      if (video) setNotice('Video submitted. Waiting for job status.');
     } catch (reason) {
       setNotice('The server did not confirm a detection job.');
       setError(reason instanceof APIError ? reason : (reason as Error).name === 'TimeoutError'
         ? 'The browser timed out receiving the submission response.' : (reason as Error).message);
     }
-    finally { setWorking(false); }
+    finally { setWorking(false); if (video) setVideoUploadStarted(null); }
   }
 
   async function cancel() {
@@ -298,6 +317,8 @@ function Workspace() {
           </div>
           <p id="image-help">{video ? 'MP4, MOV, AVI, ASF, M4V or MPEG. Up to 20 MB, 20 seconds and 600 frames. No fixed resolution limit. Video output is silent.' :
             'PNG, JPG, BMP or WebP. Up to 10 MB and 12 megapixels.'}</p>
+          {video && file && videoUploadStarted !== null &&
+            <VideoUploadProgress key={videoUploadStarted} startedAt={videoUploadStarted} />}
         </div>
         <fieldset disabled={locked}>
           <legend>Object types</legend>

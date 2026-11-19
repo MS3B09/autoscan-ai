@@ -55,6 +55,14 @@ legend { padding: 0; margin-bottom: var(--space-sm); }
 .file-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: var(--radius-control); background: var(--color-paper-3); flex: none; }
 .file-copy { min-width: 0; overflow-wrap: anywhere; }
 .file-copy strong { font-size: .9375rem; font-weight: 500; }
+.upload-progress p { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-sm); margin-bottom: var(--space-xs); color: var(--color-ink); }
+.upload-progress time { flex: none; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.upload-progress-track { height: 4px; overflow: hidden; border-radius: var(--radius-control); background: var(--color-paper-3); }
+.upload-progress-track::before { content: ''; display: block; width: 32%; height: 100%; background: var(--color-ink); border-radius: inherit; animation: upload-sweep 1.8s ease-in-out infinite alternate; }
+@keyframes upload-sweep { to { transform: translateX(212.5%); } }
+@media (prefers-reduced-motion: reduce) {
+  .upload-progress-track::before { animation: none; transform: translateX(106.25%); }
+}
 .types { display: grid; gap: var(--space-xs); }
 .type-choice { border-color: var(--color-rule); }
 .type-choice:has(:checked) { background: var(--color-paper-3); }
