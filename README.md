@@ -1,4 +1,4 @@
-# Vehicle, Logo & Plate Detector
+<h1 align="center">Vehicle, Brand &amp; License Plate Recognition System</h1>
 
 Detect cars, trucks, buses, vehicle brand logos, and Moroccan license plates in images and short videos.
 
