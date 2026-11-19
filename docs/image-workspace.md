@@ -1,12 +1,8 @@
-# Image workspace — issue #3
+# Image workspace
 
-The React/TypeScript/Vite workspace lives in `web/`, at `/detect`. Issue #6 adds
-the showcase at `/`; Netlify rewrites `/detect` and `/detect/` to the app entry
-for direct navigation and refresh, without redirecting the public root.
-The original Streamlit app, its
-requirements, and all checkpoint bytes remain unchanged. Video, downloadable
-media, JSON, and CSV controls were not part of issue #3; issue #4 adds them as
-documented in [image-exports.md](image-exports.md).
+The React/TypeScript/Vite workspace lives in `web/`, at `/detect`. Netlify rewrites
+`/detect` and `/detect/` to the app entry; the showcase is at `/`. See the
+[export formats](image-exports.md) and [video limits](video-workspace.md).
 
 ## Run and build
 
@@ -158,14 +154,14 @@ Deploy only this explicit mapping; never upload the working tree or visitor medi
 | `image_service/space-entry.py` | `app.py` |
 | `image_service/space-README.md` | `README.md` |
 | `image_service/requirements.txt` | `requirements.txt` |
-| `validation_space/packages.txt` | `packages.txt` |
+| `image_service/packages.txt` | `packages.txt` |
 | `scripts/validate_inference.py` | Same path |
 | Optional pre-bundled `models/logo.pt`, `models/plate.pt` | Same paths |
 | Optional pre-bundled, pinned standard YOLOv8n from T1 | `models/yolov8n.pt` |
 
 Missing checkpoints are provisioned server-side from the exact public T1 Space
-revision `da8e0cdd5a03d0d3c60fab3f942910ef6472310b`, whose three digests and
-original vehicle provenance are recorded in `docs/backend-validation.md`. No
+revision `da8e0cdd5a03d0d3c60fab3f942910ef6472310b`. The three trusted digests are
+in [`scripts/validate_inference.py`](../scripts/validate_inference.py). No
 owner token is required. A network/provisioning failure prevents startup, never
 substitutes weights. `load_models` verifies all trusted SHA-256 digests
 before importing a model deserializer and checks every required class identity.
@@ -213,5 +209,4 @@ hosted wait; run that test separately with `-k test_e` rather than exhausting th
 shared submission budget with the preceding tests first. Otherwise that test is
 **not run**, not passed. Rate/retained-storage
 saturation and accelerated expiry are deterministic local HTTP contract checks;
-they are not claims about public load capacity. Keep final evidence and deployment
-limitations in `docs/evidence/issue-3-verification.md`.
+they are not claims about public load capacity. See the [archived verification notes](https://github.com/MS3B09/autoscan-ai/blob/ebad2718a90baddfddb1edc9205b8fdf1dc7f057/docs/evidence/issue-3-verification.md).

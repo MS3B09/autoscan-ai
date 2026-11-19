@@ -10,7 +10,7 @@ The image-first `/detect` workspace also accepts MP4, MOV, AVI, ASF, M4V, and
 MPEG clips. Choosing a file only validates it and builds a silent browser preview.
 **Detect video** explicitly submits the chosen types and 25–100% confidence
 (40% default). No audio, OCR, tracking, deduplication, frame sampling, or paid
-fallback is added. The original Streamlit application/checkpoints are unchanged.
+fallback is provided.
 
 ## Validation and processing
 
@@ -51,7 +51,7 @@ fallback is added. The original Streamlit application/checkpoints are unchanged.
   `output_width`/`output_height` separately. Encoded data is capped at 40 MB.
 - Every encoded output frame is decoded again and its count/timestamp verified
   before publishing success. That check is **not browser-playback proof**; browser
-  verification is separately recorded in [the evidence](evidence/issue-5-verification.md).
+  verification is recorded in the [archived video checks](https://github.com/MS3B09/autoscan-ai/blob/ebad2718a90baddfddb1edc9205b8fdf1dc7f057/docs/evidence/issue-5-verification.md).
 
 ## API and schema
 

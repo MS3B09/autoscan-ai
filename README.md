@@ -10,7 +10,7 @@ Detect cars, trucks, buses, vehicle brand logos, and Moroccan license plates in 
 
 ## About the Project and Authors
 
-This fork of the [TeamX project](https://github.com/TeamXGroup/cars-logos-plates-detection) adds a browser-based detector with adjustable settings, annotated media, and downloadable detection data. The original Streamlit app remains in the repository.
+This fork of the [TeamX project](https://github.com/TeamXGroup/cars-logos-plates-detection) provides a browser-based detector with adjustable settings, annotated media, and downloadable detection data. This repository contains the current web app and detection service.
 
 **Sole developer of this fork:** [Nassiri Mosab (MS3B09)](https://github.com/MS3B09).
 
@@ -33,11 +33,8 @@ This fork of the [TeamX project](https://github.com/TeamXGroup/cars-logos-plates
 | Detection service | Python, FastAPI, Gradio, PyTorch, YOLOv8 |
 | Media processing | Pillow, OpenCV, PyAV |
 | Hosting | Netlify (web interface), Hugging Face Spaces (detection service) |
-| Original app | Streamlit |
 
 ## Run Locally
-
-### Current web app
 
 Install Node.js 24 and npm, then run:
 
@@ -59,17 +56,7 @@ From `web/`, start the development server:
 npm run dev -- --port 5173 --strictPort
 ```
 
-Open [http://127.0.0.1:5173/detect](http://127.0.0.1:5173/detect). The interface runs locally; uploaded media is processed by the hosted service, subject to its availability and shared quota. See the [runbook](docs/release-runbook.md#runtime-and-dependencies) for backend requirements.
-
-### Original Streamlit app
-
-With Git LFS installed and a Python virtual environment active, run from the repository root:
-
-```sh
-git lfs pull
-python -m pip install -r requirements.txt
-python -m streamlit run object_detection_app.py
-```
+Open [http://127.0.0.1:5173/detect](http://127.0.0.1:5173/detect). The interface runs locally; uploaded media is processed by the hosted service, subject to its availability and shared quota. You do not need Python, model files, or a GPU for this setup. See the [runbook](docs/release-runbook.md#runtime-and-dependencies) to run or deploy the backend.
 
 ## Data and Resources
 

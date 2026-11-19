@@ -97,4 +97,4 @@ authenticated submission is documented in [authenticated-image-tests.md](authent
 the default remains anonymous.
 
 Actual browser downloads and remaining verification gates are recorded in
-[`evidence/issue-4-verification.md`](evidence/issue-4-verification.md).
+[archived export checks](https://github.com/MS3B09/autoscan-ai/blob/ebad2718a90baddfddb1edc9205b8fdf1dc7f057/docs/evidence/issue-4-verification.md).
