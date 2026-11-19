@@ -9,14 +9,14 @@ The React/TypeScript/Vite workspace lives in `web/`, at `/detect`. Netlify rewri
 ```powershell
 cd web
 npm ci
-$env:VITE_AUTOSCAN_API='https://ms3b09-autoscan-ai-images.hf.space'
+$env:VITE_AUTOSCAN_API='https://YOUR-SPACE.hf.space'
 npm run dev
 npm run build
 ```
 
-`VITE_AUTOSCAN_API` is a public service URL, **never an HF token**. The service is
-a separate free ZeroGPU Space, not the T1 diagnostic. Local API contract tests do
-not require Torch or a GPU. Real model compatibility still requires hosted tests.
+Set `VITE_AUTOSCAN_API` to [your backend Space's public URL](release-runbook.md#deploy-your-own-detection-backend),
+**never an HF token**. Local API contract tests do not require Torch or a GPU.
+Real model compatibility still requires hosted tests.
 
 Netlify reads `netlify.toml`. Set the same public URL in its build environment.
 Set the backend Space variable `AUTOSCAN_ORIGINS` to the exact deployed frontend
@@ -193,7 +193,7 @@ The commands below default to anonymous requests. For developer-only use of your
 free account allowance, follow [authenticated-image-tests.md](authenticated-image-tests.md).
 
 ```powershell
-$env:AUTOSCAN_IMAGE_URL='https://ms3b09-autoscan-ai-images.hf.space'
+$env:AUTOSCAN_IMAGE_URL='https://YOUR-SPACE.hf.space'
 python -m unittest discover -s tests -p test_hosted_image_api.py -v
 ```
 
